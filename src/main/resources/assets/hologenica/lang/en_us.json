@@ -1,6 +1,7 @@
 {
     "itemGroup.hologenica": "Hologenica",
     "block.hologenica.hologram_pod": "Hologram Pod",
+    "block.hologenica.cloning_chamber": "Cloning Chamber",
     "gui.hologenica.display_options": "Display Options",
     "gui.hologenica.label_transparency": "Transparent",
     "gui.hologenica.label_rotation": "Rotating",

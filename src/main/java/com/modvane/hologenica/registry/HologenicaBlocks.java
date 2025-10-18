@@ -1,6 +1,7 @@
 package com.modvane.hologenica.registry;
 
 import com.modvane.hologenica.HologenicaMod;
+import com.modvane.hologenica.block.CloningChamberBlock;
 import com.modvane.hologenica.block.HologramPodBlock;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.Block;
@@ -21,6 +22,20 @@ public class HologenicaBlocks {
                 .sound(SoundType.METAL)
                 .lightLevel(state -> 15) // Max light level
                 .noOcclusion() // Allow transparency
+                .isValidSpawn((state, level, pos, type) -> false)
+                .isRedstoneConductor((state, level, pos) -> false)
+                .isSuffocating((state, level, pos) -> false)
+                .isViewBlocking((state, level, pos) -> false)
+        ));
+
+    // Cloning chamber block
+    public static final DeferredHolder<Block, CloningChamberBlock> CLONING_CHAMBER =
+        BLOCKS.register("cloning_chamber", () -> new CloningChamberBlock(
+            BlockBehaviour.Properties.of()
+                .strength(5.0f)
+                .sound(SoundType.METAL)
+                .lightLevel(state -> 10)
+                .noOcclusion() // Allow transparency for glass parts
                 .isValidSpawn((state, level, pos, type) -> false)
                 .isRedstoneConductor((state, level, pos) -> false)
                 .isSuffocating((state, level, pos) -> false)

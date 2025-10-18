@@ -38,6 +38,7 @@ public class HologenicaClient {
     public static void clientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.HOLOGRAM_POD.get(), RenderType.translucent());
+            ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.CLONING_CHAMBER.get(), RenderType.translucent());
         });
     }
 }
