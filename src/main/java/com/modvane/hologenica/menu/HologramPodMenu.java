@@ -1,21 +1,21 @@
 package com.modvane.hologenica.menu;
 
-import com.modvane.hologenica.block.entity.HolographicMapBlockEntity;
+import com.modvane.hologenica.block.entity.HologramPodBlockEntity;
 import com.modvane.hologenica.registry.HologenicaMenus;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 
-// Simple menu for the holographic map block GUI
+// Simple menu for the hologram pod block GUI
 // Handles button clicks from the client screen
-public class HolographicMapMenu extends AbstractContainerMenu {
+public class HologramPodMenu extends AbstractContainerMenu {
 
     private final ContainerLevelAccess access;
-    private final HolographicMapBlockEntity blockEntity;
+    private final HologramPodBlockEntity blockEntity;
 
-    public HolographicMapMenu(int containerId, Inventory playerInventory, HolographicMapBlockEntity blockEntity) {
-        super(HologenicaMenus.HOLOGRAPHIC_MAP.get(), containerId);
+    public HologramPodMenu(int containerId, Inventory playerInventory, HologramPodBlockEntity blockEntity) {
+        super(HologenicaMenus.HOLOGRAM_POD.get(), containerId);
         if (blockEntity != null) {
             this.access = ContainerLevelAccess.create(blockEntity.getLevel(), blockEntity.getBlockPos());
             this.blockEntity = blockEntity;
@@ -65,7 +65,7 @@ public class HolographicMapMenu extends AbstractContainerMenu {
     }
 
     // Get the block entity for the screen to access
-    public HolographicMapBlockEntity getBlockEntity() {
+    public HologramPodBlockEntity getBlockEntity() {
         return blockEntity;
     }
 

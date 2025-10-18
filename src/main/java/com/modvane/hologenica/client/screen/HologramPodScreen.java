@@ -1,14 +1,14 @@
 package com.modvane.hologenica.client.screen;
 
-import com.modvane.hologenica.menu.HolographicMapMenu;
+import com.modvane.hologenica.menu.HologramPodMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
-// Holographic map GUI with simple buttons
-public class HolographicMapScreen extends AbstractContainerScreen<HolographicMapMenu> {
+// Hologram pod GUI with simple buttons
+public class HologramPodScreen extends AbstractContainerScreen<HologramPodMenu> {
     
     // Consistent spacing constants
     private static final int PADDING = 10;
@@ -17,7 +17,7 @@ public class HolographicMapScreen extends AbstractContainerScreen<HolographicMap
     private static final int LABEL_TO_BUTTON = 6;  // Space between label and its buttons
     private static final int SECTION_GAP = 16;      // Space between sections
 
-    public HolographicMapScreen(HolographicMapMenu menu, Inventory playerInventory, Component title) {
+    public HologramPodScreen(HologramPodMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         this.imageWidth = 176;
         this.imageHeight = 160;

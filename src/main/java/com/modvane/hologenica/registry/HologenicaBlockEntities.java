@@ -1,7 +1,7 @@
 package com.modvane.hologenica.registry;
 
 import com.modvane.hologenica.HologenicaMod;
-import com.modvane.hologenica.block.entity.HolographicMapBlockEntity;
+import com.modvane.hologenica.block.entity.HologramPodBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
@@ -13,11 +13,11 @@ public class HologenicaBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
         DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, HologenicaMod.MODID);
 
-    // Holographic map block entity
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<HolographicMapBlockEntity>> HOLOGRAPHIC_MAP =
-        BLOCK_ENTITIES.register("holographic_map", () ->
-            BlockEntityType.Builder.of(HolographicMapBlockEntity::new,
-                HologenicaBlocks.HOLOGRAPHIC_MAP.get()).build(null));
+    // Hologram pod block entity
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<HologramPodBlockEntity>> HOLOGRAM_POD =
+        BLOCK_ENTITIES.register("hologram_pod", () ->
+            BlockEntityType.Builder.of(HologramPodBlockEntity::new,
+                HologenicaBlocks.HOLOGRAM_POD.get()).build(null));
 
     public static void init(IEventBus modEventBus) {
         BLOCK_ENTITIES.register(modEventBus);

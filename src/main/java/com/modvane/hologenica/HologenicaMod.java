@@ -26,10 +26,10 @@ public class HologenicaMod {
         CREATIVE_TABS.register("mod_tab",
             () -> CreativeModeTab.builder()
                 .title(Component.translatable("itemGroup." + MODID))
-                .icon(() -> new ItemStack(HologenicaItems.HOLOGRAPHIC_MAP.get()))
+                .icon(() -> new ItemStack(HologenicaItems.HOLOGRAM_POD.get()))
                 .displayItems((parameters, output) -> {
                     // Add all our items to the creative tab
-                    output.accept(HologenicaItems.HOLOGRAPHIC_MAP.get());
+                    output.accept(HologenicaItems.HOLOGRAM_POD.get());
                 })
                 .build()
         );

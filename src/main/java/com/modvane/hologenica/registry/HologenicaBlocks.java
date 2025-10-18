@@ -1,7 +1,7 @@
 package com.modvane.hologenica.registry;
 
 import com.modvane.hologenica.HologenicaMod;
-import com.modvane.hologenica.block.HolographicMapBlock;
+import com.modvane.hologenica.block.HologramPodBlock;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -13,13 +13,18 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class HologenicaBlocks {
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(Registries.BLOCK, HologenicaMod.MODID);
 
-    // Holographic map block
-    public static final DeferredHolder<Block, HolographicMapBlock> HOLOGRAPHIC_MAP =
-        BLOCKS.register("holographic_map", () -> new HolographicMapBlock(
+    // Hologram pod block
+    public static final DeferredHolder<Block, HologramPodBlock> HOLOGRAM_POD =
+        BLOCKS.register("hologram_pod", () -> new HologramPodBlock(
             BlockBehaviour.Properties.of()
                 .strength(3.0f)
                 .sound(SoundType.METAL)
-                .lightLevel(state -> 10)
+                .lightLevel(state -> 15) // Max light level
+                .noOcclusion() // Allow transparency
+                .isValidSpawn((state, level, pos, type) -> false)
+                .isRedstoneConductor((state, level, pos) -> false)
+                .isSuffocating((state, level, pos) -> false)
+                .isViewBlocking((state, level, pos) -> false)
         ));
 
     public static void init(IEventBus modEventBus) {

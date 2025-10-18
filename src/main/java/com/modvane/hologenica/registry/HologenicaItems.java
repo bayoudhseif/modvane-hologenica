@@ -11,10 +11,10 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class HologenicaItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(Registries.ITEM, HologenicaMod.MODID);
 
-    // Holographic map item
-    public static final DeferredHolder<Item, BlockItem> HOLOGRAPHIC_MAP =
-        ITEMS.register("holographic_map", () ->
-            new BlockItem(HologenicaBlocks.HOLOGRAPHIC_MAP.get(), new Item.Properties()));
+    // Hologram pod item
+    public static final DeferredHolder<Item, BlockItem> HOLOGRAM_POD =
+        ITEMS.register("hologram_pod", () ->
+            new BlockItem(HologenicaBlocks.HOLOGRAM_POD.get(), new Item.Properties()));
 
     public static void init(IEventBus modEventBus) {
         ITEMS.register(modEventBus);

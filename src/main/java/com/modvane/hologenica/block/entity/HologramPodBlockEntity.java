@@ -1,6 +1,6 @@
 package com.modvane.hologenica.block.entity;
 
-import com.modvane.hologenica.menu.HolographicMapMenu;
+import com.modvane.hologenica.menu.HologramPodMenu;
 import com.modvane.hologenica.registry.HologenicaBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 // Stores the map region and cached terrain scan for holographic display
-public class HolographicMapBlockEntity extends BlockEntity {
+public class HologramPodBlockEntity extends BlockEntity {
 
     // Default settings: 16x16 scan, 1x1 display, transparent, rotating
     private static final int DEFAULT_SCAN_SIZE = 16;
@@ -38,8 +38,8 @@ public class HolographicMapBlockEntity extends BlockEntity {
     private int[][][] cachedTerrain = null;
     private boolean needsRescan = true;
 
-    public HolographicMapBlockEntity(BlockPos pos, BlockState state) {
-        super(HologenicaBlockEntities.HOLOGRAPHIC_MAP.get(), pos, state);
+    public HologramPodBlockEntity(BlockPos pos, BlockState state) {
+        super(HologenicaBlockEntities.HOLOGRAM_POD.get(), pos, state);
     }
 
     // Setup scan region based on current scan size
@@ -243,8 +243,8 @@ public class HolographicMapBlockEntity extends BlockEntity {
     // Provide menu for the GUI
     public MenuProvider getMenuProvider() {
         return new SimpleMenuProvider(
-            (containerId, playerInventory, player) -> new HolographicMapMenu(containerId, playerInventory, this),
-            Component.translatable("block.hologenica.holographic_map")
+            (containerId, playerInventory, player) -> new HologramPodMenu(containerId, playerInventory, this),
+            Component.translatable("block.hologenica.hologram_pod")
         );
     }
 }
