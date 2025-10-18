@@ -56,7 +56,7 @@ public class HolographicMapRenderer implements BlockEntityRenderer<HolographicMa
 
         // Render the hologram
         poseStack.pushPose();
-        poseStack.translate(0.5, 1.3, 0.5);
+        poseStack.translate(0.5, 2.0, 0.5);
 
         // Rotate the hologram slowly over time (if rotation is enabled)
         if (map.isRotationEnabled()) {
