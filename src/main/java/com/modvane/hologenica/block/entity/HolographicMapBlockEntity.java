@@ -22,6 +22,9 @@ public class HolographicMapBlockEntity extends BlockEntity {
     private BlockState[][][] cachedTerrain = null;
     private boolean needsRescan = true;
 
+    // Toggle between transparent and solid rendering mode
+    private boolean transparentMode = true;
+
     public HolographicMapBlockEntity(BlockPos pos, BlockState state) {
         super(HologenicaBlockEntities.HOLOGRAPHIC_MAP.get(), pos, state);
     }
@@ -60,6 +63,20 @@ public class HolographicMapBlockEntity extends BlockEntity {
         this.needsRescan = true;
     }
 
+    // Check if hologram is in transparent mode
+    public boolean isTransparentMode() {
+        return transparentMode;
+    }
+
+    // Toggle between transparent and solid rendering
+    public void toggleTransparency() {
+        this.transparentMode = !this.transparentMode;
+        setChanged();
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+        }
+    }
+
     // Get the first corner of the map region
     public BlockPos getPos1() {
         return pos1;
@@ -85,6 +102,7 @@ public class HolographicMapBlockEntity extends BlockEntity {
         if (pos2 != null) {
             tag.putLong("Pos2", pos2.asLong());
         }
+        tag.putBoolean("TransparentMode", transparentMode);
     }
 
     // Load the region from disk
@@ -96,6 +114,9 @@ public class HolographicMapBlockEntity extends BlockEntity {
         }
         if (tag.contains("Pos2")) {
             pos2 = BlockPos.of(tag.getLong("Pos2"));
+        }
+        if (tag.contains("TransparentMode")) {
+            transparentMode = tag.getBoolean("TransparentMode");
         }
     }
 
@@ -109,6 +130,7 @@ public class HolographicMapBlockEntity extends BlockEntity {
         if (pos2 != null) {
             tag.putLong("Pos2", pos2.asLong());
         }
+        tag.putBoolean("TransparentMode", transparentMode);
         return tag;
     }
 

@@ -69,7 +69,7 @@ public class HolographicMapRenderer implements BlockEntityRenderer<HolographicMa
         poseStack.scale(scale, scale, scale);
         poseStack.translate(-width / 2.0f, 0, -depth / 2.0f);
 
-        renderTerrain(poseStack, buffer, terrain, width, depth);
+        renderTerrain(poseStack, buffer, terrain, width, depth, map.isTransparentMode());
 
         poseStack.popPose();
     }
@@ -118,10 +118,13 @@ public class HolographicMapRenderer implements BlockEntityRenderer<HolographicMa
         return terrain;
     }
 
-    private void renderTerrain(PoseStack poseStack, MultiBufferSource buffer, BlockState[][][] terrain, int width, int depth) {
-        // Render terrain blocks with slight transparency
+    private void renderTerrain(PoseStack poseStack, MultiBufferSource buffer, BlockState[][][] terrain, int width, int depth, boolean transparent) {
+        // Render terrain blocks with optional transparency
         // Only render faces that are exposed (not hidden by other blocks)
-        VertexConsumer terrainConsumer = buffer.getBuffer(RenderType.translucent());
+        RenderType renderType = transparent ? RenderType.translucent() : RenderType.solid();
+        int alpha = transparent ? HOLOGRAM_ALPHA : 255;
+
+        VertexConsumer terrainConsumer = buffer.getBuffer(renderType);
         Matrix4f matrix = poseStack.last().pose();
         Matrix3f normal = poseStack.last().normal();
 
@@ -132,15 +135,16 @@ public class HolographicMapRenderer implements BlockEntityRenderer<HolographicMa
                 for (int z = 0; z < depth; z++) {
                     BlockState state = terrain[x][y][z];
                     if (state != null) {
-                        renderBlockOptimized(terrainConsumer, matrix, normal, terrain, x, y, z, width, height, depth, getColor(state), HOLOGRAM_ALPHA);
+                        renderBlockOptimized(terrainConsumer, matrix, normal, terrain, x, y, z, width, height, depth, getColor(state), alpha);
                     }
                 }
             }
         }
     }
 
-    // Renders only the visible faces of a block (face culling optimization)
-    // This drastically reduces rendering load by skipping faces hidden by adjacent blocks
+    // Face culling - super simple rule:
+    // If face is NOT touching a solid block, render it
+    // If face IS touching a solid block, don't render it
     private void renderBlockOptimized(VertexConsumer c, Matrix4f m, Matrix3f n, BlockState[][][] terrain,
                                       int x, int y, int z, int width, int height, int depth, int color, int alpha) {
         int r = (color >> 16) & 0xFF;
@@ -150,30 +154,37 @@ public class HolographicMapRenderer implements BlockEntityRenderer<HolographicMa
         float x1 = x, y1 = y, z1 = z;
         float x2 = x + 1, y2 = y + 1, z2 = z + 1;
 
-        // Only render a face if there's no block adjacent to it
-        // Top face (check block above)
+        // For each face, check if there's a solid block on the other side
+        // If no solid block (air or out of bounds), render the face
+
+        // Top face: render if no solid block above
         if (y + 1 >= height || terrain[x][y + 1][z] == null) {
-            quad(c, m, n, x1, y2, z1, x2, y2, z1, x2, y2, z2, x1, y2, z2, 0, 1, 0, r, g, b, alpha);
+            quad(c, m, n, x1, y2, z2, x2, y2, z2, x2, y2, z1, x1, y2, z1, 0, 1, 0, r, g, b, alpha);
         }
-        // Bottom face (check block below)
+
+        // Bottom face: render if no solid block below
         if (y - 1 < 0 || terrain[x][y - 1][z] == null) {
-            quad(c, m, n, x1, y1, z2, x2, y1, z2, x2, y1, z1, x1, y1, z1, 0, -1, 0, r, g, b, alpha);
+            quad(c, m, n, x1, y1, z1, x2, y1, z1, x2, y1, z2, x1, y1, z2, 0, -1, 0, r, g, b, alpha);
         }
-        // North face (check block to north)
+
+        // North face: render if no solid block to north
         if (z - 1 < 0 || terrain[x][y][z - 1] == null) {
-            quad(c, m, n, x1, y1, z1, x2, y1, z1, x2, y2, z1, x1, y2, z1, 0, 0, -1, r, g, b, alpha);
+            quad(c, m, n, x2, y1, z1, x1, y1, z1, x1, y2, z1, x2, y2, z1, 0, 0, -1, r, g, b, alpha);
         }
-        // South face (check block to south)
+
+        // South face: render if no solid block to south
         if (z + 1 >= depth || terrain[x][y][z + 1] == null) {
-            quad(c, m, n, x1, y2, z2, x2, y2, z2, x2, y1, z2, x1, y1, z2, 0, 0, 1, r, g, b, alpha);
+            quad(c, m, n, x1, y1, z2, x2, y1, z2, x2, y2, z2, x1, y2, z2, 0, 0, 1, r, g, b, alpha);
         }
-        // West face (check block to west)
+
+        // West face: render if no solid block to west
         if (x - 1 < 0 || terrain[x - 1][y][z] == null) {
-            quad(c, m, n, x1, y2, z1, x1, y2, z2, x1, y1, z2, x1, y1, z1, -1, 0, 0, r, g, b, alpha);
+            quad(c, m, n, x1, y1, z1, x1, y1, z2, x1, y2, z2, x1, y2, z1, -1, 0, 0, r, g, b, alpha);
         }
-        // East face (check block to east)
+
+        // East face: render if no solid block to east
         if (x + 1 >= width || terrain[x + 1][y][z] == null) {
-            quad(c, m, n, x2, y1, z1, x2, y1, z2, x2, y2, z2, x2, y2, z1, 1, 0, 0, r, g, b, alpha);
+            quad(c, m, n, x2, y1, z2, x2, y1, z1, x2, y2, z1, x2, y2, z2, 1, 0, 0, r, g, b, alpha);
         }
     }
 

@@ -2,12 +2,15 @@ package com.modvane.hologenica.block;
 
 import com.modvane.hologenica.block.entity.HolographicMapBlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 // Block that displays a 3D holographic projection of nearby terrain
@@ -38,5 +41,15 @@ public class HolographicMapBlock extends Block implements EntityBlock {
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof HolographicMapBlockEntity map) {
             map.setupAutoRegion();
         }
+    }
+
+    // Right-click to toggle between transparent and solid rendering
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof HolographicMapBlockEntity map) {
+            map.toggleTransparency();
+            return InteractionResult.SUCCESS;
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide);
     }
 }
