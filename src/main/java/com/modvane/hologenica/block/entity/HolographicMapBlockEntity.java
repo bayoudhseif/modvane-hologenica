@@ -23,7 +23,8 @@ public class HolographicMapBlockEntity extends BlockEntity {
     private BlockPos pos2 = null;
 
     // Cached terrain data to avoid rescanning every frame
-    private BlockState[][][] cachedTerrain = null;
+    // Using int array for map colors instead of BlockState array for memory efficiency
+    private int[][][] cachedTerrain = null;
     private boolean needsRescan = true;
 
     // Toggle between transparent and solid rendering mode
@@ -50,12 +51,12 @@ public class HolographicMapBlockEntity extends BlockEntity {
     }
 
     // Get cached terrain data (null if needs rescan)
-    public BlockState[][][] getCachedTerrain() {
+    public int[][][] getCachedTerrain() {
         return cachedTerrain;
     }
 
     // Update the cached terrain data
-    public void setCachedTerrain(BlockState[][][] terrain) {
+    public void setCachedTerrain(int[][][] terrain) {
         this.cachedTerrain = terrain;
         this.needsRescan = false;
     }
@@ -80,7 +81,8 @@ public class HolographicMapBlockEntity extends BlockEntity {
         this.transparentMode = !this.transparentMode;
         setChanged();
         if (level != null && !level.isClientSide) {
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+            // Use flag 2 for immediate client update (more efficient than flag 3)
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 2);
         }
     }
     
@@ -94,7 +96,8 @@ public class HolographicMapBlockEntity extends BlockEntity {
         this.rotationEnabled = !this.rotationEnabled;
         setChanged();
         if (level != null && !level.isClientSide) {
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+            // Use flag 2 for immediate client update (more efficient than flag 3)
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 2);
         }
     }
 

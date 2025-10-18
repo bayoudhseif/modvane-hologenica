@@ -13,8 +13,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Matrix4f;
 import org.joml.Matrix3f;
 
-import java.util.HashMap;
-import java.util.Map;
 
 // Renders a 3D holographic projection of terrain above the holographic map block
 public class HolographicMapRenderer implements BlockEntityRenderer<HolographicMapBlockEntity> {
@@ -28,8 +26,7 @@ public class HolographicMapRenderer implements BlockEntityRenderer<HolographicMa
     // Alpha value for hologram transparency (0-255, 220 is slightly transparent)
     private static final int HOLOGRAM_ALPHA = 220;
 
-    // Cache block state colors to avoid recalculating every frame
-    private final Map<BlockState, Integer> colorCache = new HashMap<>();
+    // No longer needed - colors are stored directly in terrain array
 
     public HolographicMapRenderer(BlockEntityRendererProvider.Context context) {
     }
@@ -49,7 +46,7 @@ public class HolographicMapRenderer implements BlockEntityRenderer<HolographicMa
         int maxZ = Math.max(pos1.getZ(), pos2.getZ());
 
         // Use cached terrain if available, otherwise scan and cache it
-        BlockState[][][] terrain = map.getCachedTerrain();
+        int[][][] terrain = map.getCachedTerrain();
         if (terrain == null || map.needsRescan()) {
             terrain = scanTerrain(map.getLevel(), minX, maxX, minZ, maxZ);
             map.setCachedTerrain(terrain);
@@ -76,9 +73,9 @@ public class HolographicMapRenderer implements BlockEntityRenderer<HolographicMa
         poseStack.popPose();
     }
 
-    // Scans terrain in the specified region and returns a 3D array of block states
-    // This only runs once and gets cached - not every frame
-    private BlockState[][][] scanTerrain(Level level, int minX, int maxX, int minZ, int maxZ) {
+    // Scans terrain in the specified region and returns a 3D array of map colors
+    // Uses Minecraft's native map color system for efficiency
+    private int[][][] scanTerrain(Level level, int minX, int maxX, int minZ, int maxZ) {
         int width = maxX - minX + 1;
         int depth = maxZ - minZ + 1;
 
@@ -103,15 +100,15 @@ public class HolographicMapRenderer implements BlockEntityRenderer<HolographicMa
         }
 
         int height = maxY - minY + 1;
-        BlockState[][][] terrain = new BlockState[width][height][depth];
+        int[][][] terrain = new int[width][height][depth];
 
-        // Second pass: scan all blocks in the region and store non-air blocks
+        // Second pass: scan all blocks and store map colors directly
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 for (int z = 0; z < depth; z++) {
                     BlockState state = level.getBlockState(pos.set(minX + x, minY + y, minZ + z));
                     if (!state.isAir()) {
-                        terrain[x][y][z] = state;
+                        terrain[x][y][z] = state.getMapColor(null, null).col;
                     }
                 }
             }
@@ -120,7 +117,7 @@ public class HolographicMapRenderer implements BlockEntityRenderer<HolographicMa
         return terrain;
     }
 
-    private void renderTerrain(PoseStack poseStack, MultiBufferSource buffer, BlockState[][][] terrain, int width, int depth, boolean transparent) {
+    private void renderTerrain(PoseStack poseStack, MultiBufferSource buffer, int[][][] terrain, int width, int depth, boolean transparent) {
         // Render terrain blocks with optional transparency
         // Only render faces that are exposed (not hidden by other blocks)
         RenderType renderType = transparent ? RenderType.translucent() : RenderType.solid();
@@ -135,9 +132,9 @@ public class HolographicMapRenderer implements BlockEntityRenderer<HolographicMa
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 for (int z = 0; z < depth; z++) {
-                    BlockState state = terrain[x][y][z];
-                    if (state != null) {
-                        renderBlockOptimized(terrainConsumer, matrix, normal, terrain, x, y, z, width, height, depth, getColor(state), alpha);
+                    int color = terrain[x][y][z];
+                    if (color != 0) { // 0 means air/empty
+                        renderBlockOptimized(terrainConsumer, matrix, normal, terrain, x, y, z, width, height, depth, color, alpha);
                     }
                 }
             }
@@ -147,7 +144,7 @@ public class HolographicMapRenderer implements BlockEntityRenderer<HolographicMa
     // Face culling - super simple rule:
     // If face is NOT touching a solid block, render it
     // If face IS touching a solid block, don't render it
-    private void renderBlockOptimized(VertexConsumer c, Matrix4f m, Matrix3f n, BlockState[][][] terrain,
+    private void renderBlockOptimized(VertexConsumer c, Matrix4f m, Matrix3f n, int[][][] terrain,
                                       int x, int y, int z, int width, int height, int depth, int color, int alpha) {
         int r = (color >> 16) & 0xFF;
         int g = (color >> 8) & 0xFF;
@@ -160,32 +157,32 @@ public class HolographicMapRenderer implements BlockEntityRenderer<HolographicMa
         // If no solid block (air or out of bounds), render the face
 
         // Top face: render if no solid block above
-        if (y + 1 >= height || terrain[x][y + 1][z] == null) {
+        if (y + 1 >= height || terrain[x][y + 1][z] == 0) {
             quad(c, m, n, x1, y2, z2, x2, y2, z2, x2, y2, z1, x1, y2, z1, 0, 1, 0, r, g, b, alpha);
         }
 
         // Bottom face: render if no solid block below
-        if (y - 1 < 0 || terrain[x][y - 1][z] == null) {
+        if (y - 1 < 0 || terrain[x][y - 1][z] == 0) {
             quad(c, m, n, x1, y1, z1, x2, y1, z1, x2, y1, z2, x1, y1, z2, 0, -1, 0, r, g, b, alpha);
         }
 
         // North face: render if no solid block to north
-        if (z - 1 < 0 || terrain[x][y][z - 1] == null) {
+        if (z - 1 < 0 || terrain[x][y][z - 1] == 0) {
             quad(c, m, n, x2, y1, z1, x1, y1, z1, x1, y2, z1, x2, y2, z1, 0, 0, -1, r, g, b, alpha);
         }
 
         // South face: render if no solid block to south
-        if (z + 1 >= depth || terrain[x][y][z + 1] == null) {
+        if (z + 1 >= depth || terrain[x][y][z + 1] == 0) {
             quad(c, m, n, x1, y1, z2, x2, y1, z2, x2, y2, z2, x1, y2, z2, 0, 0, 1, r, g, b, alpha);
         }
 
         // West face: render if no solid block to west
-        if (x - 1 < 0 || terrain[x - 1][y][z] == null) {
+        if (x - 1 < 0 || terrain[x - 1][y][z] == 0) {
             quad(c, m, n, x1, y1, z1, x1, y1, z2, x1, y2, z2, x1, y2, z1, -1, 0, 0, r, g, b, alpha);
         }
 
         // East face: render if no solid block to east
-        if (x + 1 >= width || terrain[x + 1][y][z] == null) {
+        if (x + 1 >= width || terrain[x + 1][y][z] == 0) {
             quad(c, m, n, x2, y1, z2, x2, y1, z1, x2, y2, z1, x2, y2, z2, 1, 0, 0, r, g, b, alpha);
         }
     }
@@ -201,9 +198,6 @@ public class HolographicMapRenderer implements BlockEntityRenderer<HolographicMa
         c.addVertex(m, x4, y4, z4).setColor(r, g, b, a).setUv(UV, UV).setLight(LIGHTMAP).setNormal(nx, ny, nz);
     }
 
-    // Gets the color for a block state using Minecraft's map color system
-    private int getColor(BlockState state) {
-        return colorCache.computeIfAbsent(state, s -> s.getMapColor(null, null).col);
-    }
+    // Colors are now stored directly in terrain array - no need for separate color lookup
 }
 
