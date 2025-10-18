@@ -1,6 +1,6 @@
-package com.modvane.code47;
+package com.modvane.hologenica;
 
-import com.modvane.code47.registry.*;
+import com.modvane.hologenica.registry.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -14,9 +14,9 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.function.Supplier;
 
-@Mod(Code47Mod.MODID)
-public class Code47Mod {
-    public static final String MODID = "code47";
+@Mod(HologenicaMod.MODID)
+public class HologenicaMod {
+    public static final String MODID = "hologenica";
     public static final Logger LOGGER = LogUtils.getLogger();
 
     // Create a creative tab for our items
@@ -26,18 +26,20 @@ public class Code47Mod {
         CREATIVE_TABS.register("mod_tab",
             () -> CreativeModeTab.builder()
                 .title(Component.translatable("itemGroup." + MODID))
-                .icon(() -> ItemStack.EMPTY)
+                .icon(() -> new ItemStack(HologenicaItems.HOLOGRAPHIC_MAP.get()))
                 .displayItems((parameters, output) -> {
-                    // Add items here
+                    // Add all our items to the creative tab
+                    output.accept(HologenicaItems.HOLOGRAPHIC_MAP.get());
                 })
                 .build()
         );
 
-    public Code47Mod(IEventBus modEventBus, ModContainer modContainer) {
+    public HologenicaMod(IEventBus modEventBus, ModContainer modContainer) {
         // Initialize registries
-        Code47Blocks.init(modEventBus);
-        Code47Items.init(modEventBus);
-        Code47Entities.init(modEventBus);
+        HologenicaBlocks.init(modEventBus);
+        HologenicaItems.init(modEventBus);
+        HologenicaEntities.init(modEventBus);
+        HologenicaBlockEntities.init(modEventBus);
         CREATIVE_TABS.register(modEventBus);
 
         LOGGER.info("Mod initialized");

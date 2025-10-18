@@ -1,9 +1,9 @@
 {
     "required": true,
     "minVersion": "0.8",
-    "package": "com.modvane.code47.mixin",
+    "package": "com.modvane.hologenica.mixin",
     "compatibilityLevel": "JAVA_21",
-    "refmap": "code47.refmap.json",
+    "refmap": "hologenica.refmap.json",
     "mixins": [
     ],
     "client": [
