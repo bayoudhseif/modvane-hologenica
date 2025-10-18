@@ -11,12 +11,16 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-// Stores the map region to display as hologram
+// Stores the map region and cached terrain scan for holographic display
 public class HolographicMapBlockEntity extends BlockEntity {
 
     private static final int SCAN_SIZE = 32;
     private BlockPos pos1 = null;
     private BlockPos pos2 = null;
+
+    // Cached terrain data to avoid rescanning every frame
+    private BlockState[][][] cachedTerrain = null;
+    private boolean needsRescan = true;
 
     public HolographicMapBlockEntity(BlockPos pos, BlockState state) {
         super(HologenicaBlockEntities.HOLOGRAPHIC_MAP.get(), pos, state);
@@ -28,10 +32,32 @@ public class HolographicMapBlockEntity extends BlockEntity {
         BlockPos center = getBlockPos();
         pos1 = center.offset(-halfSize, 0, -halfSize);
         pos2 = center.offset(halfSize, 0, halfSize);
+        needsRescan = true;
         setChanged();
         if (level != null && !level.isClientSide) {
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
         }
+    }
+
+    // Get cached terrain data (null if needs rescan)
+    public BlockState[][][] getCachedTerrain() {
+        return cachedTerrain;
+    }
+
+    // Update the cached terrain data
+    public void setCachedTerrain(BlockState[][][] terrain) {
+        this.cachedTerrain = terrain;
+        this.needsRescan = false;
+    }
+
+    // Check if terrain needs to be rescanned
+    public boolean needsRescan() {
+        return needsRescan;
+    }
+
+    // Force a rescan on next render
+    public void markForRescan() {
+        this.needsRescan = true;
     }
 
     // Get the first corner of the map region

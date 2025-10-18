@@ -10,25 +10,28 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Nullable;
 
-// Holographic map that displays a selected terrain area
+// Block that displays a 3D holographic projection of nearby terrain
+// Automatically scans a 32x32 area when placed
 public class HolographicMapBlock extends Block implements EntityBlock {
 
     public HolographicMapBlock(Properties properties) {
         super(properties);
     }
 
+    // Creates the block entity that stores scan data
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new HolographicMapBlockEntity(pos, state);
     }
 
+    // Use the block's model for rendering (hologram renders separately via BlockEntityRenderer)
     @Override
     protected RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
 
-    // Auto-setup region when placed
+    // Automatically setup the scan region when the block is placed
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         super.onPlace(state, level, pos, oldState, movedByPiston);
