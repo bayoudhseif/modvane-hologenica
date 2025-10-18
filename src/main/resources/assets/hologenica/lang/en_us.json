@@ -1,4 +1,6 @@
 {
     "itemGroup.hologenica": "Hologenica",
-    "block.hologenica.holographic_map": "Holographic Map"
+    "block.hologenica.holographic_map": "Hologographic Map",
+    "gui.hologenica.toggle_transparency": "Toggle Transparency",
+    "gui.hologenica.toggle_rotation": "Toggle Rotation"
 }

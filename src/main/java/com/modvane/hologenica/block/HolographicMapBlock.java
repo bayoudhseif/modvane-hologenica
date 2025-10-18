@@ -43,11 +43,11 @@ public class HolographicMapBlock extends Block implements EntityBlock {
         }
     }
 
-    // Right-click to toggle between transparent and solid rendering
+    // Right-click to open the holographic map GUI
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof HolographicMapBlockEntity map) {
-            map.toggleTransparency();
+            player.openMenu(map.getMenuProvider());
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.sidedSuccess(level.isClientSide);

@@ -1,12 +1,16 @@
 package com.modvane.hologenica.block.entity;
 
+import com.modvane.hologenica.menu.HolographicMapMenu;
 import com.modvane.hologenica.registry.HologenicaBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
@@ -24,6 +28,9 @@ public class HolographicMapBlockEntity extends BlockEntity {
 
     // Toggle between transparent and solid rendering mode
     private boolean transparentMode = true;
+    
+    // Toggle rotation on/off
+    private boolean rotationEnabled = true;
 
     public HolographicMapBlockEntity(BlockPos pos, BlockState state) {
         super(HologenicaBlockEntities.HOLOGRAPHIC_MAP.get(), pos, state);
@@ -76,6 +83,20 @@ public class HolographicMapBlockEntity extends BlockEntity {
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
         }
     }
+    
+    // Check if rotation is enabled
+    public boolean isRotationEnabled() {
+        return rotationEnabled;
+    }
+    
+    // Toggle rotation on/off
+    public void toggleRotation() {
+        this.rotationEnabled = !this.rotationEnabled;
+        setChanged();
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+        }
+    }
 
     // Get the first corner of the map region
     public BlockPos getPos1() {
@@ -103,6 +124,7 @@ public class HolographicMapBlockEntity extends BlockEntity {
             tag.putLong("Pos2", pos2.asLong());
         }
         tag.putBoolean("TransparentMode", transparentMode);
+        tag.putBoolean("RotationEnabled", rotationEnabled);
     }
 
     // Load the region from disk
@@ -118,6 +140,9 @@ public class HolographicMapBlockEntity extends BlockEntity {
         if (tag.contains("TransparentMode")) {
             transparentMode = tag.getBoolean("TransparentMode");
         }
+        if (tag.contains("RotationEnabled")) {
+            rotationEnabled = tag.getBoolean("RotationEnabled");
+        }
     }
 
     // Send data to client for rendering
@@ -131,6 +156,7 @@ public class HolographicMapBlockEntity extends BlockEntity {
             tag.putLong("Pos2", pos2.asLong());
         }
         tag.putBoolean("TransparentMode", transparentMode);
+        tag.putBoolean("RotationEnabled", rotationEnabled);
         return tag;
     }
 
@@ -138,5 +164,13 @@ public class HolographicMapBlockEntity extends BlockEntity {
     @Override
     public Packet<ClientGamePacketListener> getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    // Provide menu for the GUI
+    public MenuProvider getMenuProvider() {
+        return new SimpleMenuProvider(
+            (containerId, playerInventory, player) -> new HolographicMapMenu(containerId, playerInventory, this),
+            Component.translatable("block.hologenica.holographic_map")
+        );
     }
 }

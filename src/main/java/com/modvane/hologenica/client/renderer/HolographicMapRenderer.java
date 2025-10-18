@@ -58,10 +58,12 @@ public class HolographicMapRenderer implements BlockEntityRenderer<HolographicMa
         poseStack.pushPose();
         poseStack.translate(0.5, 1.3, 0.5);
 
-        // Rotate the hologram slowly over time
-        long time = map.getLevel().getGameTime();
-        float rotation = (time + partialTick) * 0.5f;
-        poseStack.mulPose(new org.joml.Quaternionf().rotationY((float) Math.toRadians(rotation)));
+        // Rotate the hologram slowly over time (if rotation is enabled)
+        if (map.isRotationEnabled()) {
+            long time = map.getLevel().getGameTime();
+            float rotation = (time + partialTick) * 0.5f;
+            poseStack.mulPose(new org.joml.Quaternionf().rotationY((float) Math.toRadians(rotation)));
+        }
 
         int width = maxX - minX + 1;
         int depth = maxZ - minZ + 1;

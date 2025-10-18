@@ -40,6 +40,7 @@ public class HologenicaMod {
         HologenicaItems.init(modEventBus);
         HologenicaEntities.init(modEventBus);
         HologenicaBlockEntities.init(modEventBus);
+        HologenicaMenus.init(modEventBus);
         CREATIVE_TABS.register(modEventBus);
 
         LOGGER.info("Mod initialized");
