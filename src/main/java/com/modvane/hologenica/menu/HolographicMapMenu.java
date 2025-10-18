@@ -30,12 +30,28 @@ public class HolographicMapMenu extends AbstractContainerMenu {
     public boolean clickMenuButton(Player player, int buttonId) {
         if (blockEntity != null) {
             if (buttonId == 0) {
-                // Toggle transparency mode
                 blockEntity.toggleTransparency();
                 return true;
             } else if (buttonId == 1) {
-                // Toggle rotation
                 blockEntity.toggleRotation();
+                return true;
+            } else if (buttonId == 2) {
+                blockEntity.setScanSize(16);
+                return true;
+            } else if (buttonId == 3) {
+                blockEntity.setScanSize(32);
+                return true;
+            } else if (buttonId == 4) {
+                blockEntity.setScanSize(64);
+                return true;
+            } else if (buttonId == 5) {
+                blockEntity.setBlockSize(1);
+                return true;
+            } else if (buttonId == 6) {
+                blockEntity.setBlockSize(3);
+                return true;
+            } else if (buttonId == 7) {
+                blockEntity.setBlockSize(9);
                 return true;
             }
         }

@@ -25,19 +25,61 @@ public class HolographicMapScreen extends AbstractContainerScreen<HolographicMap
         addRenderableWidget(Button.builder(
             Component.translatable("gui.hologenica.toggle_transparency"), 
             button -> {
-                // Send button click to server via menu system
                 minecraft.gameMode.handleInventoryButtonClick(menu.containerId, 0);
             }
-        ).bounds(leftPos + 30, topPos + 50, 116, 20).build());
+        ).bounds(leftPos + 30, topPos + 30, 116, 20).build());
         
         // Add rotation toggle button
         addRenderableWidget(Button.builder(
             Component.translatable("gui.hologenica.toggle_rotation"), 
             button -> {
-                // Send button click to server via menu system
                 minecraft.gameMode.handleInventoryButtonClick(menu.containerId, 1);
             }
-        ).bounds(leftPos + 30, topPos + 80, 116, 20).build());
+        ).bounds(leftPos + 30, topPos + 60, 116, 20).build());
+        
+        // Add scan size buttons
+        addRenderableWidget(Button.builder(
+            Component.translatable("gui.hologenica.scan_size_16"), 
+            button -> {
+                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, 2);
+            }
+        ).bounds(leftPos + 30, topPos + 90, 38, 20).build());
+        
+        addRenderableWidget(Button.builder(
+            Component.translatable("gui.hologenica.scan_size_32"), 
+            button -> {
+                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, 3);
+            }
+        ).bounds(leftPos + 70, topPos + 90, 38, 20).build());
+        
+        addRenderableWidget(Button.builder(
+            Component.translatable("gui.hologenica.scan_size_64"), 
+            button -> {
+                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, 4);
+            }
+        ).bounds(leftPos + 110, topPos + 90, 38, 20).build());
+        
+        // Add block size buttons (1x1, 3x3, 9x9)
+        addRenderableWidget(Button.builder(
+            Component.translatable("gui.hologenica.block_size_1"), 
+            button -> {
+                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, 5);
+            }
+        ).bounds(leftPos + 30, topPos + 120, 38, 20).build());
+        
+        addRenderableWidget(Button.builder(
+            Component.translatable("gui.hologenica.block_size_3"), 
+            button -> {
+                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, 6);
+            }
+        ).bounds(leftPos + 70, topPos + 120, 38, 20).build());
+        
+        addRenderableWidget(Button.builder(
+            Component.translatable("gui.hologenica.block_size_9"), 
+            button -> {
+                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, 7);
+            }
+        ).bounds(leftPos + 110, topPos + 120, 38, 20).build());
     }
 
     @Override

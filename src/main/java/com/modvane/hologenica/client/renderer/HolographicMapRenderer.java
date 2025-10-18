@@ -35,23 +35,26 @@ public class HolographicMapRenderer implements BlockEntityRenderer<HolographicMa
     public void render(HolographicMapBlockEntity map, float partialTick, PoseStack poseStack,
                        MultiBufferSource buffer, int light, int overlay) {
 
-        if (!map.hasRegion() || map.getLevel() == null) return;
+        if (!map.hasValidRegion() || map.getLevel() == null) return;
 
-        BlockPos pos1 = map.getPos1();
-        BlockPos pos2 = map.getPos2();
-
-        int minX = Math.min(pos1.getX(), pos2.getX());
-        int maxX = Math.max(pos1.getX(), pos2.getX());
-        int minZ = Math.min(pos1.getZ(), pos2.getZ());
-        int maxZ = Math.max(pos1.getZ(), pos2.getZ());
+        // Get scan bounds
+        int minX = map.getScanMinX();
+        int maxX = map.getScanMaxX();
+        int minZ = map.getScanMinZ();
+        int maxZ = map.getScanMaxZ();
+        
+        int scanWidth = maxX - minX + 1;
+        int scanDepth = maxZ - minZ + 1;
 
         // Use cached terrain if available, otherwise scan and cache it
         int[][][] terrain = map.getCachedTerrain();
         if (terrain == null || map.needsRescan()) {
             terrain = scanTerrain(map.getLevel(), minX, maxX, minZ, maxZ);
+            if (terrain == null) return;
             map.setCachedTerrain(terrain);
         }
 
+        // Render the hologram
         poseStack.pushPose();
         poseStack.translate(0.5, 1.3, 0.5);
 
@@ -62,47 +65,54 @@ public class HolographicMapRenderer implements BlockEntityRenderer<HolographicMa
             poseStack.mulPose(new org.joml.Quaternionf().rotationY((float) Math.toRadians(rotation)));
         }
 
-        int width = maxX - minX + 1;
-        int depth = maxZ - minZ + 1;
-        float scale = 3.5f / Math.max(width, depth);
+        // Scale hologram to fit the desired block size
+        int blockSize = map.getBlockSize();
+        float scale = (float) blockSize / Math.max(scanWidth, scanDepth);
         poseStack.scale(scale, scale, scale);
-        poseStack.translate(-width / 2.0f, 0, -depth / 2.0f);
+        poseStack.translate(-scanWidth / 2.0f, 0, -scanDepth / 2.0f);
 
-        renderTerrain(poseStack, buffer, terrain, width, depth, map.isTransparentMode());
+        renderTerrain(poseStack, buffer, terrain, scanWidth, scanDepth, map.isTransparentMode());
 
         poseStack.popPose();
     }
 
     // Scans terrain in the specified region and returns a 3D array of map colors
-    // Uses Minecraft's native map color system for efficiency
     private int[][][] scanTerrain(Level level, int minX, int maxX, int minZ, int maxZ) {
         int width = maxX - minX + 1;
         int depth = maxZ - minZ + 1;
 
+        // Find Y bounds with blocks
         int minY = level.getMaxBuildHeight();
         int maxY = level.getMinBuildHeight();
+        boolean foundBlocks = false;
 
-        // Reusable position object to avoid creating thousands of BlockPos objects
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
-        // First pass: find the minimum and maximum Y coordinates with blocks
-        // This lets us create a smaller array and skip scanning empty vertical space
+        // First pass: find Y bounds
         for (int x = minX; x <= maxX; x++) {
             for (int z = minZ; z <= maxZ; z++) {
                 for (int y = level.getMaxBuildHeight() - 1; y >= level.getMinBuildHeight(); y--) {
-                    if (!level.getBlockState(pos.set(x, y, z)).isAir()) {
+                    BlockState state = level.getBlockState(pos.set(x, y, z));
+                    if (!state.isAir()) {
                         minY = Math.min(minY, y);
                         maxY = Math.max(maxY, y);
+                        foundBlocks = true;
                         break;
                     }
                 }
             }
         }
 
-        int height = maxY - minY + 1;
+        // If no blocks found, create minimal array
+        if (!foundBlocks) {
+            minY = level.getMinBuildHeight();
+            maxY = level.getMinBuildHeight();
+        }
+
+        int height = Math.max(1, maxY - minY + 1);
         int[][][] terrain = new int[width][height][depth];
 
-        // Second pass: scan all blocks and store map colors directly
+        // Second pass: scan all blocks and store map colors
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 for (int z = 0; z < depth; z++) {
@@ -118,8 +128,12 @@ public class HolographicMapRenderer implements BlockEntityRenderer<HolographicMa
     }
 
     private void renderTerrain(PoseStack poseStack, MultiBufferSource buffer, int[][][] terrain, int width, int depth, boolean transparent) {
+        // Validate terrain array
+        if (terrain == null || terrain.length != width || terrain[0].length == 0 || terrain[0][0].length != depth) {
+            return;
+        }
+        
         // Render terrain blocks with optional transparency
-        // Only render faces that are exposed (not hidden by other blocks)
         RenderType renderType = transparent ? RenderType.translucent() : RenderType.solid();
         int alpha = transparent ? HOLOGRAM_ALPHA : 255;
 

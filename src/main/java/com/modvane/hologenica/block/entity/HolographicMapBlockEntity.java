@@ -18,35 +18,54 @@ import org.jetbrains.annotations.Nullable;
 // Stores the map region and cached terrain scan for holographic display
 public class HolographicMapBlockEntity extends BlockEntity {
 
-    private static final int SCAN_SIZE = 32;
-    private BlockPos pos1 = null;
-    private BlockPos pos2 = null;
+    // Default settings: 16x16 scan, 1x1 display, solid, no rotation
+    private static final int DEFAULT_SCAN_SIZE = 16;
+    private static final int DEFAULT_BLOCK_SIZE = 1;
+    private static final boolean DEFAULT_TRANSPARENT = false;
+    private static final boolean DEFAULT_ROTATION = false;
+    
+    // Scan area bounds (inclusive)
+    private int scanMinX, scanMaxX, scanMinZ, scanMaxZ;
+    private boolean regionValid = false;
+    
+    // Configurable settings
+    private int scanSize = DEFAULT_SCAN_SIZE;
+    private int blockSize = DEFAULT_BLOCK_SIZE;
+    private boolean transparentMode = DEFAULT_TRANSPARENT;
+    private boolean rotationEnabled = DEFAULT_ROTATION;
 
     // Cached terrain data to avoid rescanning every frame
-    // Using int array for map colors instead of BlockState array for memory efficiency
     private int[][][] cachedTerrain = null;
     private boolean needsRescan = true;
-
-    // Toggle between transparent and solid rendering mode
-    private boolean transparentMode = true;
-    
-    // Toggle rotation on/off
-    private boolean rotationEnabled = true;
 
     public HolographicMapBlockEntity(BlockPos pos, BlockState state) {
         super(HologenicaBlockEntities.HOLOGRAPHIC_MAP.get(), pos, state);
     }
 
-    // Setup region automatically based on scan size
-    public void setupAutoRegion() {
-        int halfSize = SCAN_SIZE / 2;
+    // Setup scan region based on current scan size
+    public void setupScanRegion() {
         BlockPos center = getBlockPos();
-        pos1 = center.offset(-halfSize, 0, -halfSize);
-        pos2 = center.offset(halfSize, 0, halfSize);
+        int halfSize = scanSize / 2;
+        
+        // Calculate exact bounds for the scan size
+        scanMinX = center.getX() - halfSize;
+        scanMaxX = center.getX() + halfSize - 1; // -1 to get exact scanSize width
+        scanMinZ = center.getZ() - halfSize;
+        scanMaxZ = center.getZ() + halfSize - 1; // -1 to get exact scanSize depth
+        
+        // Verify dimensions are correct
+        int actualWidth = scanMaxX - scanMinX + 1;
+        int actualDepth = scanMaxZ - scanMinZ + 1;
+        
+        regionValid = (actualWidth == scanSize && actualDepth == scanSize);
+        
+        // Clear cache and mark for rescan
+        cachedTerrain = null;
         needsRescan = true;
         setChanged();
+        
         if (level != null && !level.isClientSide) {
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 2);
         }
     }
 
@@ -100,45 +119,69 @@ public class HolographicMapBlockEntity extends BlockEntity {
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 2);
         }
     }
-
-    // Get the first corner of the map region
-    public BlockPos getPos1() {
-        return pos1;
+    
+    // Get current scan size
+    public int getScanSize() {
+        return scanSize;
+    }
+    
+    // Set scan size and update region
+    public void setScanSize(int newSize) {
+        this.scanSize = newSize;
+        setupScanRegion();
+    }
+    
+    // Get current block size
+    public int getBlockSize() {
+        return blockSize;
+    }
+    
+    // Set block size
+    public void setBlockSize(int newSize) {
+        this.blockSize = newSize;
+        setChanged();
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 2);
+        }
     }
 
-    // Get the second corner of the map region
-    public BlockPos getPos2() {
-        return pos2;
+    // Get scan bounds
+    public int getScanMinX() { return scanMinX; }
+    public int getScanMaxX() { return scanMaxX; }
+    public int getScanMinZ() { return scanMinZ; }
+    public int getScanMaxZ() { return scanMaxZ; }
+
+    // Check if scan region is valid
+    public boolean hasValidRegion() {
+        return regionValid;
     }
 
-    // Check if a valid region is set
-    public boolean hasRegion() {
-        return pos1 != null && pos2 != null;
-    }
-
-    // Save the region to disk
+    // Save settings to disk
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        if (pos1 != null) {
-            tag.putLong("Pos1", pos1.asLong());
-        }
-        if (pos2 != null) {
-            tag.putLong("Pos2", pos2.asLong());
-        }
+        tag.putInt("ScanSize", scanSize);
+        tag.putInt("BlockSize", blockSize);
         tag.putBoolean("TransparentMode", transparentMode);
         tag.putBoolean("RotationEnabled", rotationEnabled);
+        tag.putInt("ScanMinX", scanMinX);
+        tag.putInt("ScanMaxX", scanMaxX);
+        tag.putInt("ScanMinZ", scanMinZ);
+        tag.putInt("ScanMaxZ", scanMaxZ);
+        tag.putBoolean("RegionValid", regionValid);
     }
 
-    // Load the region from disk
+    // Load settings from disk
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        if (tag.contains("Pos1")) {
-            pos1 = BlockPos.of(tag.getLong("Pos1"));
+        
+        // Load scan settings
+        if (tag.contains("ScanSize")) {
+            scanSize = tag.getInt("ScanSize");
         }
-        if (tag.contains("Pos2")) {
-            pos2 = BlockPos.of(tag.getLong("Pos2"));
+        if (tag.contains("BlockSize")) {
+            blockSize = tag.getInt("BlockSize");
         }
         if (tag.contains("TransparentMode")) {
             transparentMode = tag.getBoolean("TransparentMode");
@@ -146,20 +189,48 @@ public class HolographicMapBlockEntity extends BlockEntity {
         if (tag.contains("RotationEnabled")) {
             rotationEnabled = tag.getBoolean("RotationEnabled");
         }
+        
+        // Load bounds if present
+        boolean hasBounds = tag.contains("ScanMinX") && tag.contains("ScanMaxX") && 
+                           tag.contains("ScanMinZ") && tag.contains("ScanMaxZ");
+        
+        if (hasBounds) {
+            scanMinX = tag.getInt("ScanMinX");
+            scanMaxX = tag.getInt("ScanMaxX");
+            scanMinZ = tag.getInt("ScanMinZ");
+            scanMaxZ = tag.getInt("ScanMaxZ");
+            regionValid = tag.getBoolean("RegionValid");
+            
+            // Verify loaded bounds match the scan size
+            int loadedWidth = scanMaxX - scanMinX + 1;
+            int loadedDepth = scanMaxZ - scanMinZ + 1;
+            
+            if (loadedWidth != scanSize || loadedDepth != scanSize) {
+                setupScanRegion();
+            } else {
+                // Bounds are correct but clear cached terrain to ensure rescan with new bounds
+                cachedTerrain = null;
+                needsRescan = true;
+            }
+        } else {
+            // No bounds in NBT, calculate them
+            setupScanRegion();
+        }
     }
 
     // Send data to client for rendering
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = super.getUpdateTag(registries);
-        if (pos1 != null) {
-            tag.putLong("Pos1", pos1.asLong());
-        }
-        if (pos2 != null) {
-            tag.putLong("Pos2", pos2.asLong());
-        }
+        tag.putInt("ScanSize", scanSize);
+        tag.putInt("BlockSize", blockSize);
         tag.putBoolean("TransparentMode", transparentMode);
         tag.putBoolean("RotationEnabled", rotationEnabled);
+        tag.putInt("ScanMinX", scanMinX);
+        tag.putInt("ScanMaxX", scanMaxX);
+        tag.putInt("ScanMinZ", scanMinZ);
+        tag.putInt("ScanMaxZ", scanMaxZ);
+        tag.putBoolean("RegionValid", regionValid);
         return tag;
     }
 

@@ -39,7 +39,7 @@ public class HolographicMapBlock extends Block implements EntityBlock {
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         super.onPlace(state, level, pos, oldState, movedByPiston);
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof HolographicMapBlockEntity map) {
-            map.setupAutoRegion();
+            map.setupScanRegion();
         }
     }
 
