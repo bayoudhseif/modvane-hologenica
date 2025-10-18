@@ -18,11 +18,11 @@ import org.jetbrains.annotations.Nullable;
 // Stores the map region and cached terrain scan for holographic display
 public class HolographicMapBlockEntity extends BlockEntity {
 
-    // Default settings: 16x16 scan, 1x1 display, solid, no rotation
+    // Default settings: 16x16 scan, 1x1 display, transparent, rotating
     private static final int DEFAULT_SCAN_SIZE = 16;
     private static final int DEFAULT_BLOCK_SIZE = 1;
-    private static final boolean DEFAULT_TRANSPARENT = false;
-    private static final boolean DEFAULT_ROTATION = false;
+    private static final boolean DEFAULT_TRANSPARENT = true;
+    private static final boolean DEFAULT_ROTATION = true;
     
     // Scan area bounds (inclusive)
     private int scanMinX, scanMaxX, scanMinZ, scanMaxZ;

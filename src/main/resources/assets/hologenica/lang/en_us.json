@@ -1,12 +1,15 @@
 {
     "itemGroup.hologenica": "Hologenica",
     "block.hologenica.holographic_map": "Holographic Map",
-    "gui.hologenica.toggle_transparency": "Transparency",
-    "gui.hologenica.toggle_rotation": "Rotation",
-    "gui.hologenica.scan_size_16": "Scan: 16x16",
-    "gui.hologenica.scan_size_32": "Scan: 32x32",
-    "gui.hologenica.scan_size_64": "Scan: 64x64",
-    "gui.hologenica.block_size_1": "Size: 1x1",
-    "gui.hologenica.block_size_3": "Size: 3x3",
-    "gui.hologenica.block_size_9": "Size: 9x9"
+    "gui.hologenica.display_options": "Display Options",
+    "gui.hologenica.label_transparency": "Transparent",
+    "gui.hologenica.label_rotation": "Rotating",
+    "gui.hologenica.scan_area": "Scan Area",
+    "gui.hologenica.scan_16": "16×16",
+    "gui.hologenica.scan_32": "32×32",
+    "gui.hologenica.scan_64": "64×64",
+    "gui.hologenica.display_size": "Hologram Size",
+    "gui.hologenica.size_1": "1×1",
+    "gui.hologenica.size_3": "3×3",
+    "gui.hologenica.size_9": "9×9"
 }
