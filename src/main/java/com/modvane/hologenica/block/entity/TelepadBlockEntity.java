@@ -226,7 +226,13 @@ public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
         if (tag.contains("TelepadName")) {
             telepadName = tag.getString("TelepadName");
         }
-        // Register this telepad when it loads
+    }
+
+    // Called when the block entity is loaded into the world
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        // Register this telepad when it loads into the world
         if (level != null && !level.isClientSide) {
             updateRegistry();
         }

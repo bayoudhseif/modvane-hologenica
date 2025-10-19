@@ -21,8 +21,8 @@ import org.jetbrains.annotations.Nullable;
 // Cross-dimension compatible
 public class TelepadBlock extends Block implements EntityBlock {
 
-    // Thin slab shape (2 pixels tall, like a pressure plate but slightly thicker)
-    private static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 2.0, 16.0);
+    // Pressure plate shape (1 pixel tall)
+    private static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 1.0, 16.0);
 
     public TelepadBlock(Properties properties) {
         super(properties);
