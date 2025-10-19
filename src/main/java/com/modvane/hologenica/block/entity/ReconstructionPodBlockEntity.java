@@ -1,5 +1,7 @@
 package com.modvane.hologenica.block.entity;
 
+import com.modvane.hologenica.block.BridgeBlock;
+import com.modvane.hologenica.block.CloningPodBlock;
 import com.modvane.hologenica.registry.HologenicaBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -16,6 +18,11 @@ import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Set;
 
 // Reconstruction Pod - grows clones from 1% to 100% then spawns them as real entities
 public class ReconstructionPodBlockEntity extends BlockEntity {
@@ -39,8 +46,17 @@ public class ReconstructionPodBlockEntity extends BlockEntity {
             checkForAdjacentCloningChamber();
         }
 
-        // If reconstructing, increase progress
+        // If reconstructing, validate connection and increase progress
         if (isReconstructing && !entityType.isEmpty() && reconstructionDuration > 0) {
+            // Check if connection to cloning pod is still valid
+            CloningPodBlockEntity connectedPod = findConnectedCloningPod();
+            
+            if (connectedPod == null || !connectedPod.hasRagdoll() || connectedPod.getEntityType().isEmpty()) {
+                // Connection lost or cloning pod no longer has ragdoll - stop reconstruction
+                resetReconstruction();
+                return;
+            }
+            
             reconstructionProgress++;
             setChanged();
 
@@ -56,21 +72,70 @@ public class ReconstructionPodBlockEntity extends BlockEntity {
         }
     }
 
-    // Check all adjacent positions for a cloning chamber with a ragdoll
+    // Search for a cloning pod connected via bridge blocks
     private void checkForAdjacentCloningChamber() {
         if (level == null) return;
 
-        for (Direction direction : Direction.values()) {
-            BlockPos adjacentPos = worldPosition.relative(direction);
-            if (level.getBlockEntity(adjacentPos) instanceof CloningPodBlockEntity pod) {
-                // If pod has a ragdoll, start reconstruction
-                // Don't remove the ragdoll - it stays in the pod permanently
-                if (pod.hasRagdoll() && !pod.getEntityType().isEmpty()) {
-                    startReconstruction(pod.getEntityType(), pod.getEntityName());
-                    return;
+        // Use breadth-first search to find connected cloning pods through bridges
+        CloningPodBlockEntity connectedPod = findConnectedCloningPod();
+        
+        if (connectedPod != null && connectedPod.hasRagdoll() && !connectedPod.getEntityType().isEmpty()) {
+            startReconstruction(connectedPod.getEntityType(), connectedPod.getEntityName());
+        }
+    }
+    
+    // Find a cloning pod connected through bridge blocks (max 32 blocks away)
+    private CloningPodBlockEntity findConnectedCloningPod() {
+        if (level == null) return null;
+        
+        Queue<BlockPos> toVisit = new LinkedList<>();
+        Set<BlockPos> visited = new HashSet<>();
+        
+        // Start from reconstruction pod position
+        toVisit.add(worldPosition);
+        visited.add(worldPosition);
+        
+        int maxDistance = 32; // Maximum search distance
+        int currentDistance = 0;
+        
+        while (!toVisit.isEmpty() && currentDistance < maxDistance) {
+            int levelSize = toVisit.size();
+            
+            for (int i = 0; i < levelSize; i++) {
+                BlockPos current = toVisit.poll();
+                
+                // Check all horizontal directions (bridges connect horizontally)
+                for (Direction direction : Direction.Plane.HORIZONTAL) {
+                    BlockPos neighbor = current.relative(direction);
+                    
+                    // Skip if already visited
+                    if (visited.contains(neighbor)) continue;
+                    visited.add(neighbor);
+                    
+                    BlockState neighborState = level.getBlockState(neighbor);
+                    
+                    // Check if this is a cloning pod with a ragdoll
+                    if (neighborState.getBlock() instanceof CloningPodBlock) {
+                        BlockEntity be = level.getBlockEntity(neighbor);
+                        if (be instanceof CloningPodBlockEntity pod) {
+                            // Found a cloning pod - check if it has a ragdoll
+                            if (pod.hasRagdoll() && !pod.getEntityType().isEmpty()) {
+                                return pod;
+                            }
+                        }
+                    }
+                    
+                    // If this is a bridge block, continue searching through it
+                    if (neighborState.getBlock() instanceof BridgeBlock) {
+                        toVisit.add(neighbor);
+                    }
                 }
             }
+            
+            currentDistance++;
         }
+        
+        return null; // No connected cloning pod found
     }
 
     // Start the reconstruction process
@@ -83,6 +148,20 @@ public class ReconstructionPodBlockEntity extends BlockEntity {
         this.reconstructionDuration = calculateReconstructionDuration(entityTypeString);
         
         this.isReconstructing = true;
+        setChanged();
+        
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+        }
+    }
+    
+    // Reset reconstruction when connection is lost
+    private void resetReconstruction() {
+        this.entityType = "";
+        this.entityName = "";
+        this.reconstructionProgress = 0;
+        this.reconstructionDuration = 0;
+        this.isReconstructing = false;
         setChanged();
         
         if (level != null && !level.isClientSide) {
