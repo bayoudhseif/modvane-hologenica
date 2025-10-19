@@ -6,7 +6,6 @@ import com.modvane.hologenica.registry.HologenicaBlockEntities;
 import com.modvane.hologenica.world.TelepadRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -16,8 +15,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -114,13 +111,7 @@ public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
         // Force-load the destination chunk to ensure the telepad exists
         dest.level.getChunk(dest.pos);
 
-        // Spawn disintegration particles at source
-        spawnTeleportParticles((ServerLevel) level, player.position(), true);
-
-        // Play teleport sound at source
-        level.playSound(null, getBlockPos(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.BLOCKS, 1.0F, 1.0F);
-
-        // Teleport the player
+        // Teleport the player (no sounds or effects)
         serverPlayer.teleportTo(
             dest.level,
             dest.pos.getX() + 0.5,
@@ -129,12 +120,6 @@ public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
             serverPlayer.getYRot(),
             serverPlayer.getXRot()
         );
-
-        // Spawn reintegration particles at destination
-        spawnTeleportParticles(dest.level, serverPlayer.position(), false);
-
-        // Play teleport sound at destination
-        dest.level.playSound(null, dest.pos, SoundEvents.ENDERMAN_TELEPORT, SoundSource.BLOCKS, 1.0F, 1.2F);
 
         // Set cooldown
         PLAYER_COOLDOWNS.put(playerKey, currentTick);
@@ -171,47 +156,6 @@ public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
         return destinations;
     }
 
-    // Spawn futuristic disintegration/reintegration particles
-    private void spawnTeleportParticles(ServerLevel level, net.minecraft.world.phys.Vec3 pos, boolean isDisintegration) {
-        int particleCount = isDisintegration ? 50 : 30;
-
-        for (int i = 0; i < particleCount; i++) {
-            double offsetX = (level.random.nextDouble() - 0.5) * 1.5;
-            double offsetY = level.random.nextDouble() * 2.0;
-            double offsetZ = (level.random.nextDouble() - 0.5) * 1.5;
-
-            double velocityX = (level.random.nextDouble() - 0.5) * 0.2;
-            double velocityY = isDisintegration ? 0.1 : -0.1; // Rise up when disintegrating, fall when reintegrating
-            double velocityZ = (level.random.nextDouble() - 0.5) * 0.2;
-
-            // Mix of portal and end rod particles for futuristic effect
-            if (i % 2 == 0) {
-                level.sendParticles(
-                    ParticleTypes.PORTAL,
-                    pos.x + offsetX,
-                    pos.y + offsetY,
-                    pos.z + offsetZ,
-                    1,
-                    velocityX,
-                    velocityY,
-                    velocityZ,
-                    0.1
-                );
-            } else {
-                level.sendParticles(
-                    ParticleTypes.END_ROD,
-                    pos.x + offsetX,
-                    pos.y + offsetY,
-                    pos.z + offsetZ,
-                    1,
-                    velocityX,
-                    velocityY,
-                    velocityZ,
-                    0.05
-                );
-            }
-        }
-    }
 
     // Save telepad name to disk
     @Override
