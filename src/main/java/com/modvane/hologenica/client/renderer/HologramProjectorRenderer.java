@@ -1,6 +1,6 @@
 package com.modvane.hologenica.client.renderer;
 
-import com.modvane.hologenica.block.entity.HologramPodBlockEntity;
+import com.modvane.hologenica.block.entity.HologramProjectorBlockEntity;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -16,8 +16,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Matrix4f;
 import org.joml.Matrix3f;
 
-// Renders a 3D holographic projection of terrain above the hologram pod block
-public class HologramPodRenderer implements BlockEntityRenderer<HologramPodBlockEntity> {
+// Renders a 3D holographic projection of terrain above the hologram projector block
+public class HologramProjectorRenderer implements BlockEntityRenderer<HologramProjectorBlockEntity> {
 
     // Full brightness for hologram
     private static final int FULL_BRIGHT = 0xF000F0;
@@ -54,11 +54,11 @@ public class HologramPodRenderer implements BlockEntityRenderer<HologramPodBlock
             .createCompositeState(false)
     );
 
-    public HologramPodRenderer(BlockEntityRendererProvider.Context context) {
+    public HologramProjectorRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
-    public void render(HologramPodBlockEntity blockEntity, float partialTick, PoseStack poseStack,
+    public void render(HologramProjectorBlockEntity blockEntity, float partialTick, PoseStack poseStack,
                        MultiBufferSource buffer, int light, int overlay) {
 
         if (!blockEntity.hasValidRegion() || blockEntity.getLevel() == null) return;

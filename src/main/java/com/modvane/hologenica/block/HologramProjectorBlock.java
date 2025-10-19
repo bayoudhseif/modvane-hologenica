@@ -1,6 +1,6 @@
 package com.modvane.hologenica.block;
 
-import com.modvane.hologenica.block.entity.HologramPodBlockEntity;
+import com.modvane.hologenica.block.entity.HologramProjectorBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -15,9 +15,9 @@ import org.jetbrains.annotations.Nullable;
 
 // Block that displays a 3D holographic projection of nearby terrain
 // Automatically scans a 32x32 area when placed
-public class HologramPodBlock extends Block implements EntityBlock {
+public class HologramProjectorBlock extends Block implements EntityBlock {
 
-    public HologramPodBlock(Properties properties) {
+    public HologramProjectorBlock(Properties properties) {
         super(properties);
     }
 
@@ -25,7 +25,7 @@ public class HologramPodBlock extends Block implements EntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new HologramPodBlockEntity(pos, state);
+        return new HologramProjectorBlockEntity(pos, state);
     }
 
     // Use the block's model for rendering (hologram renders separately via BlockEntityRenderer)
@@ -44,16 +44,16 @@ public class HologramPodBlock extends Block implements EntityBlock {
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         super.onPlace(state, level, pos, oldState, movedByPiston);
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof HologramPodBlockEntity map) {
-            map.setupScanRegion();
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof HologramProjectorBlockEntity projector) {
+            projector.setupScanRegion();
         }
     }
 
-    // Right-click to open the hologram pod GUI
+    // Right-click to open the hologram projector GUI
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof HologramPodBlockEntity map) {
-            player.openMenu(map.getMenuProvider());
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof HologramProjectorBlockEntity projector) {
+            player.openMenu(projector.getMenuProvider());
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.sidedSuccess(level.isClientSide);

@@ -3,7 +3,7 @@ package com.modvane.hologenica.registry;
 import com.modvane.hologenica.HologenicaMod;
 import com.modvane.hologenica.block.entity.CloningPodBlockEntity;
 import com.modvane.hologenica.block.entity.DNACentrifugeBlockEntity;
-import com.modvane.hologenica.block.entity.HologramPodBlockEntity;
+import com.modvane.hologenica.block.entity.HologramProjectorBlockEntity;
 import com.modvane.hologenica.block.entity.ReconstructionPodBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -16,11 +16,11 @@ public class HologenicaBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
         DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, HologenicaMod.MODID);
 
-    // Hologram pod block entity
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<HologramPodBlockEntity>> HOLOGRAM_POD =
-        BLOCK_ENTITIES.register("hologram_pod", () ->
-            BlockEntityType.Builder.of(HologramPodBlockEntity::new,
-                HologenicaBlocks.HOLOGRAM_POD.get()).build(null));
+    // Hologram projector block entity
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<HologramProjectorBlockEntity>> HOLOGRAM_PROJECTOR =
+        BLOCK_ENTITIES.register("hologram_projector", () ->
+            BlockEntityType.Builder.of(HologramProjectorBlockEntity::new,
+                HologenicaBlocks.HOLOGRAM_PROJECTOR.get()).build(null));
 
     // Cloning pod block entity
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CloningPodBlockEntity>> CLONING_POD =

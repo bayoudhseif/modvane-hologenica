@@ -12,10 +12,10 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class HologenicaItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(Registries.ITEM, HologenicaMod.MODID);
 
-    // Hologram pod item
-    public static final DeferredHolder<Item, BlockItem> HOLOGRAM_POD =
-        ITEMS.register("hologram_pod", () ->
-            new BlockItem(HologenicaBlocks.HOLOGRAM_POD.get(), new Item.Properties()));
+    // Hologram projector item
+    public static final DeferredHolder<Item, BlockItem> HOLOGRAM_PROJECTOR =
+        ITEMS.register("hologram_projector", () ->
+            new BlockItem(HologenicaBlocks.HOLOGRAM_PROJECTOR.get(), new Item.Properties()));
 
     // Cloning pod item
     public static final DeferredHolder<Item, BlockItem> CLONING_POD =

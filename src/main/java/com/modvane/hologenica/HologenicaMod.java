@@ -26,10 +26,10 @@ public class HologenicaMod {
         CREATIVE_TABS.register("mod_tab",
             () -> CreativeModeTab.builder()
                 .title(Component.translatable("itemGroup." + MODID))
-                .icon(() -> new ItemStack(HologenicaItems.HOLOGRAM_POD.get()))
+                .icon(() -> new ItemStack(HologenicaItems.HOLOGRAM_PROJECTOR.get()))
                 .displayItems((parameters, output) -> {
                     // Add all our items to the creative tab
-                    output.accept(HologenicaItems.HOLOGRAM_POD.get());
+                    output.accept(HologenicaItems.HOLOGRAM_PROJECTOR.get());
                     output.accept(HologenicaItems.CLONING_POD.get());
                     output.accept(HologenicaItems.DNA_CENTRIFUGE.get());
                     output.accept(HologenicaItems.RECONSTRUCTION_POD.get());

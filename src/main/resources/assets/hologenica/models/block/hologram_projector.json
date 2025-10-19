@@ -1,10 +1,10 @@
 {
 	"format_version": "1.21.6",
 	"texture_size": [128, 128],
-	"textures": {
-		"0": "hologenica:block/hologram_pod",
-		"particle": "hologenica:block/hologram_pod"
-	},
+    "textures": {
+        "0": "hologenica:block/hologram_projector",
+        "particle": "hologenica:block/hologram_projector"
+    },
 	"elements": [
 		{
 			"from": [0, 0, 0],

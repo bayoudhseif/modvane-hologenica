@@ -3,7 +3,7 @@ package com.modvane.hologenica.registry;
 import com.modvane.hologenica.HologenicaMod;
 import com.modvane.hologenica.block.CloningPodBlock;
 import com.modvane.hologenica.block.DNACentrifugeBlock;
-import com.modvane.hologenica.block.HologramPodBlock;
+import com.modvane.hologenica.block.HologramProjectorBlock;
 import com.modvane.hologenica.block.ReconstructionPodBlock;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.Block;
@@ -16,9 +16,9 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class HologenicaBlocks {
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(Registries.BLOCK, HologenicaMod.MODID);
 
-    // Hologram pod block
-    public static final DeferredHolder<Block, HologramPodBlock> HOLOGRAM_POD =
-        BLOCKS.register("hologram_pod", () -> new HologramPodBlock(
+    // Hologram projector block
+    public static final DeferredHolder<Block, HologramProjectorBlock> HOLOGRAM_PROJECTOR =
+        BLOCKS.register("hologram_projector", () -> new HologramProjectorBlock(
             BlockBehaviour.Properties.of()
                 .strength(3.0f)
                 .sound(SoundType.METAL)
