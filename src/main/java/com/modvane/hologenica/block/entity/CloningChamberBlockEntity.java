@@ -3,21 +3,20 @@ package com.modvane.hologenica.block.entity;
 import com.modvane.hologenica.registry.HologenicaBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 
-// Block entity for Cloning Chamber - receives DNA and spawns entities
+// Block entity for Cloning Chamber - displays a static ragdoll model when complete
 public class CloningChamberBlockEntity extends BlockEntity {
     
     private String entityType = "";
     private int cloningTime = 0;
+    private boolean hasRagdoll = false; // Whether a ragdoll is currently displayed
     private static final int CLONING_DURATION = 100; // 5 seconds (20 ticks per second)
 
     public CloningChamberBlockEntity(BlockPos pos, BlockState state) {
@@ -29,68 +28,52 @@ public class CloningChamberBlockEntity extends BlockEntity {
         if (level == null || level.isClientSide) return;
 
         // If we have DNA to clone, start the cloning process
-        if (!entityType.isEmpty() && cloningTime < CLONING_DURATION) {
+        if (!entityType.isEmpty() && cloningTime < CLONING_DURATION && !hasRagdoll) {
             cloningTime++;
             setChanged();
 
-            // When cloning is complete, spawn the entity
+            // When cloning is complete, display the ragdoll
             if (cloningTime >= CLONING_DURATION) {
-                spawnClonedEntity();
+                displayRagdoll();
             }
         }
     }
 
     // Receive DNA from centrifuge
     public void receiveDNA(String entityTypeString) {
-        if (entityType.isEmpty() || cloningTime >= CLONING_DURATION) {
+        if (entityType.isEmpty() || hasRagdoll) {
             this.entityType = entityTypeString;
             this.cloningTime = 0;
+            this.hasRagdoll = false;
             setChanged();
+            
+            if (level != null && !level.isClientSide) {
+                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+            }
         }
     }
 
-    // Spawn the cloned entity
-    private void spawnClonedEntity() {
-        if (level == null || !(level instanceof ServerLevel serverLevel)) return;
-        if (entityType.isEmpty()) return;
-
-        try {
-            // Parse the entity type
-            ResourceLocation entityId = ResourceLocation.parse(entityType);
-            EntityType<?> type = EntityType.byString(entityId.toString()).orElse(null);
-            
-            if (type != null) {
-                // Spawn position above the chamber
-                BlockPos spawnPos = worldPosition.above();
-                
-                // Make sure the spawn position is safe
-                if (!serverLevel.getBlockState(spawnPos).isAir()) {
-                    spawnPos = worldPosition.above(2);
-                }
-                
-                // Spawn the entity as a baby
-                Entity entity = type.create(serverLevel, null, spawnPos, MobSpawnType.SPAWNER, false, false);
-                
-                if (entity != null) {
-                    // Position it in the center of the block
-                    entity.setPos(spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5);
-                    
-                    // Make it a baby if possible
-                    if (entity instanceof net.minecraft.world.entity.AgeableMob ageableMob) {
-                        ageableMob.setBaby(true);
-                    }
-                    
-                    serverLevel.addFreshEntity(entity);
-                }
-            }
-        } catch (Exception e) {
-            // Failed to spawn entity - silently fail
-        }
-
-        // Reset the chamber
-        entityType = "";
-        cloningTime = 0;
+    // Display the ragdoll inside the chamber
+    private void displayRagdoll() {
+        this.hasRagdoll = true;
         setChanged();
+        
+        // Sync to client for rendering
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+        }
+    }
+
+    // Clear the ragdoll (for future use if needed)
+    public void clearRagdoll() {
+        this.entityType = "";
+        this.cloningTime = 0;
+        this.hasRagdoll = false;
+        setChanged();
+        
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+        }
     }
 
     @Override
@@ -98,6 +81,7 @@ public class CloningChamberBlockEntity extends BlockEntity {
         super.saveAdditional(tag, provider);
         tag.putString("EntityType", entityType);
         tag.putInt("CloningTime", cloningTime);
+        tag.putBoolean("HasRagdoll", hasRagdoll);
     }
 
     @Override
@@ -105,6 +89,22 @@ public class CloningChamberBlockEntity extends BlockEntity {
         super.loadAdditional(tag, provider);
         entityType = tag.getString("EntityType");
         cloningTime = tag.getInt("CloningTime");
+        hasRagdoll = tag.getBoolean("HasRagdoll");
+    }
+
+    // Sync data to client for rendering
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        CompoundTag tag = super.getUpdateTag(registries);
+        tag.putString("EntityType", entityType);
+        tag.putBoolean("HasRagdoll", hasRagdoll);
+        return tag;
+    }
+
+    @Nullable
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     public String getEntityType() {
@@ -120,7 +120,11 @@ public class CloningChamberBlockEntity extends BlockEntity {
     }
 
     public boolean isCloning() {
-        return !entityType.isEmpty() && cloningTime < CLONING_DURATION;
+        return !entityType.isEmpty() && cloningTime < CLONING_DURATION && !hasRagdoll;
+    }
+
+    public boolean hasRagdoll() {
+        return hasRagdoll;
     }
 }
 

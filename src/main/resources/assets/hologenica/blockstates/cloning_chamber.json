@@ -1,7 +1,10 @@
 {
   "variants": {
-    "": {
+    "half=lower": {
       "model": "hologenica:block/cloning_chamber"
+    },
+    "half=upper": {
+      "model": "hologenica:block/cloning_chamber_upper"
     }
   }
 }

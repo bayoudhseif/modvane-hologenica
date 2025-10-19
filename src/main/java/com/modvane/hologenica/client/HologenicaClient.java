@@ -1,5 +1,6 @@
 package com.modvane.hologenica.client;
 
+import com.modvane.hologenica.client.renderer.CloningChamberRenderer;
 import com.modvane.hologenica.client.renderer.HologramPodRenderer;
 import com.modvane.hologenica.client.screen.DNACentrifugeScreen;
 import com.modvane.hologenica.client.screen.HologramPodScreen;
@@ -19,12 +20,16 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class HologenicaClient {
 
-    // Register hologram pod renderer
+    // Register block entity renderers
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(
             HologenicaBlockEntities.HOLOGRAM_POD.get(),
             HologramPodRenderer::new
+        );
+        event.registerBlockEntityRenderer(
+            HologenicaBlockEntities.CLONING_CHAMBER.get(),
+            CloningChamberRenderer::new
         );
     }
 
