@@ -39,13 +39,13 @@ public class HologramProjectorMenu extends AbstractContainerMenu {
                 blockEntity.cycleStyle();
                 return true;
             } else if (buttonId == 3) {
-                blockEntity.setScanSize(16);
-                return true;
-            } else if (buttonId == 4) {
                 blockEntity.setScanSize(32);
                 return true;
-            } else if (buttonId == 5) {
+            } else if (buttonId == 4) {
                 blockEntity.setScanSize(64);
+                return true;
+            } else if (buttonId == 5) {
+                blockEntity.setScanSize(128);
                 return true;
             } else if (buttonId == 6) {
                 blockEntity.setBlockSize(1);

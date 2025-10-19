@@ -5,16 +5,13 @@ import com.modvane.hologenica.network.SetTelepadNamePacket;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 // Telepad GUI with text input for naming
-public class TelepadScreen extends AbstractContainerScreen<TelepadMenu> {
+public class TelepadScreen extends BaseModScreen<TelepadMenu> {
 
-    private static final int PADDING = 10;
-    private static final int BUTTON_HEIGHT = 20;
     private static final int TEXTFIELD_HEIGHT = 20;
     private static final int SPACING = 6;
 
@@ -22,8 +19,12 @@ public class TelepadScreen extends AbstractContainerScreen<TelepadMenu> {
 
     public TelepadScreen(TelepadMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
-        this.imageWidth = 176;
-        this.imageHeight = 100;
+    }
+
+    @Override
+    protected int calculateGuiHeight() {
+        // Label + spacing + textfield + spacing + button + bottom padding
+        return (2 * PADDING) + FONT_HEIGHT + SPACING + TEXTFIELD_HEIGHT + SPACING + BUTTON_HEIGHT;
     }
 
     @Override

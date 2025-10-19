@@ -3,24 +3,25 @@ package com.modvane.hologenica.client.screen;
 import com.modvane.hologenica.menu.HologramProjectorMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
 // Hologram projector GUI with simple buttons
-public class HologramProjectorScreen extends AbstractContainerScreen<HologramProjectorMenu> {
-    
-    // Consistent spacing constants
-    private static final int PADDING = 10;
-    private static final int BUTTON_HEIGHT = 20;
-    private static final int BUTTON_SPACING = 4;
-    private static final int LABEL_TO_BUTTON = 6;  // Space between label and its buttons
-    private static final int SECTION_GAP = 16;      // Space between sections
+public class HologramProjectorScreen extends BaseModScreen<HologramProjectorMenu> {
 
     public HologramProjectorScreen(HologramProjectorMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
-        this.imageWidth = 176;
-        this.imageHeight = 160;
+    }
+
+    @Override
+    protected int calculateGuiHeight() {
+        // Section 1: Display Options (2 rows of buttons)
+        // Section 2: Scan Area (1 row of buttons)
+        // Section 3: Hologram Size (1 row of buttons)
+        return (2 * PADDING) 
+            + calculateSectionHeight(2, true)   // Section 1 with gap
+            + calculateSectionHeight(1, true)   // Section 2 with gap
+            + calculateSectionHeight(1, false); // Section 3 no gap
     }
 
     @Override
@@ -28,11 +29,10 @@ public class HologramProjectorScreen extends AbstractContainerScreen<HologramPro
         super.init();
         
         int y = topPos + PADDING;
-        int contentWidth = imageWidth - (2 * PADDING);
         
         // Section 1: Display Options (3 buttons in 2 rows)
-        y += font.lineHeight + LABEL_TO_BUTTON;
-        int twoButtonWidth = (contentWidth - BUTTON_SPACING) / 2;
+        y += FONT_HEIGHT + LABEL_TO_BUTTON;
+        int twoButtonWidth = getButtonWidth(2);
         
         // Row 1: Transparency and Rotation
         addRenderableWidget(Button.builder(
@@ -51,33 +51,33 @@ public class HologramProjectorScreen extends AbstractContainerScreen<HologramPro
         addRenderableWidget(Button.builder(
             Component.translatable("gui.hologenica.label_style"),
             button -> minecraft.gameMode.handleInventoryButtonClick(menu.containerId, 2)
-        ).bounds(leftPos + PADDING, y, contentWidth, BUTTON_HEIGHT).build());
+        ).bounds(leftPos + PADDING, y, getContentWidth(), BUTTON_HEIGHT).build());
         
         y += BUTTON_HEIGHT + SECTION_GAP;
         
         // Section 2: Scan Area (3 buttons)
-        y += font.lineHeight + LABEL_TO_BUTTON;
-        int threeButtonWidth = (contentWidth - (2 * BUTTON_SPACING)) / 3;
+        y += FONT_HEIGHT + LABEL_TO_BUTTON;
+        int threeButtonWidth = getButtonWidth(3);
         
         addRenderableWidget(Button.builder(
-            Component.translatable("gui.hologenica.scan_16"), 
+            Component.translatable("gui.hologenica.scan_32"), 
             button -> minecraft.gameMode.handleInventoryButtonClick(menu.containerId, 3)
         ).bounds(leftPos + PADDING, y, threeButtonWidth, BUTTON_HEIGHT).build());
         
         addRenderableWidget(Button.builder(
-            Component.translatable("gui.hologenica.scan_32"), 
+            Component.translatable("gui.hologenica.scan_64"), 
             button -> minecraft.gameMode.handleInventoryButtonClick(menu.containerId, 4)
         ).bounds(leftPos + PADDING + threeButtonWidth + BUTTON_SPACING, y, threeButtonWidth, BUTTON_HEIGHT).build());
         
         addRenderableWidget(Button.builder(
-            Component.translatable("gui.hologenica.scan_64"), 
+            Component.translatable("gui.hologenica.scan_128"), 
             button -> minecraft.gameMode.handleInventoryButtonClick(menu.containerId, 5)
         ).bounds(leftPos + PADDING + (2 * threeButtonWidth) + (2 * BUTTON_SPACING), y, threeButtonWidth, BUTTON_HEIGHT).build());
         
         y += BUTTON_HEIGHT + SECTION_GAP;
         
         // Section 3: Hologram Size (3 buttons)
-        y += font.lineHeight + LABEL_TO_BUTTON;
+        y += FONT_HEIGHT + LABEL_TO_BUTTON;
         
         addRenderableWidget(Button.builder(
             Component.translatable("gui.hologenica.size_1"), 
@@ -109,10 +109,10 @@ public class HologramProjectorScreen extends AbstractContainerScreen<HologramPro
         
         // Section headers (each section follows the pattern: label -> buttons -> gap)
         graphics.drawString(this.font, Component.translatable("gui.hologenica.display_options"), PADDING, y, 0xFFFFFF, false);
-        y += font.lineHeight + LABEL_TO_BUTTON + (BUTTON_HEIGHT * 2) + BUTTON_SPACING + SECTION_GAP; // 2 rows of buttons
+        y += calculateSectionHeight(2, true); // 2 rows of buttons with gap
         
         graphics.drawString(this.font, Component.translatable("gui.hologenica.scan_area"), PADDING, y, 0xFFFFFF, false);
-        y += font.lineHeight + LABEL_TO_BUTTON + BUTTON_HEIGHT + SECTION_GAP;
+        y += calculateSectionHeight(1, true); // 1 row with gap
         
         graphics.drawString(this.font, Component.translatable("gui.hologenica.display_size"), PADDING, y, 0xFFFFFF, false);
     }
