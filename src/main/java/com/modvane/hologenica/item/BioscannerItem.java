@@ -16,10 +16,10 @@ import net.minecraft.world.item.component.CustomData;
 
 import java.util.List;
 
-// Syringe item that captures entity DNA for cloning
-public class DNASyringeItem extends Item {
+// Bioscanner item that captures entity DNA for cloning
+public class BioscannerItem extends Item {
 
-    public DNASyringeItem(Properties properties) {
+    public BioscannerItem(Properties properties) {
         super(properties);
     }
 

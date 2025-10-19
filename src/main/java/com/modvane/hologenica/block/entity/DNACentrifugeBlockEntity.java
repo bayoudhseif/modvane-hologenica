@@ -42,7 +42,7 @@ public class DNACentrifugeBlockEntity extends BlockEntity implements MenuProvide
     public void tick() {
         if (level == null || level.isClientSide) return;
 
-        // Check if we have a syringe with DNA
+        // Check if we have a bioscanner with DNA
         if (!inventory.isEmpty() && inventory.getItem(0).has(net.minecraft.core.component.DataComponents.CUSTOM_DATA)) {
             processingTime++;
 
@@ -79,7 +79,7 @@ public class DNACentrifugeBlockEntity extends BlockEntity implements MenuProvide
                 // Transfer DNA to the pod
                 pod.receiveDNA(entityType);
                 
-                // Consume the syringe
+                // Consume the bioscanner
                 inventory.setItem(0, net.minecraft.world.item.ItemStack.EMPTY);
                 setChanged();
                 return;

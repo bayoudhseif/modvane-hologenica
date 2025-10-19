@@ -1,7 +1,7 @@
 package com.modvane.hologenica.registry;
 
 import com.modvane.hologenica.HologenicaMod;
-import com.modvane.hologenica.item.DNASyringeItem;
+import com.modvane.hologenica.item.BioscannerItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -22,10 +22,10 @@ public class HologenicaItems {
         ITEMS.register("cloning_pod", () ->
             new BlockItem(HologenicaBlocks.CLONING_POD.get(), new Item.Properties()));
 
-    // DNA syringe item
-    public static final DeferredHolder<Item, DNASyringeItem> DNA_SYRINGE =
-        ITEMS.register("dna_syringe", () ->
-            new DNASyringeItem(new Item.Properties().stacksTo(1)));
+    // Bioscanner item
+    public static final DeferredHolder<Item, BioscannerItem> BIOSCANNER =
+        ITEMS.register("bioscanner", () ->
+            new BioscannerItem(new Item.Properties().stacksTo(1)));
 
     // DNA centrifuge item
     public static final DeferredHolder<Item, BlockItem> DNA_CENTRIFUGE =
