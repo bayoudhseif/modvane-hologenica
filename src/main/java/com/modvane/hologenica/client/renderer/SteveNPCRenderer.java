@@ -22,5 +22,11 @@ public class SteveNPCRenderer extends MobRenderer<SteveNPCEntity, HumanoidModel<
     public ResourceLocation getTextureLocation(SteveNPCEntity entity) {
         return STEVE_SKIN;
     }
+    
+    @Override
+    protected void scale(SteveNPCEntity entity, com.mojang.blaze3d.vertex.PoseStack poseStack, float partialTick) {
+        // Scale to 0.9375F to match exact player size (15/16 of a block)
+        poseStack.scale(0.9375F, 0.9375F, 0.9375F);
+    }
 }
 
