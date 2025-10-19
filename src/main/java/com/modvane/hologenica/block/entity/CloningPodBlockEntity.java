@@ -11,16 +11,16 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-// Block entity for Cloning Chamber - displays a static ragdoll model when complete
-public class CloningChamberBlockEntity extends BlockEntity {
+// Block entity for Cloning Pod - displays a static ragdoll model when complete
+public class CloningPodBlockEntity extends BlockEntity {
     
     private String entityType = "";
     private int cloningTime = 0;
     private boolean hasRagdoll = false; // Whether a ragdoll is currently displayed
     private static final int CLONING_DURATION = 100; // 5 seconds (20 ticks per second)
 
-    public CloningChamberBlockEntity(BlockPos pos, BlockState state) {
-        super(HologenicaBlockEntities.CLONING_CHAMBER.get(), pos, state);
+    public CloningPodBlockEntity(BlockPos pos, BlockState state) {
+        super(HologenicaBlockEntities.CLONING_POD.get(), pos, state);
     }
 
     // Called every tick

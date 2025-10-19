@@ -1,7 +1,7 @@
 package com.modvane.hologenica.registry;
 
 import com.modvane.hologenica.HologenicaMod;
-import com.modvane.hologenica.block.CloningChamberBlock;
+import com.modvane.hologenica.block.CloningPodBlock;
 import com.modvane.hologenica.block.DNACentrifugeBlock;
 import com.modvane.hologenica.block.HologramPodBlock;
 import com.modvane.hologenica.block.ReconstructionPodBlock;
@@ -30,9 +30,9 @@ public class HologenicaBlocks {
                 .isViewBlocking((state, level, pos) -> false)
         ));
 
-    // Cloning chamber block
-    public static final DeferredHolder<Block, CloningChamberBlock> CLONING_CHAMBER =
-        BLOCKS.register("cloning_chamber", () -> new CloningChamberBlock(
+    // Cloning pod block
+    public static final DeferredHolder<Block, CloningPodBlock> CLONING_POD =
+        BLOCKS.register("cloning_pod", () -> new CloningPodBlock(
             BlockBehaviour.Properties.of()
                 .strength(5.0f)
                 .sound(SoundType.METAL)

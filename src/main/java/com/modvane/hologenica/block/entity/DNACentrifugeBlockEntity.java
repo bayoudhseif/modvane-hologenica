@@ -72,12 +72,12 @@ public class DNACentrifugeBlockEntity extends BlockEntity implements MenuProvide
         
         String entityType = tag.getString("EntityType");
 
-        // Check all adjacent positions for a cloning chamber
+        // Check all adjacent positions for a cloning pod
         for (net.minecraft.core.Direction direction : net.minecraft.core.Direction.values()) {
             BlockPos adjacentPos = worldPosition.relative(direction);
-            if (level.getBlockEntity(adjacentPos) instanceof CloningChamberBlockEntity chamber) {
-                // Transfer DNA to the chamber
-                chamber.receiveDNA(entityType);
+            if (level.getBlockEntity(adjacentPos) instanceof CloningPodBlockEntity pod) {
+                // Transfer DNA to the pod
+                pod.receiveDNA(entityType);
                 
                 // Consume the syringe
                 inventory.setItem(0, net.minecraft.world.item.ItemStack.EMPTY);

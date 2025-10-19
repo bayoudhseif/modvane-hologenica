@@ -61,11 +61,11 @@ public class ReconstructionPodBlockEntity extends BlockEntity {
 
         for (Direction direction : Direction.values()) {
             BlockPos adjacentPos = worldPosition.relative(direction);
-            if (level.getBlockEntity(adjacentPos) instanceof CloningChamberBlockEntity chamber) {
-                // If chamber has a ragdoll, start reconstruction
-                // Don't remove the ragdoll - it stays in the chamber permanently
-                if (chamber.hasRagdoll() && !chamber.getEntityType().isEmpty()) {
-                    startReconstruction(chamber.getEntityType());
+            if (level.getBlockEntity(adjacentPos) instanceof CloningPodBlockEntity pod) {
+                // If pod has a ragdoll, start reconstruction
+                // Don't remove the ragdoll - it stays in the pod permanently
+                if (pod.hasRagdoll() && !pod.getEntityType().isEmpty()) {
+                    startReconstruction(pod.getEntityType());
                     return;
                 }
             }

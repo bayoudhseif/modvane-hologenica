@@ -1,6 +1,6 @@
 package com.modvane.hologenica.client;
 
-import com.modvane.hologenica.client.renderer.CloningChamberRenderer;
+import com.modvane.hologenica.client.renderer.CloningPodRenderer;
 import com.modvane.hologenica.client.renderer.HologramPodRenderer;
 import com.modvane.hologenica.client.renderer.ReconstructionPodRenderer;
 import com.modvane.hologenica.client.screen.DNACentrifugeScreen;
@@ -29,8 +29,8 @@ public class HologenicaClient {
             HologramPodRenderer::new
         );
         event.registerBlockEntityRenderer(
-            HologenicaBlockEntities.CLONING_CHAMBER.get(),
-            CloningChamberRenderer::new
+            HologenicaBlockEntities.CLONING_POD.get(),
+            CloningPodRenderer::new
         );
         event.registerBlockEntityRenderer(
             HologenicaBlockEntities.RECONSTRUCTION_POD.get(),
@@ -50,7 +50,7 @@ public class HologenicaClient {
     public static void clientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.HOLOGRAM_POD.get(), RenderType.translucent());
-            ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.CLONING_CHAMBER.get(), RenderType.translucent());
+            ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.CLONING_POD.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.DNA_CENTRIFUGE.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.RECONSTRUCTION_POD.get(), RenderType.translucent());
         });

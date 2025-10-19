@@ -30,7 +30,7 @@ public class HologenicaMod {
                 .displayItems((parameters, output) -> {
                     // Add all our items to the creative tab
                     output.accept(HologenicaItems.HOLOGRAM_POD.get());
-                    output.accept(HologenicaItems.CLONING_CHAMBER.get());
+                    output.accept(HologenicaItems.CLONING_POD.get());
                     output.accept(HologenicaItems.DNA_CENTRIFUGE.get());
                     output.accept(HologenicaItems.RECONSTRUCTION_POD.get());
                     output.accept(HologenicaItems.DNA_SYRINGE.get());

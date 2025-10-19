@@ -17,10 +17,10 @@ public class HologenicaItems {
         ITEMS.register("hologram_pod", () ->
             new BlockItem(HologenicaBlocks.HOLOGRAM_POD.get(), new Item.Properties()));
 
-    // Cloning chamber item
-    public static final DeferredHolder<Item, BlockItem> CLONING_CHAMBER =
-        ITEMS.register("cloning_chamber", () ->
-            new BlockItem(HologenicaBlocks.CLONING_CHAMBER.get(), new Item.Properties()));
+    // Cloning pod item
+    public static final DeferredHolder<Item, BlockItem> CLONING_POD =
+        ITEMS.register("cloning_pod", () ->
+            new BlockItem(HologenicaBlocks.CLONING_POD.get(), new Item.Properties()));
 
     // DNA syringe item
     public static final DeferredHolder<Item, DNASyringeItem> DNA_SYRINGE =

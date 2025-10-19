@@ -1,6 +1,6 @@
 package com.modvane.hologenica.block;
 
-import com.modvane.hologenica.block.entity.CloningChamberBlockEntity;
+import com.modvane.hologenica.block.entity.CloningPodBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
@@ -27,12 +27,12 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-// Cloning Chamber block for entity duplication - two blocks tall
-public class CloningChamberBlock extends Block implements EntityBlock {
+// Cloning Pod block for entity duplication - two blocks tall
+public class CloningPodBlock extends Block implements EntityBlock {
 
     public static final EnumProperty<DoubleBlockHalf> HALF = BlockStateProperties.DOUBLE_BLOCK_HALF;
 
-    public CloningChamberBlock(Properties properties) {
+    public CloningPodBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any().setValue(HALF, DoubleBlockHalf.LOWER));
     }
@@ -46,7 +46,7 @@ public class CloningChamberBlock extends Block implements EntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return state.getValue(HALF) == DoubleBlockHalf.LOWER ? new CloningChamberBlockEntity(pos, state) : null;
+        return state.getValue(HALF) == DoubleBlockHalf.LOWER ? new CloningPodBlockEntity(pos, state) : null;
     }
 
     @Override
@@ -141,8 +141,8 @@ public class CloningChamberBlock extends Block implements EntityBlock {
             return null;
         }
         return (lvl, pos, st, be) -> {
-            if (be instanceof CloningChamberBlockEntity chamber) {
-                chamber.tick();
+            if (be instanceof CloningPodBlockEntity pod) {
+                pod.tick();
             }
         };
     }
