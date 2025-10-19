@@ -5,6 +5,7 @@
     "block.hologenica.centrifuge": "Centrifuge",
     "block.hologenica.reconstruction_pod": "Reconstruction Pod",
     "block.hologenica.telepad": "Telepad",
+    "block.hologenica.bridge": "Bridge",
     "item.hologenica.bioscanner": "Bioscanner",
     "entity.hologenica.steve_npc": "Steve NPC",
     "gui.hologenica.display_options": "Display Options",

@@ -42,6 +42,11 @@ public class HologenicaItems {
         ITEMS.register("telepad", () ->
             new BlockItem(HologenicaBlocks.TELEPAD.get(), new Item.Properties()));
 
+    // Bridge item
+    public static final DeferredHolder<Item, BlockItem> BRIDGE =
+        ITEMS.register("bridge", () ->
+            new BlockItem(HologenicaBlocks.BRIDGE.get(), new Item.Properties()));
+
     public static void init(IEventBus modEventBus) {
         ITEMS.register(modEventBus);
     }

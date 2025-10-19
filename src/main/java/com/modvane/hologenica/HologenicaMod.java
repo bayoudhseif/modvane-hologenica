@@ -35,6 +35,7 @@ public class HologenicaMod {
                     output.accept(HologenicaItems.CENTRIFUGE.get());
                     output.accept(HologenicaItems.RECONSTRUCTION_POD.get());
                     output.accept(HologenicaItems.TELEPAD.get());
+                    output.accept(HologenicaItems.BRIDGE.get());
                     output.accept(HologenicaItems.BIOSCANNER.get());
                 })
                 .build()

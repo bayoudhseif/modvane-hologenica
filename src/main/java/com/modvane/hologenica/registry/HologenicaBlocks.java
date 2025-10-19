@@ -1,6 +1,7 @@
 package com.modvane.hologenica.registry;
 
 import com.modvane.hologenica.HologenicaMod;
+import com.modvane.hologenica.block.BridgeBlock;
 import com.modvane.hologenica.block.CentrifugeBlock;
 import com.modvane.hologenica.block.CloningPodBlock;
 import com.modvane.hologenica.block.HologramProjectorBlock;
@@ -80,6 +81,19 @@ public class HologenicaBlocks {
                 .strength(4.0f)
                 .sound(SoundType.METAL)
                 .lightLevel(state -> 10)
+                .noOcclusion()
+                .isValidSpawn((state, level, pos, type) -> false)
+                .isRedstoneConductor((state, level, pos) -> false)
+                .isSuffocating((state, level, pos) -> false)
+                .isViewBlocking((state, level, pos) -> false)
+        ));
+
+    // Bridge block - decorative walkway
+    public static final DeferredHolder<Block, BridgeBlock> BRIDGE =
+        BLOCKS.register("bridge", () -> new BridgeBlock(
+            BlockBehaviour.Properties.of()
+                .strength(2.0f)
+                .sound(SoundType.METAL)
                 .noOcclusion()
                 .isValidSpawn((state, level, pos, type) -> false)
                 .isRedstoneConductor((state, level, pos) -> false)
