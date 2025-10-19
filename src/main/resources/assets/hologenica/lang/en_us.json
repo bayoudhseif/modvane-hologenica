@@ -2,7 +2,7 @@
     "itemGroup.hologenica": "Hologenica",
     "block.hologenica.hologram_projector": "Hologram Projector",
     "block.hologenica.cloning_pod": "Cloning Pod",
-    "block.hologenica.dna_centrifuge": "DNA Centrifuge",
+    "block.hologenica.centrifuge": "Centrifuge",
     "block.hologenica.reconstruction_pod": "Reconstruction Pod",
     "item.hologenica.bioscanner": "Bioscanner",
     "gui.hologenica.display_options": "Display Options",

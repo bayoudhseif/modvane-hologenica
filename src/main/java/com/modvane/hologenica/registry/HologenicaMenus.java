@@ -1,7 +1,7 @@
 package com.modvane.hologenica.registry;
 
 import com.modvane.hologenica.HologenicaMod;
-import com.modvane.hologenica.menu.DNACentrifugeMenu;
+import com.modvane.hologenica.menu.CentrifugeMenu;
 import com.modvane.hologenica.menu.HologramProjectorMenu;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.SimpleContainer;
@@ -20,10 +20,10 @@ public class HologenicaMenus {
         MENUS.register("hologram_projector", () -> IMenuTypeExtension.create((containerId, inventory, buffer) -> 
             new HologramProjectorMenu(containerId, inventory, null)));
 
-    // DNA centrifuge menu type
-    public static final DeferredHolder<MenuType<?>, MenuType<DNACentrifugeMenu>> DNA_CENTRIFUGE =
-        MENUS.register("dna_centrifuge", () -> IMenuTypeExtension.create((containerId, inventory, buffer) -> 
-            new DNACentrifugeMenu(containerId, inventory, new SimpleContainer(1))));
+    // Centrifuge menu type
+    public static final DeferredHolder<MenuType<?>, MenuType<CentrifugeMenu>> CENTRIFUGE =
+        MENUS.register("centrifuge", () -> IMenuTypeExtension.create((containerId, inventory, buffer) -> 
+            new CentrifugeMenu(containerId, inventory, new SimpleContainer(1))));
 
     public static void init(IEventBus modEventBus) {
         MENUS.register(modEventBus);

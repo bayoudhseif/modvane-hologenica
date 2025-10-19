@@ -1,8 +1,8 @@
 package com.modvane.hologenica.registry;
 
 import com.modvane.hologenica.HologenicaMod;
+import com.modvane.hologenica.block.CentrifugeBlock;
 import com.modvane.hologenica.block.CloningPodBlock;
-import com.modvane.hologenica.block.DNACentrifugeBlock;
 import com.modvane.hologenica.block.HologramProjectorBlock;
 import com.modvane.hologenica.block.ReconstructionPodBlock;
 import net.minecraft.core.registries.Registries;
@@ -44,9 +44,9 @@ public class HologenicaBlocks {
                 .isViewBlocking((state, level, pos) -> false)
         ));
 
-    // DNA centrifuge block
-    public static final DeferredHolder<Block, DNACentrifugeBlock> DNA_CENTRIFUGE =
-        BLOCKS.register("dna_centrifuge", () -> new DNACentrifugeBlock(
+    // Centrifuge block
+    public static final DeferredHolder<Block, CentrifugeBlock> CENTRIFUGE =
+        BLOCKS.register("centrifuge", () -> new CentrifugeBlock(
             BlockBehaviour.Properties.of()
                 .strength(4.0f)
                 .sound(SoundType.METAL)

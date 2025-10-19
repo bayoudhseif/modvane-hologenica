@@ -1,6 +1,6 @@
 package com.modvane.hologenica.block;
 
-import com.modvane.hologenica.block.entity.DNACentrifugeBlockEntity;
+import com.modvane.hologenica.block.entity.CentrifugeBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -16,17 +16,17 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-// DNA Centrifuge - processes DNA syringes to extract genetic data for cloning
-public class DNACentrifugeBlock extends Block implements EntityBlock {
+// Centrifuge - processes bioscanners to extract genetic data for cloning
+public class CentrifugeBlock extends Block implements EntityBlock {
 
-    public DNACentrifugeBlock(Properties properties) {
+    public CentrifugeBlock(Properties properties) {
         super(properties);
     }
 
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new DNACentrifugeBlockEntity(pos, state);
+        return new CentrifugeBlockEntity(pos, state);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class DNACentrifugeBlock extends Block implements EntityBlock {
     // Right-click to open the centrifuge GUI
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof DNACentrifugeBlockEntity centrifuge) {
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof CentrifugeBlockEntity centrifuge) {
             player.openMenu(centrifuge);
             return InteractionResult.SUCCESS;
         }
@@ -55,7 +55,7 @@ public class DNACentrifugeBlock extends Block implements EntityBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return level.isClientSide ? null : (lvl, pos, st, be) -> {
-            if (be instanceof DNACentrifugeBlockEntity centrifuge) {
+            if (be instanceof CentrifugeBlockEntity centrifuge) {
                 centrifuge.tick();
             }
         };

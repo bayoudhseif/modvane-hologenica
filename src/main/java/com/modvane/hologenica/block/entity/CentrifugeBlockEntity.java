@@ -1,6 +1,6 @@
 package com.modvane.hologenica.block.entity;
 
-import com.modvane.hologenica.menu.DNACentrifugeMenu;
+import com.modvane.hologenica.menu.CentrifugeMenu;
 import com.modvane.hologenica.registry.HologenicaBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -15,23 +15,23 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-// Block entity for DNA Centrifuge - stores syringe and processes DNA
-public class DNACentrifugeBlockEntity extends BlockEntity implements MenuProvider {
+// Block entity for Centrifuge - stores bioscanner and processes DNA
+public class CentrifugeBlockEntity extends BlockEntity implements MenuProvider {
     
-    // Container to hold the DNA syringe
+    // Container to hold the bioscanner
     private final SimpleContainer inventory = new SimpleContainer(1) {
         @Override
         public void setChanged() {
             super.setChanged();
-            DNACentrifugeBlockEntity.this.setChanged();
+            CentrifugeBlockEntity.this.setChanged();
         }
     };
 
     private int processingTime = 0;
     private static final int PROCESSING_DURATION = 100; // 5 seconds (20 ticks per second)
 
-    public DNACentrifugeBlockEntity(BlockPos pos, BlockState state) {
-        super(HologenicaBlockEntities.DNA_CENTRIFUGE.get(), pos, state);
+    public CentrifugeBlockEntity(BlockPos pos, BlockState state) {
+        super(HologenicaBlockEntities.CENTRIFUGE.get(), pos, state);
     }
 
     public SimpleContainer getInventory() {
@@ -113,13 +113,13 @@ public class DNACentrifugeBlockEntity extends BlockEntity implements MenuProvide
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable("block.hologenica.dna_centrifuge");
+        return Component.translatable("block.hologenica.centrifuge");
     }
 
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
-        return new DNACentrifugeMenu(containerId, playerInventory, this);
+        return new CentrifugeMenu(containerId, playerInventory, this);
     }
 
     public int getProcessingTime() {

@@ -1,20 +1,20 @@
 package com.modvane.hologenica.client.screen;
 
 import com.modvane.hologenica.HologenicaMod;
-import com.modvane.hologenica.menu.DNACentrifugeMenu;
+import com.modvane.hologenica.menu.CentrifugeMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-// Client-side GUI screen for DNA Centrifuge
-public class DNACentrifugeScreen extends AbstractContainerScreen<DNACentrifugeMenu> {
+// Client-side GUI screen for Centrifuge
+public class CentrifugeScreen extends AbstractContainerScreen<CentrifugeMenu> {
     
     private static final ResourceLocation TEXTURE = 
-        ResourceLocation.fromNamespaceAndPath(HologenicaMod.MODID, "textures/gui/dna_centrifuge.png");
+        ResourceLocation.fromNamespaceAndPath(HologenicaMod.MODID, "textures/gui/centrifuge.png");
 
-    public DNACentrifugeScreen(DNACentrifugeMenu menu, Inventory playerInventory, Component title) {
+    public CentrifugeScreen(CentrifugeMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         this.imageHeight = 166;
         this.inventoryLabelY = this.imageHeight - 94;

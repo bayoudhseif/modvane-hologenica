@@ -27,10 +27,10 @@ public class HologenicaItems {
         ITEMS.register("bioscanner", () ->
             new BioscannerItem(new Item.Properties().stacksTo(1)));
 
-    // DNA centrifuge item
-    public static final DeferredHolder<Item, BlockItem> DNA_CENTRIFUGE =
-        ITEMS.register("dna_centrifuge", () ->
-            new BlockItem(HologenicaBlocks.DNA_CENTRIFUGE.get(), new Item.Properties()));
+    // Centrifuge item
+    public static final DeferredHolder<Item, BlockItem> CENTRIFUGE =
+        ITEMS.register("centrifuge", () ->
+            new BlockItem(HologenicaBlocks.CENTRIFUGE.get(), new Item.Properties()));
 
     // Reconstruction pod item
     public static final DeferredHolder<Item, BlockItem> RECONSTRUCTION_POD =

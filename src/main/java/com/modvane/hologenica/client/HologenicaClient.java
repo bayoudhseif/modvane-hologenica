@@ -3,7 +3,7 @@ package com.modvane.hologenica.client;
 import com.modvane.hologenica.client.renderer.CloningPodRenderer;
 import com.modvane.hologenica.client.renderer.HologramProjectorRenderer;
 import com.modvane.hologenica.client.renderer.ReconstructionPodRenderer;
-import com.modvane.hologenica.client.screen.DNACentrifugeScreen;
+import com.modvane.hologenica.client.screen.CentrifugeScreen;
 import com.modvane.hologenica.client.screen.HologramProjectorScreen;
 import com.modvane.hologenica.registry.HologenicaBlockEntities;
 import com.modvane.hologenica.registry.HologenicaBlocks;
@@ -42,7 +42,7 @@ public class HologenicaClient {
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(HologenicaMenus.HOLOGRAM_PROJECTOR.get(), HologramProjectorScreen::new);
-        event.register(HologenicaMenus.DNA_CENTRIFUGE.get(), DNACentrifugeScreen::new);
+        event.register(HologenicaMenus.CENTRIFUGE.get(), CentrifugeScreen::new);
     }
 
     // Set render layer for transparency support
@@ -51,7 +51,7 @@ public class HologenicaClient {
         event.enqueueWork(() -> {
             ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.HOLOGRAM_PROJECTOR.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.CLONING_POD.get(), RenderType.translucent());
-            ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.DNA_CENTRIFUGE.get(), RenderType.translucent());
+            ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.CENTRIFUGE.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.RECONSTRUCTION_POD.get(), RenderType.translucent());
         });
     }

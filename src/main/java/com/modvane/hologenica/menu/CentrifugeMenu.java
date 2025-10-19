@@ -1,6 +1,6 @@
 package com.modvane.hologenica.menu;
 
-import com.modvane.hologenica.block.entity.DNACentrifugeBlockEntity;
+import com.modvane.hologenica.block.entity.CentrifugeBlockEntity;
 import com.modvane.hologenica.registry.HologenicaMenus;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -10,15 +10,15 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-// Menu for DNA Centrifuge GUI
-public class DNACentrifugeMenu extends AbstractContainerMenu {
+// Menu for Centrifuge GUI
+public class CentrifugeMenu extends AbstractContainerMenu {
     
     private final Container container;
-    private DNACentrifugeBlockEntity blockEntity;
+    private CentrifugeBlockEntity blockEntity;
 
     // Constructor for server-side (with block entity)
-    public DNACentrifugeMenu(int containerId, Inventory playerInventory, DNACentrifugeBlockEntity blockEntity) {
-        super(HologenicaMenus.DNA_CENTRIFUGE.get(), containerId);
+    public CentrifugeMenu(int containerId, Inventory playerInventory, CentrifugeBlockEntity blockEntity) {
+        super(HologenicaMenus.CENTRIFUGE.get(), containerId);
         this.container = blockEntity.getInventory();
         this.blockEntity = blockEntity;
 
@@ -39,8 +39,8 @@ public class DNACentrifugeMenu extends AbstractContainerMenu {
     }
 
     // Constructor for client-side (without block entity)
-    public DNACentrifugeMenu(int containerId, Inventory playerInventory, Container container) {
-        super(HologenicaMenus.DNA_CENTRIFUGE.get(), containerId);
+    public CentrifugeMenu(int containerId, Inventory playerInventory, Container container) {
+        super(HologenicaMenus.CENTRIFUGE.get(), containerId);
         this.container = container;
         this.blockEntity = null;
 
@@ -96,7 +96,7 @@ public class DNACentrifugeMenu extends AbstractContainerMenu {
         return this.container.stillValid(player);
     }
 
-    public DNACentrifugeBlockEntity getBlockEntity() {
+    public CentrifugeBlockEntity getBlockEntity() {
         return blockEntity;
     }
 }
