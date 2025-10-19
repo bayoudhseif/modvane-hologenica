@@ -36,21 +36,24 @@ public class HologramProjectorMenu extends AbstractContainerMenu {
                 blockEntity.toggleRotation();
                 return true;
             } else if (buttonId == 2) {
-                blockEntity.setScanSize(16);
+                blockEntity.cycleStyle();
                 return true;
             } else if (buttonId == 3) {
-                blockEntity.setScanSize(32);
+                blockEntity.setScanSize(16);
                 return true;
             } else if (buttonId == 4) {
-                blockEntity.setScanSize(64);
+                blockEntity.setScanSize(32);
                 return true;
             } else if (buttonId == 5) {
-                blockEntity.setBlockSize(1);
+                blockEntity.setScanSize(64);
                 return true;
             } else if (buttonId == 6) {
-                blockEntity.setBlockSize(3);
+                blockEntity.setBlockSize(1);
                 return true;
             } else if (buttonId == 7) {
+                blockEntity.setBlockSize(3);
+                return true;
+            } else if (buttonId == 8) {
                 blockEntity.setBlockSize(9);
                 return true;
             }

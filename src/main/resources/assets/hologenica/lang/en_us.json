@@ -10,6 +10,7 @@
     "gui.hologenica.display_options": "Display Options",
     "gui.hologenica.label_transparency": "Transparent",
     "gui.hologenica.label_rotation": "Rotating",
+    "gui.hologenica.label_style": "Cycle Style",
     "gui.hologenica.scan_area": "Scan Area",
     "gui.hologenica.scan_16": "16×16",
     "gui.hologenica.scan_32": "32×32",

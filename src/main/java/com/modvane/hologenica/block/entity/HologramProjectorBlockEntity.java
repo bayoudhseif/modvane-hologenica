@@ -18,11 +18,18 @@ import org.jetbrains.annotations.Nullable;
 // Stores the map region and cached terrain scan for holographic display
 public class HologramProjectorBlockEntity extends BlockEntity {
 
-    // Default settings: 16x16 scan, 1x1 display, transparent, rotating
-    private static final int DEFAULT_SCAN_SIZE = 16;
+    // Rendering style options
+    public enum RenderStyle {
+        CLASSIC,      // Volumetric layering with depth-based color gradients
+        REALISTIC     // Modern realistic clean solid rendering
+    }
+
+    // Default settings: 32x32 scan, 1x1 display, transparent, rotating, classic style
+    private static final int DEFAULT_SCAN_SIZE = 32;
     private static final int DEFAULT_BLOCK_SIZE = 1;
     private static final boolean DEFAULT_TRANSPARENT = true;
     private static final boolean DEFAULT_ROTATION = true;
+    private static final RenderStyle DEFAULT_STYLE = RenderStyle.CLASSIC;
     
     // Scan area bounds (inclusive)
     private int scanMinX, scanMaxX, scanMinZ, scanMaxZ;
@@ -33,6 +40,7 @@ public class HologramProjectorBlockEntity extends BlockEntity {
     private int blockSize = DEFAULT_BLOCK_SIZE;
     private boolean transparentMode = DEFAULT_TRANSPARENT;
     private boolean rotationEnabled = DEFAULT_ROTATION;
+    private RenderStyle renderStyle = DEFAULT_STYLE;
 
     // Cached terrain data to avoid rescanning every frame
     private int[][][] cachedTerrain = null;
@@ -120,6 +128,23 @@ public class HologramProjectorBlockEntity extends BlockEntity {
         }
     }
     
+    // Get current render style
+    public RenderStyle getRenderStyle() {
+        return renderStyle;
+    }
+    
+    // Cycle through rendering styles: CLASSIC -> REALISTIC -> CLASSIC
+    public void cycleStyle() {
+        this.renderStyle = switch (renderStyle) {
+            case CLASSIC -> RenderStyle.REALISTIC;
+            case REALISTIC -> RenderStyle.CLASSIC;
+        };
+        setChanged();
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 2);
+        }
+    }
+    
     // Get current scan size
     public int getScanSize() {
         return scanSize;
@@ -164,6 +189,7 @@ public class HologramProjectorBlockEntity extends BlockEntity {
         tag.putInt("BlockSize", blockSize);
         tag.putBoolean("TransparentMode", transparentMode);
         tag.putBoolean("RotationEnabled", rotationEnabled);
+        tag.putString("RenderStyle", renderStyle.name());
         tag.putInt("ScanMinX", scanMinX);
         tag.putInt("ScanMaxX", scanMaxX);
         tag.putInt("ScanMinZ", scanMinZ);
@@ -188,6 +214,13 @@ public class HologramProjectorBlockEntity extends BlockEntity {
         }
         if (tag.contains("RotationEnabled")) {
             rotationEnabled = tag.getBoolean("RotationEnabled");
+        }
+        if (tag.contains("RenderStyle")) {
+            try {
+                renderStyle = RenderStyle.valueOf(tag.getString("RenderStyle"));
+            } catch (IllegalArgumentException e) {
+                renderStyle = DEFAULT_STYLE;
+            }
         }
         
         // Load bounds if present
@@ -226,6 +259,7 @@ public class HologramProjectorBlockEntity extends BlockEntity {
         tag.putInt("BlockSize", blockSize);
         tag.putBoolean("TransparentMode", transparentMode);
         tag.putBoolean("RotationEnabled", rotationEnabled);
+        tag.putString("RenderStyle", renderStyle.name());
         tag.putInt("ScanMinX", scanMinX);
         tag.putInt("ScanMaxX", scanMaxX);
         tag.putInt("ScanMinZ", scanMinZ);

@@ -23,5 +23,7 @@ run
 runs
 run-data
 claude.md
+.claude
+untrue_review.py
 
 repo
