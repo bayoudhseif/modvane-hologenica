@@ -108,6 +108,16 @@ public class HologramRendererClassic {
                 r, g, b, a);
         }
 
+        // Bottom (fixed vertex winding order)
+        if (y - 1 < 0 || terrain[x][y - 1][z] == 0) {
+            addQuad(c, m, 
+                x1 + inset, y1, z1 + inset, 
+                x2 - inset, y1, z1 + inset, 
+                x2 - inset, y1, z2 - inset, 
+                x1 + inset, y1, z2 - inset, 
+                r, g, b, a);
+        }
+
         // All sides use same alpha as top for consistency
         
         // North
