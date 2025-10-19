@@ -1,6 +1,8 @@
 package com.modvane.hologenica.registry;
 
 import com.modvane.hologenica.HologenicaMod;
+import com.modvane.hologenica.block.entity.CloningChamberBlockEntity;
+import com.modvane.hologenica.block.entity.DNACentrifugeBlockEntity;
 import com.modvane.hologenica.block.entity.HologramPodBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -18,6 +20,18 @@ public class HologenicaBlockEntities {
         BLOCK_ENTITIES.register("hologram_pod", () ->
             BlockEntityType.Builder.of(HologramPodBlockEntity::new,
                 HologenicaBlocks.HOLOGRAM_POD.get()).build(null));
+
+    // Cloning chamber block entity
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CloningChamberBlockEntity>> CLONING_CHAMBER =
+        BLOCK_ENTITIES.register("cloning_chamber", () ->
+            BlockEntityType.Builder.of(CloningChamberBlockEntity::new,
+                HologenicaBlocks.CLONING_CHAMBER.get()).build(null));
+
+    // DNA centrifuge block entity
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DNACentrifugeBlockEntity>> DNA_CENTRIFUGE =
+        BLOCK_ENTITIES.register("dna_centrifuge", () ->
+            BlockEntityType.Builder.of(DNACentrifugeBlockEntity::new,
+                HologenicaBlocks.DNA_CENTRIFUGE.get()).build(null));
 
     public static void init(IEventBus modEventBus) {
         BLOCK_ENTITIES.register(modEventBus);

@@ -1,8 +1,10 @@
 package com.modvane.hologenica.registry;
 
 import com.modvane.hologenica.HologenicaMod;
+import com.modvane.hologenica.menu.DNACentrifugeMenu;
 import com.modvane.hologenica.menu.HologramPodMenu;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.inventory.MenuType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
@@ -17,6 +19,11 @@ public class HologenicaMenus {
     public static final DeferredHolder<MenuType<?>, MenuType<HologramPodMenu>> HOLOGRAM_POD =
         MENUS.register("hologram_pod", () -> IMenuTypeExtension.create((containerId, inventory, buffer) -> 
             new HologramPodMenu(containerId, inventory, null)));
+
+    // DNA centrifuge menu type
+    public static final DeferredHolder<MenuType<?>, MenuType<DNACentrifugeMenu>> DNA_CENTRIFUGE =
+        MENUS.register("dna_centrifuge", () -> IMenuTypeExtension.create((containerId, inventory, buffer) -> 
+            new DNACentrifugeMenu(containerId, inventory, new SimpleContainer(1))));
 
     public static void init(IEventBus modEventBus) {
         MENUS.register(modEventBus);

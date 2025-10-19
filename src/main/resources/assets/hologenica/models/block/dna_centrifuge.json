@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "hologenica:block/dna_centrifuge",
+    "particle": "hologenica:block/dna_centrifuge"
+  }
+}
+

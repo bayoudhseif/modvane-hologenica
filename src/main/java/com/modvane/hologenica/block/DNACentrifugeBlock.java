@@ -1,7 +1,9 @@
 package com.modvane.hologenica.block;
 
-import com.modvane.hologenica.block.entity.CloningChamberBlockEntity;
+import com.modvane.hologenica.block.entity.DNACentrifugeBlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -11,19 +13,20 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-// Cloning Chamber block for entity duplication
-public class CloningChamberBlock extends Block implements EntityBlock {
+// DNA Centrifuge - processes DNA syringes to extract genetic data for cloning
+public class DNACentrifugeBlock extends Block implements EntityBlock {
 
-    public CloningChamberBlock(Properties properties) {
+    public DNACentrifugeBlock(Properties properties) {
         super(properties);
     }
 
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new CloningChamberBlockEntity(pos, state);
+        return new DNACentrifugeBlockEntity(pos, state);
     }
 
     @Override
@@ -34,7 +37,17 @@ public class CloningChamberBlock extends Block implements EntityBlock {
     // Disable ambient occlusion for brighter rendering
     @Override
     protected float getShadeBrightness(BlockState state, BlockGetter level, BlockPos pos) {
-        return 1.0f; // Full brightness, no shading
+        return 1.0f;
+    }
+
+    // Right-click to open the centrifuge GUI
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof DNACentrifugeBlockEntity centrifuge) {
+            player.openMenu(centrifuge);
+            return InteractionResult.SUCCESS;
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
     // Enable ticking for the block entity
@@ -42,8 +55,8 @@ public class CloningChamberBlock extends Block implements EntityBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return level.isClientSide ? null : (lvl, pos, st, be) -> {
-            if (be instanceof CloningChamberBlockEntity chamber) {
-                chamber.tick();
+            if (be instanceof DNACentrifugeBlockEntity centrifuge) {
+                centrifuge.tick();
             }
         };
     }
