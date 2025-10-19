@@ -27,13 +27,16 @@ public class CloningPodBlockEntity extends BlockEntity implements MenuProvider {
         public void setChanged() {
             super.setChanged();
             CloningPodBlockEntity.this.setChanged();
-            CloningPodBlockEntity.this.onInventoryChanged();
+            if (!isLoading) {
+                CloningPodBlockEntity.this.onInventoryChanged();
+            }
         }
     };
     
     private String entityType = "";
     private int cloningTime = 0;
     private boolean hasRagdoll = false; // Whether a ragdoll is currently displayed
+    private boolean isLoading = false; // Flag to prevent inventory changes during load
     private static final int CLONING_DURATION = 300; // 15 seconds (20 ticks per second)
 
     public CloningPodBlockEntity(BlockPos pos, BlockState state) {
@@ -153,25 +156,30 @@ public class CloningPodBlockEntity extends BlockEntity implements MenuProvider {
         tag.putInt("CloningTime", cloningTime);
         tag.putBoolean("HasRagdoll", hasRagdoll);
         
-        // Save inventory
-        if (!inventory.isEmpty()) {
-            CompoundTag inventoryTag = new CompoundTag();
-            inventory.getItem(0).save(provider, inventoryTag);
-            tag.put("Inventory", inventoryTag);
-        }
+        // Save inventory using container save method
+        net.minecraft.core.NonNullList<ItemStack> items = net.minecraft.core.NonNullList.withSize(1, ItemStack.EMPTY);
+        items.set(0, inventory.getItem(0));
+        net.minecraft.world.ContainerHelper.saveAllItems(tag, items, provider);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider provider) {
         super.loadAdditional(tag, provider);
+        
+        // Set loading flag to prevent onInventoryChanged during load
+        isLoading = true;
+        
         entityType = tag.getString("EntityType");
         cloningTime = tag.getInt("CloningTime");
         hasRagdoll = tag.getBoolean("HasRagdoll");
         
-        // Load inventory
-        if (tag.contains("Inventory")) {
-            inventory.setItem(0, ItemStack.parse(provider, tag.getCompound("Inventory")).orElse(ItemStack.EMPTY));
-        }
+        // Load inventory using container load method
+        net.minecraft.core.NonNullList<ItemStack> items = net.minecraft.core.NonNullList.withSize(1, ItemStack.EMPTY);
+        net.minecraft.world.ContainerHelper.loadAllItems(tag, items, provider);
+        inventory.setItem(0, items.get(0));
+        
+        // Clear loading flag
+        isLoading = false;
     }
     
     @Override
