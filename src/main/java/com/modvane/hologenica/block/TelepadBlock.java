@@ -15,6 +15,8 @@ import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.BlockHitResult;
@@ -99,13 +101,28 @@ public class TelepadBlock extends HorizontalDirectionalBlock implements EntityBl
         }
     }
 
-    // Trigger teleportation when an entity steps on the telepad
+    // Start charging when an entity steps on the telepad
     @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
         if (!level.isClientSide && entity instanceof Player player) {
             if (level.getBlockEntity(pos) instanceof TelepadBlockEntity telepad) {
-                telepad.teleportEntity(player);
+                telepad.startCharging(player);
             }
         }
     }
+    
+    // Enable ticking for the telepad block entity
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        if (level.isClientSide) {
+            return null;
+        }
+        return (lvl, pos, st, be) -> {
+            if (be instanceof TelepadBlockEntity telepad) {
+                telepad.tick();
+            }
+        };
+    }
 }
+
