@@ -4,6 +4,7 @@
     "block.hologenica.cloning_pod": "Cloning Pod",
     "block.hologenica.centrifuge": "Centrifuge",
     "block.hologenica.reconstruction_pod": "Reconstruction Pod",
+    "block.hologenica.telepad": "Telepad",
     "item.hologenica.bioscanner": "Bioscanner",
     "entity.hologenica.steve_npc": "Steve NPC",
     "gui.hologenica.display_options": "Display Options",
@@ -17,5 +18,7 @@
     "gui.hologenica.size_1": "1×1",
     "gui.hologenica.size_3": "3×3",
     "gui.hologenica.size_9": "9×9",
-    "gui.hologenica.toggle_follow": "Toggle Follow"
+    "gui.hologenica.toggle_follow": "Toggle Follow",
+    "gui.hologenica.telepad_name_label": "Telepad Name",
+    "gui.hologenica.save": "Save"
 }

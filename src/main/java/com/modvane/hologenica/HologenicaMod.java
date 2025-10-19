@@ -1,5 +1,6 @@
 package com.modvane.hologenica;
 
+import com.modvane.hologenica.network.HologenicaNetwork;
 import com.modvane.hologenica.registry.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -33,6 +34,7 @@ public class HologenicaMod {
                     output.accept(HologenicaItems.CLONING_POD.get());
                     output.accept(HologenicaItems.CENTRIFUGE.get());
                     output.accept(HologenicaItems.RECONSTRUCTION_POD.get());
+                    output.accept(HologenicaItems.TELEPAD.get());
                     output.accept(HologenicaItems.BIOSCANNER.get());
                 })
                 .build()
@@ -46,6 +48,9 @@ public class HologenicaMod {
         HologenicaBlockEntities.init(modEventBus);
         HologenicaMenus.init(modEventBus);
         CREATIVE_TABS.register(modEventBus);
+
+        // Initialize network
+        HologenicaNetwork.register(modEventBus);
 
         LOGGER.info("Mod initialized");
     }

@@ -5,6 +5,7 @@ import com.modvane.hologenica.block.CentrifugeBlock;
 import com.modvane.hologenica.block.CloningPodBlock;
 import com.modvane.hologenica.block.HologramProjectorBlock;
 import com.modvane.hologenica.block.ReconstructionPodBlock;
+import com.modvane.hologenica.block.TelepadBlock;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -65,6 +66,20 @@ public class HologenicaBlocks {
                 .strength(4.0f)
                 .sound(SoundType.METAL)
                 .lightLevel(state -> 12)
+                .noOcclusion()
+                .isValidSpawn((state, level, pos, type) -> false)
+                .isRedstoneConductor((state, level, pos) -> false)
+                .isSuffocating((state, level, pos) -> false)
+                .isViewBlocking((state, level, pos) -> false)
+        ));
+
+    // Telepad block
+    public static final DeferredHolder<Block, TelepadBlock> TELEPAD =
+        BLOCKS.register("telepad", () -> new TelepadBlock(
+            BlockBehaviour.Properties.of()
+                .strength(4.0f)
+                .sound(SoundType.METAL)
+                .lightLevel(state -> 10)
                 .noOcclusion()
                 .isValidSpawn((state, level, pos, type) -> false)
                 .isRedstoneConductor((state, level, pos) -> false)

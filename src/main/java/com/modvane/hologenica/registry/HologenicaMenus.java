@@ -4,6 +4,7 @@ import com.modvane.hologenica.HologenicaMod;
 import com.modvane.hologenica.menu.CloningPodMenu;
 import com.modvane.hologenica.menu.HologramProjectorMenu;
 import com.modvane.hologenica.menu.SteveNPCMenu;
+import com.modvane.hologenica.menu.TelepadMenu;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.inventory.MenuType;
@@ -28,8 +29,15 @@ public class HologenicaMenus {
 
     // Steve NPC menu type
     public static final DeferredHolder<MenuType<?>, MenuType<SteveNPCMenu>> STEVE_NPC =
-        MENUS.register("steve_npc", () -> IMenuTypeExtension.create((containerId, inventory, buffer) -> 
+        MENUS.register("steve_npc", () -> IMenuTypeExtension.create((containerId, inventory, buffer) ->
             new SteveNPCMenu(containerId, inventory, null)));
+
+    // Telepad menu type
+    public static final DeferredHolder<MenuType<?>, MenuType<TelepadMenu>> TELEPAD =
+        MENUS.register("telepad", () -> IMenuTypeExtension.create((containerId, inventory, buffer) -> {
+            net.minecraft.core.BlockPos pos = buffer.readBlockPos();
+            return new TelepadMenu(containerId, inventory, pos);
+        }));
 
     public static void init(IEventBus modEventBus) {
         MENUS.register(modEventBus);

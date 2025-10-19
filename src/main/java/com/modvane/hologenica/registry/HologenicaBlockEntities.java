@@ -4,6 +4,7 @@ import com.modvane.hologenica.HologenicaMod;
 import com.modvane.hologenica.block.entity.CloningPodBlockEntity;
 import com.modvane.hologenica.block.entity.HologramProjectorBlockEntity;
 import com.modvane.hologenica.block.entity.ReconstructionPodBlockEntity;
+import com.modvane.hologenica.block.entity.TelepadBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
@@ -32,6 +33,12 @@ public class HologenicaBlockEntities {
         BLOCK_ENTITIES.register("reconstruction_pod", () ->
             BlockEntityType.Builder.of(ReconstructionPodBlockEntity::new,
                 HologenicaBlocks.RECONSTRUCTION_POD.get()).build(null));
+
+    // Telepad block entity
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TelepadBlockEntity>> TELEPAD =
+        BLOCK_ENTITIES.register("telepad", () ->
+            BlockEntityType.Builder.of(TelepadBlockEntity::new,
+                HologenicaBlocks.TELEPAD.get()).build(null));
 
     public static void init(IEventBus modEventBus) {
         BLOCK_ENTITIES.register(modEventBus);

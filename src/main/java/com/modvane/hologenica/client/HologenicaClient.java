@@ -7,6 +7,7 @@ import com.modvane.hologenica.client.renderer.SteveNPCRenderer;
 import com.modvane.hologenica.client.screen.CloningPodScreen;
 import com.modvane.hologenica.client.screen.HologramProjectorScreen;
 import com.modvane.hologenica.client.screen.SteveNPCScreen;
+import com.modvane.hologenica.client.screen.TelepadScreen;
 import com.modvane.hologenica.registry.HologenicaBlockEntities;
 import com.modvane.hologenica.registry.HologenicaBlocks;
 import com.modvane.hologenica.registry.HologenicaEntities;
@@ -50,6 +51,7 @@ public class HologenicaClient {
         event.register(HologenicaMenus.HOLOGRAM_PROJECTOR.get(), HologramProjectorScreen::new);
         event.register(HologenicaMenus.CLONING_POD.get(), CloningPodScreen::new);
         event.register(HologenicaMenus.STEVE_NPC.get(), SteveNPCScreen::new);
+        event.register(HologenicaMenus.TELEPAD.get(), TelepadScreen::new);
     }
 
     // Set render layer for transparency support
@@ -60,6 +62,7 @@ public class HologenicaClient {
             ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.CLONING_POD.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.CENTRIFUGE.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.RECONSTRUCTION_POD.get(), RenderType.translucent());
+            ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.TELEPAD.get(), RenderType.translucent());
         });
     }
 }

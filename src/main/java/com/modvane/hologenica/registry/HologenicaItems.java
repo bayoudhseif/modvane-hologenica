@@ -37,6 +37,11 @@ public class HologenicaItems {
         ITEMS.register("reconstruction_pod", () ->
             new BlockItem(HologenicaBlocks.RECONSTRUCTION_POD.get(), new Item.Properties()));
 
+    // Telepad item
+    public static final DeferredHolder<Item, BlockItem> TELEPAD =
+        ITEMS.register("telepad", () ->
+            new BlockItem(HologenicaBlocks.TELEPAD.get(), new Item.Properties()));
+
     public static void init(IEventBus modEventBus) {
         ITEMS.register(modEventBus);
     }
