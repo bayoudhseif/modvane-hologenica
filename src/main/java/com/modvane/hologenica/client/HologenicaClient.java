@@ -6,6 +6,7 @@ import com.modvane.hologenica.client.renderer.ReconstructionPodRenderer;
 import com.modvane.hologenica.client.renderer.SteveNPCRenderer;
 import com.modvane.hologenica.client.screen.CentrifugeScreen;
 import com.modvane.hologenica.client.screen.HologramProjectorScreen;
+import com.modvane.hologenica.client.screen.SteveNPCScreen;
 import com.modvane.hologenica.registry.HologenicaBlockEntities;
 import com.modvane.hologenica.registry.HologenicaBlocks;
 import com.modvane.hologenica.registry.HologenicaEntities;
@@ -48,6 +49,7 @@ public class HologenicaClient {
     public static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(HologenicaMenus.HOLOGRAM_PROJECTOR.get(), HologramProjectorScreen::new);
         event.register(HologenicaMenus.CENTRIFUGE.get(), CentrifugeScreen::new);
+        event.register(HologenicaMenus.STEVE_NPC.get(), SteveNPCScreen::new);
     }
 
     // Set render layer for transparency support

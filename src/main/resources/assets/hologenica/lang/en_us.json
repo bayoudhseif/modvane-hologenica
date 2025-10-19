@@ -16,5 +16,6 @@
     "gui.hologenica.display_size": "Hologram Size",
     "gui.hologenica.size_1": "1×1",
     "gui.hologenica.size_3": "3×3",
-    "gui.hologenica.size_9": "9×9"
+    "gui.hologenica.size_9": "9×9",
+    "gui.hologenica.toggle_follow": "Toggle Follow"
 }
