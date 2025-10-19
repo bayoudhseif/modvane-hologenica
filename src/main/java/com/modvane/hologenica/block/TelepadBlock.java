@@ -63,6 +63,17 @@ public class TelepadBlock extends Block implements EntityBlock {
         return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
+    // Called when block is broken - remove from registry
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!state.is(newState.getBlock())) {
+            if (!level.isClientSide && level.getBlockEntity(pos) instanceof TelepadBlockEntity telepad) {
+                telepad.removeFromRegistry();
+            }
+            super.onRemove(state, level, pos, newState, movedByPiston);
+        }
+    }
+
     // Trigger teleportation when an entity steps on the telepad
     @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {

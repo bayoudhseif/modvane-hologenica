@@ -3,6 +3,7 @@ package com.modvane.hologenica.block.entity;
 import com.modvane.hologenica.HologenicaMod;
 import com.modvane.hologenica.menu.TelepadMenu;
 import com.modvane.hologenica.registry.HologenicaBlockEntities;
+import com.modvane.hologenica.world.TelepadRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleTypes;
@@ -34,9 +35,6 @@ public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
 
     private String telepadName = "";
 
-    // Global registry of all telepads (dimension + pos -> name)
-    private static final Map<String, TelepadInfo> TELEPAD_REGISTRY = new HashMap<>();
-
     // Cooldown tracking per player to prevent spam teleporting
     private static final Map<String, Long> PLAYER_COOLDOWNS = new HashMap<>();
     private static final long COOLDOWN_TICKS = 60; // 3 seconds (20 ticks per second)
@@ -60,29 +58,24 @@ public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
         }
     }
 
-    // Register this telepad in the global registry
+    // Register this telepad in the persistent registry
     private void updateRegistry() {
         if (level instanceof ServerLevel serverLevel) {
-            String key = getRegistryKey(serverLevel.dimension(), getBlockPos());
+            TelepadRegistry registry = TelepadRegistry.get(serverLevel.getServer());
             if (!telepadName.isEmpty()) {
-                TELEPAD_REGISTRY.put(key, new TelepadInfo(telepadName, serverLevel.dimension(), getBlockPos()));
+                registry.registerTelepad(telepadName, serverLevel.dimension(), getBlockPos());
             } else {
-                TELEPAD_REGISTRY.remove(key);
+                registry.unregisterTelepad(serverLevel.dimension(), getBlockPos());
             }
         }
     }
 
-    // Remove this telepad from the registry
-    private void removeFromRegistry() {
+    // Remove this telepad from the registry (called when block is broken, not when unloaded)
+    public void removeFromRegistry() {
         if (level instanceof ServerLevel serverLevel) {
-            String key = getRegistryKey(serverLevel.dimension(), getBlockPos());
-            TELEPAD_REGISTRY.remove(key);
+            TelepadRegistry registry = TelepadRegistry.get(serverLevel.getServer());
+            registry.unregisterTelepad(serverLevel.dimension(), getBlockPos());
         }
-    }
-
-    // Generate a unique key for the registry
-    private static String getRegistryKey(ResourceKey<Level> dimension, BlockPos pos) {
-        return dimension.location().toString() + "_" + pos.getX() + "_" + pos.getY() + "_" + pos.getZ();
     }
 
     // Teleport an entity to a matching telepad
@@ -118,6 +111,9 @@ public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
         // Pick a random destination (or cycle through them if multiple exist)
         TelepadDestination dest = destinations.get(level.random.nextInt(destinations.size()));
 
+        // Force-load the destination chunk to ensure the telepad exists
+        dest.level.getChunk(dest.pos);
+
         // Spawn disintegration particles at source
         spawnTeleportParticles((ServerLevel) level, player.position(), true);
 
@@ -152,18 +148,27 @@ public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
         List<TelepadDestination> destinations = new ArrayList<>();
         if (server == null || telepadName.isEmpty()) return destinations;
 
-        // Search through the registry for matching names
-        for (TelepadInfo info : TELEPAD_REGISTRY.values()) {
+        // Get the persistent registry
+        TelepadRegistry registry = TelepadRegistry.get(server);
+        List<TelepadRegistry.TelepadLocation> locations = registry.findTelepads(telepadName);
+
+        HologenicaMod.LOGGER.info("Finding telepads named '{}', found {} candidates", telepadName, locations.size());
+
+        // Convert to destinations, skipping self
+        for (TelepadRegistry.TelepadLocation loc : locations) {
             // Skip self
-            if (info.pos.equals(this.getBlockPos()) && info.dimension.equals(((ServerLevel) level).dimension())) {
+            if (loc.pos().equals(this.getBlockPos()) &&
+                level instanceof ServerLevel serverLevel &&
+                loc.dimension().equals(serverLevel.dimension())) {
+                HologenicaMod.LOGGER.info("Skipping self at {}", loc.pos());
                 continue;
             }
-            // Check if names match
-            if (info.name.equals(this.telepadName)) {
-                ServerLevel targetLevel = server.getLevel(info.dimension);
-                if (targetLevel != null) {
-                    destinations.add(new TelepadDestination(targetLevel, info.pos));
-                }
+
+            // Get the dimension
+            ServerLevel targetLevel = server.getLevel(loc.dimension());
+            if (targetLevel != null) {
+                HologenicaMod.LOGGER.info("Added destination at {} in {}", loc.pos(), loc.dimension().location());
+                destinations.add(new TelepadDestination(targetLevel, loc.pos()));
             }
         }
 
@@ -234,15 +239,16 @@ public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
         super.onLoad();
         // Register this telepad when it loads into the world
         if (level != null && !level.isClientSide) {
+            HologenicaMod.LOGGER.info("TelepadBlockEntity.onLoad() called for '{}' at {}", telepadName, getBlockPos());
             updateRegistry();
         }
     }
 
-    // Called when block entity is removed
+    // Called when block entity is removed/unloaded
+    // DO NOT remove from registry here - that happens in onRemove() when block is actually broken
     @Override
     public void setRemoved() {
         super.setRemoved();
-        removeFromRegistry();
     }
 
     // Send data to client for synchronization
@@ -274,9 +280,6 @@ public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
     public void writeExtraData(RegistryFriendlyByteBuf buffer) {
         buffer.writeBlockPos(getBlockPos());
     }
-
-    // Helper record to store telepad information in the registry
-    private record TelepadInfo(String name, ResourceKey<Level> dimension, BlockPos pos) {}
 
     // Helper class to store destination information
     private static class TelepadDestination {
