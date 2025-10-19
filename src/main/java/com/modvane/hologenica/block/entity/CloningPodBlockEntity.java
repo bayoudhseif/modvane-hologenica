@@ -17,7 +17,7 @@ public class CloningPodBlockEntity extends BlockEntity {
     private String entityType = "";
     private int cloningTime = 0;
     private boolean hasRagdoll = false; // Whether a ragdoll is currently displayed
-    private static final int CLONING_DURATION = 100; // 5 seconds (20 ticks per second)
+    private static final int CLONING_DURATION = 300; // 15 seconds (20 ticks per second)
 
     public CloningPodBlockEntity(BlockPos pos, BlockState state) {
         super(HologenicaBlockEntities.CLONING_POD.get(), pos, state);
@@ -31,6 +31,11 @@ public class CloningPodBlockEntity extends BlockEntity {
         if (!entityType.isEmpty() && cloningTime < CLONING_DURATION && !hasRagdoll) {
             cloningTime++;
             setChanged();
+            
+            // Sync to client every 5 ticks for smooth visual updates
+            if (cloningTime % 5 == 0 && level != null && !level.isClientSide) {
+                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+            }
 
             // When cloning is complete, display the ragdoll
             if (cloningTime >= CLONING_DURATION) {
@@ -97,6 +102,7 @@ public class CloningPodBlockEntity extends BlockEntity {
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = super.getUpdateTag(registries);
         tag.putString("EntityType", entityType);
+        tag.putInt("CloningTime", cloningTime);
         tag.putBoolean("HasRagdoll", hasRagdoll);
         return tag;
     }
@@ -125,6 +131,12 @@ public class CloningPodBlockEntity extends BlockEntity {
 
     public boolean hasRagdoll() {
         return hasRagdoll;
+    }
+    
+    // Get progress as a percentage (0.0 to 1.0)
+    public float getCloningProgress() {
+        if (hasRagdoll || entityType.isEmpty()) return 1.0f;
+        return (float) cloningTime / (float) CLONING_DURATION;
     }
 }
 
