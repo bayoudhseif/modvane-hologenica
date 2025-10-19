@@ -32,6 +32,7 @@ public class HologenicaMod {
                     output.accept(HologenicaItems.HOLOGRAM_POD.get());
                     output.accept(HologenicaItems.CLONING_CHAMBER.get());
                     output.accept(HologenicaItems.DNA_CENTRIFUGE.get());
+                    output.accept(HologenicaItems.RECONSTRUCTION_POD.get());
                     output.accept(HologenicaItems.DNA_SYRINGE.get());
                 })
                 .build()

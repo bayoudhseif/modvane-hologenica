@@ -4,6 +4,7 @@ import com.modvane.hologenica.HologenicaMod;
 import com.modvane.hologenica.block.entity.CloningChamberBlockEntity;
 import com.modvane.hologenica.block.entity.DNACentrifugeBlockEntity;
 import com.modvane.hologenica.block.entity.HologramPodBlockEntity;
+import com.modvane.hologenica.block.entity.ReconstructionPodBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
@@ -32,6 +33,12 @@ public class HologenicaBlockEntities {
         BLOCK_ENTITIES.register("dna_centrifuge", () ->
             BlockEntityType.Builder.of(DNACentrifugeBlockEntity::new,
                 HologenicaBlocks.DNA_CENTRIFUGE.get()).build(null));
+
+    // Reconstruction pod block entity
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ReconstructionPodBlockEntity>> RECONSTRUCTION_POD =
+        BLOCK_ENTITIES.register("reconstruction_pod", () ->
+            BlockEntityType.Builder.of(ReconstructionPodBlockEntity::new,
+                HologenicaBlocks.RECONSTRUCTION_POD.get()).build(null));
 
     public static void init(IEventBus modEventBus) {
         BLOCK_ENTITIES.register(modEventBus);

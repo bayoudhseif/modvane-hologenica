@@ -32,6 +32,11 @@ public class HologenicaItems {
         ITEMS.register("dna_centrifuge", () ->
             new BlockItem(HologenicaBlocks.DNA_CENTRIFUGE.get(), new Item.Properties()));
 
+    // Reconstruction pod item
+    public static final DeferredHolder<Item, BlockItem> RECONSTRUCTION_POD =
+        ITEMS.register("reconstruction_pod", () ->
+            new BlockItem(HologenicaBlocks.RECONSTRUCTION_POD.get(), new Item.Properties()));
+
     public static void init(IEventBus modEventBus) {
         ITEMS.register(modEventBus);
     }
