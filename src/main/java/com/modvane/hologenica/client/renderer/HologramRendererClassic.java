@@ -20,7 +20,7 @@ public class HologramRendererClassic {
 
     private static final int FULL_BRIGHT = 0xF000F0;
 
-    // Custom render type for volumetric quads with additive blending
+    // Custom render type for volumetric quads with proper depth handling
     private static final RenderType VOLUMETRIC_QUADS = RenderType.create(
         "hologenica_volumetric",
         DefaultVertexFormat.POSITION_COLOR_LIGHTMAP,
@@ -32,8 +32,9 @@ public class HologramRendererClassic {
             .setShaderState(RenderStateShard.POSITION_COLOR_LIGHTMAP_SHADER)
             .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
             .setLightmapState(RenderStateShard.LIGHTMAP)
-            .setWriteMaskState(RenderStateShard.COLOR_WRITE)
+            .setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE) // Write both color and depth
             .setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
+            .setCullState(RenderStateShard.NO_CULL) // Don't cull faces
             .createCompositeState(false)
     );
 

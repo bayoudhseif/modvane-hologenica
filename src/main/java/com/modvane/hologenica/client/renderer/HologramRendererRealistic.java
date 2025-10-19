@@ -35,7 +35,7 @@ public class HologramRendererRealistic {
             .createCompositeState(false)
     );
 
-    // Custom render type for transparent hologram
+    // Custom render type for transparent hologram with proper depth handling
     private static final RenderType HOLOGRAM_TRANSLUCENT = RenderType.create(
         "hologenica_hologram_translucent",
         DefaultVertexFormat.POSITION_COLOR_LIGHTMAP,
@@ -47,8 +47,9 @@ public class HologramRendererRealistic {
             .setShaderState(RenderStateShard.POSITION_COLOR_LIGHTMAP_SHADER)
             .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
             .setLightmapState(RenderStateShard.LIGHTMAP)
-            .setWriteMaskState(RenderStateShard.COLOR_WRITE)
+            .setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE) // Write both color and depth
             .setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
+            .setCullState(RenderStateShard.NO_CULL) // Don't cull faces
             .createCompositeState(false)
     );
 
