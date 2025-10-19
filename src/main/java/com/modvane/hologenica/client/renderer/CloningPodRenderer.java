@@ -45,7 +45,15 @@ public class CloningPodRenderer implements BlockEntityRenderer<CloningPodBlockEn
         // Parse entity type and create a temporary entity for rendering
         try {
             ResourceLocation entityId = ResourceLocation.parse(entityTypeString);
-            EntityType<?> type = EntityType.byString(entityId.toString()).orElse(null);
+            EntityType<?> type = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.get(entityId);
+            
+            if (type == null) {
+                // Debug: Entity type not found in registry
+                if (blockEntity.getLevel() != null && blockEntity.getLevel().getGameTime() % 100 == 0) {
+                    com.modvane.hologenica.HologenicaMod.LOGGER.warn("Failed to find entity type in registry: {}", entityTypeString);
+                }
+                return;
+            }
             
             if (type != null && blockEntity.getLevel() != null) {
                 // Create a temporary entity just for rendering (not added to world)

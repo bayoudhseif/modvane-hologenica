@@ -39,7 +39,7 @@ public class ReconstructionPodRenderer implements BlockEntityRenderer<Reconstruc
         // Parse entity type and create a temporary entity for rendering
         try {
             ResourceLocation entityId = ResourceLocation.parse(entityTypeString);
-            EntityType<?> type = EntityType.byString(entityId.toString()).orElse(null);
+            EntityType<?> type = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.get(entityId);
             
             if (type != null && blockEntity.getLevel() != null) {
                 // Create a temporary entity just for rendering (not added to world)

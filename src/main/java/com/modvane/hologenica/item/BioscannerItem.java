@@ -49,11 +49,23 @@ public class BioscannerItem extends Item {
 
     // Helper method to capture DNA from any living entity
     private void captureDNA(ItemStack stack, Player player, InteractionHand hand, LivingEntity entity) {
-        // Store entity type and custom name
-        String entityTypeString = EntityType.getKey(entity.getType()).toString();
-        String entityName = entity.hasCustomName() ? 
-            entity.getCustomName().getString() : 
-            entity.getDisplayName().getString();
+        // Check if the entity is a player - if so, we'll clone a Steve NPC instead
+        boolean isPlayer = entity instanceof Player;
+        
+        String entityTypeString;
+        String entityName;
+        
+        if (isPlayer) {
+            // Store our custom Steve NPC entity type
+            entityTypeString = "hologenica:steve_npc";
+            entityName = entity.getDisplayName().getString();
+        } else {
+            // Store regular entity type and name
+            entityTypeString = EntityType.getKey(entity.getType()).toString();
+            entityName = entity.hasCustomName() ? 
+                entity.getCustomName().getString() : 
+                entity.getDisplayName().getString();
+        }
         
         // Use CUSTOM_DATA to store information
         stack.update(DataComponents.CUSTOM_DATA, CustomData.EMPTY, customData -> {

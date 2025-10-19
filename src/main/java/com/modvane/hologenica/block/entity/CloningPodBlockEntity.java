@@ -32,6 +32,11 @@ public class CloningPodBlockEntity extends BlockEntity {
             cloningTime++;
             setChanged();
             
+            // Debug: Log first tick of cloning
+            if (cloningTime == 1) {
+                com.modvane.hologenica.HologenicaMod.LOGGER.info("Starting cloning process for: {}", entityType);
+            }
+            
             // Sync to client every 5 ticks for smooth visual updates
             if (cloningTime % 5 == 0 && level != null && !level.isClientSide) {
                 level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
@@ -39,6 +44,7 @@ public class CloningPodBlockEntity extends BlockEntity {
 
             // When cloning is complete, display the ragdoll
             if (cloningTime >= CLONING_DURATION) {
+                com.modvane.hologenica.HologenicaMod.LOGGER.info("Cloning complete! Displaying ragdoll for: {}", entityType);
                 displayRagdoll();
             }
         }
@@ -52,7 +58,9 @@ public class CloningPodBlockEntity extends BlockEntity {
             this.hasRagdoll = false;
             setChanged();
             
+            // Debug logging
             if (level != null && !level.isClientSide) {
+                com.modvane.hologenica.HologenicaMod.LOGGER.info("Cloning Pod received DNA: {}", entityTypeString);
                 level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
             }
         }

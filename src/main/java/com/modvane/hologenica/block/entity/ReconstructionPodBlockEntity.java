@@ -95,7 +95,7 @@ public class ReconstructionPodBlockEntity extends BlockEntity {
         
         try {
             ResourceLocation entityId = ResourceLocation.parse(entityTypeString);
-            EntityType<?> type = EntityType.byString(entityId.toString()).orElse(null);
+            EntityType<?> type = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.get(entityId);
             
             if (type != null) {
                 // Create temporary entity to get its max health
@@ -122,7 +122,7 @@ public class ReconstructionPodBlockEntity extends BlockEntity {
         try {
             // Parse the entity type
             ResourceLocation entityId = ResourceLocation.parse(entityType);
-            EntityType<?> type = EntityType.byString(entityId.toString()).orElse(null);
+            EntityType<?> type = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.get(entityId);
             
             if (type != null) {
                 // Spawn position above the pod
