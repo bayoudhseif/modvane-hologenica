@@ -92,7 +92,6 @@ public class SteveNPCEntity extends PathfinderMob {
             
             @Override
             public void start() {
-                com.modvane.hologenica.HologenicaMod.LOGGER.info("Steve NPC follow mode activated!");
             }
             
             @Override
@@ -122,7 +121,6 @@ public class SteveNPCEntity extends PathfinderMob {
             @Override
             public void stop() {
                 SteveNPCEntity.this.getNavigation().stop();
-                com.modvane.hologenica.HologenicaMod.LOGGER.info("Steve NPC follow mode deactivated!");
             }
         });
         
@@ -168,12 +166,10 @@ public class SteveNPCEntity extends PathfinderMob {
             // Set this player as the owner
             this.ownerUUID = player.getUUID();
             this.cachedOwner = player;
-            com.modvane.hologenica.HologenicaMod.LOGGER.info("Steve NPC now following player: {}", player.getName().getString());
         } else {
             // Clear owner
             this.ownerUUID = null;
             this.cachedOwner = null;
-            com.modvane.hologenica.HologenicaMod.LOGGER.info("Steve NPC stopped following");
         }
     }
 

@@ -85,8 +85,7 @@ public class CloningPodBlockEntity extends BlockEntity implements MenuProvider {
                         this.cloningTime = 0;
                         this.hasRagdoll = false;
                         setChanged();
-                        
-                        com.modvane.hologenica.HologenicaMod.LOGGER.info("Cloning Pod starting clone: {} ({})", entityType, entityName);
+
                         level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
                     }
                 }
@@ -111,12 +110,7 @@ public class CloningPodBlockEntity extends BlockEntity implements MenuProvider {
         if (!entityType.isEmpty() && cloningTime < CLONING_DURATION && !hasRagdoll) {
             cloningTime++;
             setChanged();
-            
-            // Debug: Log first tick of cloning
-            if (cloningTime == 1) {
-                com.modvane.hologenica.HologenicaMod.LOGGER.info("Starting cloning process for: {}", entityType);
-            }
-            
+
             // Sync to client every 5 ticks for smooth visual updates
             if (cloningTime % 5 == 0) {
                 level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
@@ -124,7 +118,6 @@ public class CloningPodBlockEntity extends BlockEntity implements MenuProvider {
 
             // When cloning is complete, display the ragdoll
             if (cloningTime >= CLONING_DURATION) {
-                com.modvane.hologenica.HologenicaMod.LOGGER.info("Cloning complete! Displaying ragdoll for: {}", entityType);
                 displayRagdoll();
                 // Bioscanner keeps its DNA - it's an infinite template!
             }

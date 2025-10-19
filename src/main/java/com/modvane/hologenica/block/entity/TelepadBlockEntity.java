@@ -152,22 +152,18 @@ public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
         TelepadRegistry registry = TelepadRegistry.get(server);
         List<TelepadRegistry.TelepadLocation> locations = registry.findTelepads(telepadName);
 
-        HologenicaMod.LOGGER.info("Finding telepads named '{}', found {} candidates", telepadName, locations.size());
-
         // Convert to destinations, skipping self
         for (TelepadRegistry.TelepadLocation loc : locations) {
             // Skip self
             if (loc.pos().equals(this.getBlockPos()) &&
                 level instanceof ServerLevel serverLevel &&
                 loc.dimension().equals(serverLevel.dimension())) {
-                HologenicaMod.LOGGER.info("Skipping self at {}", loc.pos());
                 continue;
             }
 
             // Get the dimension
             ServerLevel targetLevel = server.getLevel(loc.dimension());
             if (targetLevel != null) {
-                HologenicaMod.LOGGER.info("Added destination at {} in {}", loc.pos(), loc.dimension().location());
                 destinations.add(new TelepadDestination(targetLevel, loc.pos()));
             }
         }
@@ -239,7 +235,6 @@ public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
         super.onLoad();
         // Register this telepad when it loads into the world
         if (level != null && !level.isClientSide) {
-            HologenicaMod.LOGGER.info("TelepadBlockEntity.onLoad() called for '{}' at {}", telepadName, getBlockPos());
             updateRegistry();
         }
     }

@@ -29,7 +29,6 @@ public class TelepadRegistry extends SavedData {
     // Load telepad registry from NBT
     public TelepadRegistry(CompoundTag tag, HolderLookup.Provider registries) {
         ListTag list = tag.getList("Telepads", Tag.TAG_COMPOUND);
-        HologenicaMod.LOGGER.info("Loading TelepadRegistry with {} entries", list.size());
 
         for (int i = 0; i < list.size(); i++) {
             CompoundTag entry = list.getCompound(i);
@@ -51,7 +50,6 @@ public class TelepadRegistry extends SavedData {
                 );
 
                 locationList.add(new TelepadLocation(dimension, pos));
-                HologenicaMod.LOGGER.info("Loaded telepad '{}' at {} in {}", name, pos, dimensionStr);
             }
 
             telepads.put(name, locationList);
@@ -62,8 +60,6 @@ public class TelepadRegistry extends SavedData {
     @Override
     public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
         ListTag list = new ListTag();
-
-        HologenicaMod.LOGGER.info("Saving TelepadRegistry with {} telepad names", telepads.size());
 
         for (Map.Entry<String, List<TelepadLocation>> entry : telepads.entrySet()) {
             CompoundTag telepadEntry = new CompoundTag();
@@ -77,7 +73,6 @@ public class TelepadRegistry extends SavedData {
                 locTag.putInt("Y", loc.pos().getY());
                 locTag.putInt("Z", loc.pos().getZ());
                 locations.add(locTag);
-                HologenicaMod.LOGGER.info("Saving telepad '{}' at {} in {}", entry.getKey(), loc.pos(), loc.dimension().location());
             }
 
             telepadEntry.put("Locations", locations);
@@ -90,7 +85,7 @@ public class TelepadRegistry extends SavedData {
 
     // Get the telepad registry for the server
     public static TelepadRegistry get(MinecraftServer server) {
-        TelepadRegistry registry = server.overworld().getDataStorage()
+        return server.overworld().getDataStorage()
             .computeIfAbsent(
                 new SavedData.Factory<>(
                     TelepadRegistry::new,
@@ -99,8 +94,6 @@ public class TelepadRegistry extends SavedData {
                 ),
                 DATA_NAME
             );
-        HologenicaMod.LOGGER.info("TelepadRegistry.get() called, registry has {} telepad names", registry.telepads.size());
-        return registry;
     }
 
     // Register a telepad with a name at a specific location
@@ -116,7 +109,6 @@ public class TelepadRegistry extends SavedData {
 
         // Add the new location
         locations.add(newLoc);
-        HologenicaMod.LOGGER.info("Registered telepad '{}' at {} in {}", name, pos, dimension.location());
         setDirty();
     }
 
