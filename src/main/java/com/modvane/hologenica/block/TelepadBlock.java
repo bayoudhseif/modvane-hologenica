@@ -1,31 +1,56 @@
 package com.modvane.hologenica.block;
 
+import com.mojang.serialization.MapCodec;
 import com.modvane.hologenica.block.entity.TelepadBlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 // Block that allows teleportation between telepads with matching names
-// Cross-dimension compatible
-public class TelepadBlock extends Block implements EntityBlock {
+// Cross-dimension compatible with directional placement
+public class TelepadBlock extends HorizontalDirectionalBlock implements EntityBlock {
+
+    public static final MapCodec<TelepadBlock> CODEC = simpleCodec(TelepadBlock::new);
 
     // Half slab shape (8 pixels / 0.5 blocks tall)
     private static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 8.0, 16.0);
 
     public TelepadBlock(Properties properties) {
         super(properties);
+        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
+    }
+
+    @Override
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
+        return CODEC;
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(FACING);
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        // Face toward the player - north side of block faces player
+        // getHorizontalDirection() returns player facing direction, so use opposite to face toward player
+        return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
     }
 
     // Creates the block entity that stores telepad name and handles teleportation

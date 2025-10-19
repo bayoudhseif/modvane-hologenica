@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=north": {
       "model": "hologenica:block/telepad"
+    },
+    "facing=south": {
+      "model": "hologenica:block/telepad",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "hologenica:block/telepad",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "hologenica:block/telepad",
+      "y": 90
     }
   }
 }
