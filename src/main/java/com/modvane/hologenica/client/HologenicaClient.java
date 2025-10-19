@@ -4,7 +4,7 @@ import com.modvane.hologenica.client.renderer.CloningPodRenderer;
 import com.modvane.hologenica.client.renderer.HologramProjectorRenderer;
 import com.modvane.hologenica.client.renderer.ReconstructionPodRenderer;
 import com.modvane.hologenica.client.renderer.SteveNPCRenderer;
-import com.modvane.hologenica.client.screen.CentrifugeScreen;
+import com.modvane.hologenica.client.screen.CloningPodScreen;
 import com.modvane.hologenica.client.screen.HologramProjectorScreen;
 import com.modvane.hologenica.client.screen.SteveNPCScreen;
 import com.modvane.hologenica.registry.HologenicaBlockEntities;
@@ -48,7 +48,7 @@ public class HologenicaClient {
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(HologenicaMenus.HOLOGRAM_PROJECTOR.get(), HologramProjectorScreen::new);
-        event.register(HologenicaMenus.CENTRIFUGE.get(), CentrifugeScreen::new);
+        event.register(HologenicaMenus.CLONING_POD.get(), CloningPodScreen::new);
         event.register(HologenicaMenus.STEVE_NPC.get(), SteveNPCScreen::new);
     }
 

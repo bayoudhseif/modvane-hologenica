@@ -1,20 +1,20 @@
 package com.modvane.hologenica.client.screen;
 
 import com.modvane.hologenica.HologenicaMod;
-import com.modvane.hologenica.menu.CentrifugeMenu;
+import com.modvane.hologenica.menu.CloningPodMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-// Client-side GUI screen for Centrifuge
-public class CentrifugeScreen extends AbstractContainerScreen<CentrifugeMenu> {
+// Client-side GUI screen for Cloning Pod
+public class CloningPodScreen extends AbstractContainerScreen<CloningPodMenu> {
     
     private static final ResourceLocation TEXTURE = 
         ResourceLocation.fromNamespaceAndPath(HologenicaMod.MODID, "textures/gui/centrifuge.png");
 
-    public CentrifugeScreen(CentrifugeMenu menu, Inventory playerInventory, Component title) {
+    public CloningPodScreen(CloningPodMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         this.imageHeight = 166;
         this.inventoryLabelY = this.imageHeight - 94;
@@ -28,10 +28,10 @@ public class CentrifugeScreen extends AbstractContainerScreen<CentrifugeMenu> {
         // Draw background
         graphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
         
-        // Draw progress bar if processing
+        // Draw progress bar if cloning
         if (menu.getBlockEntity() != null) {
-            int progress = menu.getBlockEntity().getProcessingTime();
-            int duration = menu.getBlockEntity().getProcessingDuration();
+            int progress = menu.getBlockEntity().getCloningTime();
+            int duration = menu.getBlockEntity().getCloningDuration();
             
             if (progress > 0 && duration > 0) {
                 int progressWidth = (int) (24.0f * progress / duration);

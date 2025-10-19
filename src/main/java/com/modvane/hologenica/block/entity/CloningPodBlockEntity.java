@@ -4,15 +4,32 @@ import com.modvane.hologenica.registry.HologenicaBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 // Block entity for Cloning Pod - displays a static ragdoll model when complete
-public class CloningPodBlockEntity extends BlockEntity {
+public class CloningPodBlockEntity extends BlockEntity implements MenuProvider {
+    
+    // Container to hold the bioscanner
+    private final SimpleContainer inventory = new SimpleContainer(1) {
+        @Override
+        public void setChanged() {
+            super.setChanged();
+            CloningPodBlockEntity.this.setChanged();
+            CloningPodBlockEntity.this.onInventoryChanged();
+        }
+    };
     
     private String entityType = "";
     private int cloningTime = 0;
@@ -21,6 +38,61 @@ public class CloningPodBlockEntity extends BlockEntity {
 
     public CloningPodBlockEntity(BlockPos pos, BlockState state) {
         super(HologenicaBlockEntities.CLONING_POD.get(), pos, state);
+    }
+    
+    public SimpleContainer getInventory() {
+        return inventory;
+    }
+
+    // Called when inventory changes
+    private void onInventoryChanged() {
+        if (level == null || level.isClientSide) return;
+        
+        ItemStack bioscannerStack = inventory.getItem(0);
+        
+        // If bioscanner was removed completely, clear everything
+        if (bioscannerStack.isEmpty()) {
+            if (!entityType.isEmpty() || hasRagdoll) {
+                this.entityType = "";
+                this.cloningTime = 0;
+                this.hasRagdoll = false;
+                setChanged();
+                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+            }
+            return;
+        }
+        
+        // Check if bioscanner has DNA
+        if (bioscannerStack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA)) {
+            net.minecraft.world.item.component.CustomData customData = bioscannerStack.getOrDefault(
+                net.minecraft.core.component.DataComponents.CUSTOM_DATA,
+                net.minecraft.world.item.component.CustomData.EMPTY);
+            CompoundTag tag = customData.copyTag();
+            
+            if (tag.contains("EntityType")) {
+                String newEntityType = tag.getString("EntityType");
+                
+                // If entity type changed, restart cloning with new entity
+                if (!newEntityType.equals(entityType)) {
+                    this.entityType = newEntityType;
+                    this.cloningTime = 0;
+                    this.hasRagdoll = false;
+                    setChanged();
+                    
+                    com.modvane.hologenica.HologenicaMod.LOGGER.info("Cloning Pod starting clone: {}", entityType);
+                    level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+                }
+            }
+        } else {
+            // Bioscanner present but no DNA - clear everything
+            if (!entityType.isEmpty() || hasRagdoll) {
+                this.entityType = "";
+                this.cloningTime = 0;
+                this.hasRagdoll = false;
+                setChanged();
+                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+            }
+        }
     }
 
     // Called every tick
@@ -38,7 +110,7 @@ public class CloningPodBlockEntity extends BlockEntity {
             }
             
             // Sync to client every 5 ticks for smooth visual updates
-            if (cloningTime % 5 == 0 && level != null && !level.isClientSide) {
+            if (cloningTime % 5 == 0) {
                 level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
             }
 
@@ -46,22 +118,7 @@ public class CloningPodBlockEntity extends BlockEntity {
             if (cloningTime >= CLONING_DURATION) {
                 com.modvane.hologenica.HologenicaMod.LOGGER.info("Cloning complete! Displaying ragdoll for: {}", entityType);
                 displayRagdoll();
-            }
-        }
-    }
-
-    // Receive DNA from centrifuge
-    public void receiveDNA(String entityTypeString) {
-        if (entityType.isEmpty() || hasRagdoll) {
-            this.entityType = entityTypeString;
-            this.cloningTime = 0;
-            this.hasRagdoll = false;
-            setChanged();
-            
-            // Debug logging
-            if (level != null && !level.isClientSide) {
-                com.modvane.hologenica.HologenicaMod.LOGGER.info("Cloning Pod received DNA: {}", entityTypeString);
-                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+                // Bioscanner keeps its DNA - it's an infinite template!
             }
         }
     }
@@ -95,6 +152,13 @@ public class CloningPodBlockEntity extends BlockEntity {
         tag.putString("EntityType", entityType);
         tag.putInt("CloningTime", cloningTime);
         tag.putBoolean("HasRagdoll", hasRagdoll);
+        
+        // Save inventory
+        if (!inventory.isEmpty()) {
+            CompoundTag inventoryTag = new CompoundTag();
+            inventory.getItem(0).save(provider, inventoryTag);
+            tag.put("Inventory", inventoryTag);
+        }
     }
 
     @Override
@@ -103,6 +167,22 @@ public class CloningPodBlockEntity extends BlockEntity {
         entityType = tag.getString("EntityType");
         cloningTime = tag.getInt("CloningTime");
         hasRagdoll = tag.getBoolean("HasRagdoll");
+        
+        // Load inventory
+        if (tag.contains("Inventory")) {
+            inventory.setItem(0, ItemStack.parse(provider, tag.getCompound("Inventory")).orElse(ItemStack.EMPTY));
+        }
+    }
+    
+    @Override
+    public Component getDisplayName() {
+        return Component.translatable("block.hologenica.cloning_pod");
+    }
+    
+    @Nullable
+    @Override
+    public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
+        return new com.modvane.hologenica.menu.CloningPodMenu(containerId, playerInventory, this);
     }
 
     // Sync data to client for rendering

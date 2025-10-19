@@ -1,7 +1,7 @@
 package com.modvane.hologenica.registry;
 
 import com.modvane.hologenica.HologenicaMod;
-import com.modvane.hologenica.menu.CentrifugeMenu;
+import com.modvane.hologenica.menu.CloningPodMenu;
 import com.modvane.hologenica.menu.HologramProjectorMenu;
 import com.modvane.hologenica.menu.SteveNPCMenu;
 import net.minecraft.core.registries.Registries;
@@ -21,10 +21,10 @@ public class HologenicaMenus {
         MENUS.register("hologram_projector", () -> IMenuTypeExtension.create((containerId, inventory, buffer) -> 
             new HologramProjectorMenu(containerId, inventory, null)));
 
-    // Centrifuge menu type
-    public static final DeferredHolder<MenuType<?>, MenuType<CentrifugeMenu>> CENTRIFUGE =
-        MENUS.register("centrifuge", () -> IMenuTypeExtension.create((containerId, inventory, buffer) -> 
-            new CentrifugeMenu(containerId, inventory, new SimpleContainer(1))));
+    // Cloning Pod menu type
+    public static final DeferredHolder<MenuType<?>, MenuType<CloningPodMenu>> CLONING_POD =
+        MENUS.register("cloning_pod", () -> IMenuTypeExtension.create((containerId, inventory, buffer) -> 
+            new CloningPodMenu(containerId, inventory, new SimpleContainer(1))));
 
     // Steve NPC menu type
     public static final DeferredHolder<MenuType<?>, MenuType<SteveNPCMenu>> STEVE_NPC =

@@ -1,6 +1,6 @@
 package com.modvane.hologenica.menu;
 
-import com.modvane.hologenica.block.entity.CentrifugeBlockEntity;
+import com.modvane.hologenica.block.entity.CloningPodBlockEntity;
 import com.modvane.hologenica.registry.HologenicaMenus;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -10,19 +10,19 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-// Menu for Centrifuge GUI
-public class CentrifugeMenu extends AbstractContainerMenu {
+// Menu for Cloning Pod GUI
+public class CloningPodMenu extends AbstractContainerMenu {
     
     private final Container container;
-    private CentrifugeBlockEntity blockEntity;
+    private CloningPodBlockEntity blockEntity;
 
     // Constructor for server-side (with block entity)
-    public CentrifugeMenu(int containerId, Inventory playerInventory, CentrifugeBlockEntity blockEntity) {
-        super(HologenicaMenus.CENTRIFUGE.get(), containerId);
+    public CloningPodMenu(int containerId, Inventory playerInventory, CloningPodBlockEntity blockEntity) {
+        super(HologenicaMenus.CLONING_POD.get(), containerId);
         this.container = blockEntity.getInventory();
         this.blockEntity = blockEntity;
 
-        // DNA Syringe slot (center of GUI)
+        // Bioscanner slot (center of GUI)
         this.addSlot(new Slot(container, 0, 80, 35));
 
         // Player inventory
@@ -39,12 +39,12 @@ public class CentrifugeMenu extends AbstractContainerMenu {
     }
 
     // Constructor for client-side (without block entity)
-    public CentrifugeMenu(int containerId, Inventory playerInventory, Container container) {
-        super(HologenicaMenus.CENTRIFUGE.get(), containerId);
+    public CloningPodMenu(int containerId, Inventory playerInventory, Container container) {
+        super(HologenicaMenus.CLONING_POD.get(), containerId);
         this.container = container;
         this.blockEntity = null;
 
-        // DNA Syringe slot (center of GUI)
+        // Bioscanner slot (center of GUI)
         this.addSlot(new Slot(container, 0, 80, 35));
 
         // Player inventory
@@ -70,12 +70,12 @@ public class CentrifugeMenu extends AbstractContainerMenu {
             itemstack = slotItem.copy();
             
             if (index == 0) {
-                // Moving from centrifuge to player inventory
+                // Moving from cloning pod to player inventory
                 if (!this.moveItemStackTo(slotItem, 1, 37, true)) {
                     return ItemStack.EMPTY;
                 }
             } else {
-                // Moving from player inventory to centrifuge
+                // Moving from player inventory to cloning pod
                 if (!this.moveItemStackTo(slotItem, 0, 1, false)) {
                     return ItemStack.EMPTY;
                 }
@@ -96,7 +96,7 @@ public class CentrifugeMenu extends AbstractContainerMenu {
         return this.container.stillValid(player);
     }
 
-    public CentrifugeBlockEntity getBlockEntity() {
+    public CloningPodBlockEntity getBlockEntity() {
         return blockEntity;
     }
 }

@@ -1,7 +1,6 @@
 package com.modvane.hologenica.registry;
 
 import com.modvane.hologenica.HologenicaMod;
-import com.modvane.hologenica.block.entity.CentrifugeBlockEntity;
 import com.modvane.hologenica.block.entity.CloningPodBlockEntity;
 import com.modvane.hologenica.block.entity.HologramProjectorBlockEntity;
 import com.modvane.hologenica.block.entity.ReconstructionPodBlockEntity;
@@ -27,12 +26,6 @@ public class HologenicaBlockEntities {
         BLOCK_ENTITIES.register("cloning_pod", () ->
             BlockEntityType.Builder.of(CloningPodBlockEntity::new,
                 HologenicaBlocks.CLONING_POD.get()).build(null));
-
-    // Centrifuge block entity
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CentrifugeBlockEntity>> CENTRIFUGE =
-        BLOCK_ENTITIES.register("centrifuge", () ->
-            BlockEntityType.Builder.of(CentrifugeBlockEntity::new,
-                HologenicaBlocks.CENTRIFUGE.get()).build(null));
 
     // Reconstruction pod block entity
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ReconstructionPodBlockEntity>> RECONSTRUCTION_POD =

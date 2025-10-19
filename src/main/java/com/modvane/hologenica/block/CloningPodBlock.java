@@ -3,7 +3,9 @@ package com.modvane.hologenica.block;
 import com.modvane.hologenica.block.entity.CloningPodBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -22,6 +24,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -131,6 +134,19 @@ public class CloningPodBlock extends Block implements EntityBlock {
             return below.is(this) && below.getValue(HALF) == DoubleBlockHalf.LOWER;
         }
         return true;
+    }
+
+    // Right-click to open GUI
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        // Only interact with lower block
+        BlockPos lowerPos = state.getValue(HALF) == DoubleBlockHalf.LOWER ? pos : pos.below();
+        
+        if (!level.isClientSide && level.getBlockEntity(lowerPos) instanceof CloningPodBlockEntity pod) {
+            player.openMenu(pod);
+            return InteractionResult.SUCCESS;
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
     // Enable ticking for the lower block entity only
