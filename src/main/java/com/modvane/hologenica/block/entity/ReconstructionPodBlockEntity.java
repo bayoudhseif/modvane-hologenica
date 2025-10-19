@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 public class ReconstructionPodBlockEntity extends BlockEntity {
     
     private String entityType = "";
+    private String entityName = ""; // Name of the entity being reconstructed
     private int reconstructionProgress = 0;
     private int reconstructionDuration = 0; // Dynamic duration based on entity health
     private boolean isReconstructing = false;
@@ -65,7 +66,7 @@ public class ReconstructionPodBlockEntity extends BlockEntity {
                 // If pod has a ragdoll, start reconstruction
                 // Don't remove the ragdoll - it stays in the pod permanently
                 if (pod.hasRagdoll() && !pod.getEntityType().isEmpty()) {
-                    startReconstruction(pod.getEntityType());
+                    startReconstruction(pod.getEntityType(), pod.getEntityName());
                     return;
                 }
             }
@@ -73,8 +74,9 @@ public class ReconstructionPodBlockEntity extends BlockEntity {
     }
 
     // Start the reconstruction process
-    private void startReconstruction(String entityTypeString) {
+    private void startReconstruction(String entityTypeString, String entityNameString) {
         this.entityType = entityTypeString;
+        this.entityName = entityNameString;
         this.reconstructionProgress = 0;
         
         // Calculate duration based on entity's max health (health × 6 seconds × 20 ticks)
@@ -137,6 +139,11 @@ public class ReconstructionPodBlockEntity extends BlockEntity {
                 Entity entity = type.create(serverLevel, null, spawnPos, MobSpawnType.SPAWNER, false, false);
                 
                 if (entity != null) {
+                    // If it's a Steve NPC, set the owner name
+                    if (entity instanceof com.modvane.hologenica.entity.SteveNPCEntity steveNPC && !entityName.isEmpty()) {
+                        steveNPC.setOwnerName(entityName);
+                    }
+                    
                     // Position it in the center of the block
                     entity.setPos(spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5);
                     serverLevel.addFreshEntity(entity);
@@ -148,6 +155,7 @@ public class ReconstructionPodBlockEntity extends BlockEntity {
 
         // Reset the pod
         entityType = "";
+        entityName = "";
         reconstructionProgress = 0;
         reconstructionDuration = 0;
         isReconstructing = false;
@@ -162,6 +170,7 @@ public class ReconstructionPodBlockEntity extends BlockEntity {
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider provider) {
         super.saveAdditional(tag, provider);
         tag.putString("EntityType", entityType);
+        tag.putString("EntityName", entityName);
         tag.putInt("ReconstructionProgress", reconstructionProgress);
         tag.putInt("ReconstructionDuration", reconstructionDuration);
         tag.putBoolean("IsReconstructing", isReconstructing);
@@ -171,6 +180,7 @@ public class ReconstructionPodBlockEntity extends BlockEntity {
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider provider) {
         super.loadAdditional(tag, provider);
         entityType = tag.getString("EntityType");
+        entityName = tag.getString("EntityName");
         reconstructionProgress = tag.getInt("ReconstructionProgress");
         reconstructionDuration = tag.getInt("ReconstructionDuration");
         isReconstructing = tag.getBoolean("IsReconstructing");
@@ -181,6 +191,7 @@ public class ReconstructionPodBlockEntity extends BlockEntity {
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = super.getUpdateTag(registries);
         tag.putString("EntityType", entityType);
+        tag.putString("EntityName", entityName);
         tag.putInt("ReconstructionProgress", reconstructionProgress);
         tag.putInt("ReconstructionDuration", reconstructionDuration);
         tag.putBoolean("IsReconstructing", isReconstructing);

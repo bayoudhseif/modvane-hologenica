@@ -29,6 +29,7 @@ public class SteveNPCEntity extends PathfinderMob {
 
     private UUID ownerUUID;
     private Player cachedOwner;
+    private String ownerName = ""; // Store the name of who was cloned
 
     public SteveNPCEntity(EntityType<? extends PathfinderMob> entityType, Level level) {
         super(entityType, level);
@@ -38,6 +39,19 @@ public class SteveNPCEntity extends PathfinderMob {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(FOLLOWING, false);
+    }
+    
+    // Set the name of the original player that was cloned
+    public void setOwnerName(String name) {
+        this.ownerName = name;
+        // Update custom name to show "Clone" after the name
+        this.setCustomName(Component.literal(name + " Clone"));
+        this.setCustomNameVisible(true);
+    }
+    
+    // Get the stored owner name
+    public String getStoredOwnerName() {
+        return ownerName;
     }
 
     // Set up AI goals
@@ -141,7 +155,7 @@ public class SteveNPCEntity extends PathfinderMob {
     private MenuProvider getMenuProvider() {
         return new SimpleMenuProvider(
             (containerId, playerInventory, player) -> new SteveNPCMenu(containerId, playerInventory, this),
-            Component.translatable("entity.hologenica.steve_npc")
+            Component.empty()
         );
     }
 
@@ -192,6 +206,9 @@ public class SteveNPCEntity extends PathfinderMob {
         if (this.ownerUUID != null) {
             tag.putUUID("Owner", this.ownerUUID);
         }
+        if (!this.ownerName.isEmpty()) {
+            tag.putString("OwnerName", this.ownerName);
+        }
     }
 
     // Load data
@@ -201,6 +218,14 @@ public class SteveNPCEntity extends PathfinderMob {
         setFollowing(tag.getBoolean("Following"));
         if (tag.hasUUID("Owner")) {
             this.ownerUUID = tag.getUUID("Owner");
+        }
+        if (tag.contains("OwnerName")) {
+            this.ownerName = tag.getString("OwnerName");
+            // Restore custom name
+            if (!this.ownerName.isEmpty()) {
+                this.setCustomName(Component.literal(this.ownerName + " Clone"));
+                this.setCustomNameVisible(true);
+            }
         }
     }
 }

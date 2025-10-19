@@ -34,6 +34,7 @@ public class CloningPodBlockEntity extends BlockEntity implements MenuProvider {
     };
     
     private String entityType = "";
+    private String entityName = ""; // Name of the entity being cloned
     private int cloningTime = 0;
     private boolean hasRagdoll = false; // Whether a ragdoll is currently displayed
     private boolean isLoading = false; // Flag to prevent inventory changes during load
@@ -57,6 +58,7 @@ public class CloningPodBlockEntity extends BlockEntity implements MenuProvider {
         if (bioscannerStack.isEmpty()) {
             if (!entityType.isEmpty() || hasRagdoll) {
                 this.entityType = "";
+                this.entityName = "";
                 this.cloningTime = 0;
                 this.hasRagdoll = false;
                 setChanged();
@@ -65,37 +67,40 @@ public class CloningPodBlockEntity extends BlockEntity implements MenuProvider {
             return;
         }
         
-        // Check if bioscanner has DNA
-        if (bioscannerStack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA)) {
-            net.minecraft.world.item.component.CustomData customData = bioscannerStack.getOrDefault(
-                net.minecraft.core.component.DataComponents.CUSTOM_DATA,
-                net.minecraft.world.item.component.CustomData.EMPTY);
-            CompoundTag tag = customData.copyTag();
-            
-            if (tag.contains("EntityType")) {
-                String newEntityType = tag.getString("EntityType");
+            // Check if bioscanner has DNA
+            if (bioscannerStack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA)) {
+                net.minecraft.world.item.component.CustomData customData = bioscannerStack.getOrDefault(
+                    net.minecraft.core.component.DataComponents.CUSTOM_DATA,
+                    net.minecraft.world.item.component.CustomData.EMPTY);
+                CompoundTag tag = customData.copyTag();
                 
-                // If entity type changed, restart cloning with new entity
-                if (!newEntityType.equals(entityType)) {
-                    this.entityType = newEntityType;
+                if (tag.contains("EntityType")) {
+                    String newEntityType = tag.getString("EntityType");
+                    String newEntityName = tag.contains("EntityName") ? tag.getString("EntityName") : "";
+                    
+                    // If entity type changed, restart cloning with new entity
+                    if (!newEntityType.equals(entityType)) {
+                        this.entityType = newEntityType;
+                        this.entityName = newEntityName;
+                        this.cloningTime = 0;
+                        this.hasRagdoll = false;
+                        setChanged();
+                        
+                        com.modvane.hologenica.HologenicaMod.LOGGER.info("Cloning Pod starting clone: {} ({})", entityType, entityName);
+                        level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+                    }
+                }
+            } else {
+                // Bioscanner present but no DNA - clear everything
+                if (!entityType.isEmpty() || hasRagdoll) {
+                    this.entityType = "";
+                    this.entityName = "";
                     this.cloningTime = 0;
                     this.hasRagdoll = false;
                     setChanged();
-                    
-                    com.modvane.hologenica.HologenicaMod.LOGGER.info("Cloning Pod starting clone: {}", entityType);
                     level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
                 }
             }
-        } else {
-            // Bioscanner present but no DNA - clear everything
-            if (!entityType.isEmpty() || hasRagdoll) {
-                this.entityType = "";
-                this.cloningTime = 0;
-                this.hasRagdoll = false;
-                setChanged();
-                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
-            }
-        }
     }
 
     // Called every tick
@@ -153,6 +158,7 @@ public class CloningPodBlockEntity extends BlockEntity implements MenuProvider {
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider provider) {
         super.saveAdditional(tag, provider);
         tag.putString("EntityType", entityType);
+        tag.putString("EntityName", entityName);
         tag.putInt("CloningTime", cloningTime);
         tag.putBoolean("HasRagdoll", hasRagdoll);
         
@@ -170,6 +176,7 @@ public class CloningPodBlockEntity extends BlockEntity implements MenuProvider {
         isLoading = true;
         
         entityType = tag.getString("EntityType");
+        entityName = tag.getString("EntityName");
         cloningTime = tag.getInt("CloningTime");
         hasRagdoll = tag.getBoolean("HasRagdoll");
         
@@ -198,6 +205,7 @@ public class CloningPodBlockEntity extends BlockEntity implements MenuProvider {
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = super.getUpdateTag(registries);
         tag.putString("EntityType", entityType);
+        tag.putString("EntityName", entityName);
         tag.putInt("CloningTime", cloningTime);
         tag.putBoolean("HasRagdoll", hasRagdoll);
         return tag;
@@ -211,6 +219,10 @@ public class CloningPodBlockEntity extends BlockEntity implements MenuProvider {
 
     public String getEntityType() {
         return entityType;
+    }
+    
+    public String getEntityName() {
+        return entityName;
     }
 
     public int getCloningTime() {
