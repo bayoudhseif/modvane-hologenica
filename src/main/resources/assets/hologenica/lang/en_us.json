@@ -10,7 +10,7 @@
     "item.hologenica.bioscanner": "Bioscanner",
     "entity.hologenica.steve_npc": "Steve NPC",
     "gui.hologenica.display_options": "Display Options",
-    "gui.hologenica.label_transparency": "Transparent",
+    "gui.hologenica.label_transparency": "Opacity",
     "gui.hologenica.label_rotation": "Rotating",
     "gui.hologenica.label_style": "Cycle Style",
     "gui.hologenica.scan_area": "Scan Area",

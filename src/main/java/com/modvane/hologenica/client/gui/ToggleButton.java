@@ -21,7 +21,7 @@ public class ToggleButton extends Button {
     @Override
     public Component getMessage() {
         boolean isOn = toggleStateSupplier.get();
-        String symbol = isOn ? "✔" : "✖";
+        String symbol = isOn ? "✔" : "×";
         return Component.literal(symbol + " " + baseMessage.getString());
     }
 }

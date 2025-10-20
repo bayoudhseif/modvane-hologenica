@@ -5,7 +5,9 @@ import com.modvane.hologenica.registry.HologenicaMenus;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.SimpleContainerData;
 
 // Simple menu for the hologram block GUI
 // Handles button clicks from the client screen
@@ -13,6 +15,7 @@ public class HologramMenu extends AbstractContainerMenu {
 
     private final ContainerLevelAccess access;
     private final HologramBlockEntity blockEntity;
+    private final ContainerData data;
 
     public HologramMenu(int containerId, Inventory playerInventory, HologramBlockEntity blockEntity) {
         super(HologenicaMenus.HOLOGRAM.get(), containerId);
@@ -23,6 +26,11 @@ public class HologramMenu extends AbstractContainerMenu {
             this.access = ContainerLevelAccess.NULL;
             this.blockEntity = null;
         }
+        
+        // Create data container to sync toggle states to client
+        // Index 0: transparency, Index 1: rotation, Index 2: render style (0=CLASSIC, 1=REALISTIC)
+        this.data = new SimpleContainerData(3);
+        addDataSlots(this.data);
     }
 
     // Handle button clicks from the client screen
@@ -59,6 +67,33 @@ public class HologramMenu extends AbstractContainerMenu {
             }
         }
         return false;
+    }
+
+    @Override
+    public void broadcastChanges() {
+        super.broadcastChanges();
+        // Update the synced data with current toggle states
+        if (blockEntity != null) {
+            this.data.set(0, blockEntity.isTransparentMode() ? 1 : 0);
+            this.data.set(1, blockEntity.isRotationEnabled() ? 1 : 0);
+            this.data.set(2, blockEntity.getRenderStyle().ordinal());
+        }
+    }
+
+    // Get transparency state from synced data (works on both client and server)
+    public boolean isTransparentMode() {
+        return this.data.get(0) == 1;
+    }
+
+    // Get rotation state from synced data (works on both client and server)
+    public boolean isRotationEnabled() {
+        return this.data.get(1) == 1;
+    }
+
+    // Get current render style name from synced data
+    public String getRenderStyleName() {
+        int styleIndex = this.data.get(2);
+        return styleIndex == 0 ? "Classic" : "Realistic";
     }
 
     // Check if the player can still access this menu

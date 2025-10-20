@@ -1,5 +1,6 @@
 package com.modvane.hologenica.client.screen;
 
+import com.modvane.hologenica.client.gui.ToggleButton;
 import com.modvane.hologenica.menu.HologramMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -8,6 +9,9 @@ import net.minecraft.world.entity.player.Inventory;
 
 // Hologram projector GUI with simple buttons
 public class HologramScreen extends BaseModScreen<HologramMenu> {
+
+    // Custom button that shows current style name
+    private Button styleButton;
 
     public HologramScreen(HologramMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -35,21 +39,25 @@ public class HologramScreen extends BaseModScreen<HologramMenu> {
         int twoButtonWidth = getButtonWidth(2);
         
         // Row 1: Transparency and Rotation
-        addRenderableWidget(Button.builder(
+        addRenderableWidget(new ToggleButton(
+            leftPos + PADDING, y, twoButtonWidth, BUTTON_HEIGHT,
             Component.translatable("gui.hologenica.label_transparency"),
-            button -> minecraft.gameMode.handleInventoryButtonClick(menu.containerId, 0)
-        ).bounds(leftPos + PADDING, y, twoButtonWidth, BUTTON_HEIGHT).build());
+            button -> minecraft.gameMode.handleInventoryButtonClick(menu.containerId, 0),
+            () -> menu.isTransparentMode()
+        ));
         
-        addRenderableWidget(Button.builder(
+        addRenderableWidget(new ToggleButton(
+            leftPos + PADDING + twoButtonWidth + BUTTON_SPACING, y, twoButtonWidth, BUTTON_HEIGHT,
             Component.translatable("gui.hologenica.label_rotation"),
-            button -> minecraft.gameMode.handleInventoryButtonClick(menu.containerId, 1)
-        ).bounds(leftPos + PADDING + twoButtonWidth + BUTTON_SPACING, y, twoButtonWidth, BUTTON_HEIGHT).build());
+            button -> minecraft.gameMode.handleInventoryButtonClick(menu.containerId, 1),
+            () -> menu.isRotationEnabled()
+        ));
         
         y += BUTTON_HEIGHT + BUTTON_SPACING;
         
-        // Row 2: Style toggle (full width)
-        addRenderableWidget(Button.builder(
-            Component.translatable("gui.hologenica.label_style"),
+        // Row 2: Style button (full width) - shows current style name
+        styleButton = addRenderableWidget(Button.builder(
+            Component.literal("Style: " + menu.getRenderStyleName()),
             button -> minecraft.gameMode.handleInventoryButtonClick(menu.containerId, 2)
         ).bounds(leftPos + PADDING, y, getContentWidth(), BUTTON_HEIGHT).build());
         
@@ -101,6 +109,11 @@ public class HologramScreen extends BaseModScreen<HologramMenu> {
         int x = leftPos;
         int y = topPos;
         graphics.fill(x, y, x + imageWidth, y + imageHeight, 0xC0101010);
+        
+        // Update style button text
+        if (styleButton != null) {
+            styleButton.setMessage(Component.literal("Style: " + menu.getRenderStyleName()));
+        }
     }
 
     @Override
