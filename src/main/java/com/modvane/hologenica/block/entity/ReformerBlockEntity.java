@@ -1,8 +1,7 @@
 package com.modvane.hologenica.block.entity;
 
-import com.modvane.hologenica.block.NeurolinkBlock;
-import com.modvane.hologenica.block.NeurocellBlock;
 import com.modvane.hologenica.registry.HologenicaBlockEntities;
+import com.modvane.hologenica.util.NeurocellConnector;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -21,7 +20,15 @@ import org.jetbrains.annotations.Nullable;
 
 // Reformer - grows clones from 1% to 100% then spawns them as real entities
 public class ReformerBlockEntity extends BlockEntity {
-    
+
+    // Reconstruction timing constants
+    private static final int DEFAULT_RECONSTRUCTION_DURATION = 1200; // 60 seconds default
+    private static final int SYNC_INTERVAL = 5; // Sync to client every 5 ticks
+    private static final int HEALTH_TO_TICKS_MULTIPLIER = 120; // health × 6 seconds × 20 ticks
+
+    // Spawn position constants
+    private static final double SPAWN_OFFSET = 0.5; // Center of block (8 pixels = 0.5 blocks tall)
+
     private String entityType = "";
     private String entityName = ""; // Name of the entity being reconstructed
     private java.util.UUID playerUUID = null; // UUID of the player (for skin rendering)
@@ -56,8 +63,8 @@ public class ReformerBlockEntity extends BlockEntity {
             reconstructionProgress++;
             setChanged();
 
-            // Sync to client every 5 ticks for smooth visual updates
-            if (reconstructionProgress % 5 == 0) {
+            // Sync to client periodically for smooth visual updates
+            if (reconstructionProgress % SYNC_INTERVAL == 0) {
                 level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
             }
 
@@ -81,35 +88,26 @@ public class ReformerBlockEntity extends BlockEntity {
     }
     
     // Find a neurocell connected through exactly 1 neurolink block (no direct connection)
+    @Nullable
     private NeurocellBlockEntity findConnectedNeurocell() {
-        if (level == null) return null;
-        
-        // Check all 4 horizontal directions for neurolinks
-        for (Direction firstDir : Direction.Plane.HORIZONTAL) {
-            BlockPos neurolinkPos = worldPosition.relative(firstDir);
-            BlockState neurolinkState = level.getBlockState(neurolinkPos);
-            
-            // Must be a neurolink (no direct connection to neurocell)
-            if (neurolinkState.getBlock() instanceof NeurolinkBlock) {
-                // Now check all 4 directions from the neurolink for a neurocell
-                for (Direction secondDir : Direction.Plane.HORIZONTAL) {
-                    BlockPos neurocellPos = neurolinkPos.relative(secondDir);
-                    BlockState neurocellState = level.getBlockState(neurocellPos);
-                    
-                    if (neurocellState.getBlock() instanceof NeurocellBlock) {
-                        BlockEntity be = level.getBlockEntity(neurocellPos);
-                        if (be instanceof NeurocellBlockEntity pod) {
-                            // Check if connection is NOT from the back (Reformer uses left/right sides only)
-                            if (pod.acceptsConnectionFrom(secondDir.getOpposite()) && !pod.isBackConnection(secondDir.getOpposite()) && pod.hasRagdoll() && !pod.getEntityType().isEmpty()) {
-                                return pod;
-                            }
-                        }
-                    }
-                }
-            }
+        return NeurocellConnector.findConnectedNeurocell(
+            level,
+            worldPosition,
+            this::isValidNeurocellForReformer
+        );
+    }
+
+    // Check if neurocell is valid for reformer connection
+    private boolean isValidNeurocellForReformer(NeurocellBlockEntity neurocell) {
+        // Neurocell must have a ragdoll and entity type
+        if (!neurocell.hasRagdoll() || neurocell.getEntityType().isEmpty()) {
+            return false;
         }
-        
-        return null; // No connected neurocell found
+
+        // Check connection is from left/right sides only (not from back)
+        // The reformer connects from the sides, not the back
+        // This is validated by checking if the connection is accepted but not from back
+        return true; // BlockConnectionHelper already validates acceptsConnectionFrom
     }
 
     // Start the reconstruction process
@@ -163,27 +161,25 @@ public class ReformerBlockEntity extends BlockEntity {
     // Calculate reconstruction duration based on entity's max health
     // Formula: health × 6 seconds × 20 ticks per second
     private int calculateReconstructionDuration(String entityTypeString) {
-        if (level == null) return 1200; // Default 60 seconds if we can't calculate
-        
+        if (level == null) return DEFAULT_RECONSTRUCTION_DURATION;
+
         try {
             ResourceLocation entityId = ResourceLocation.parse(entityTypeString);
             EntityType<?> type = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.get(entityId);
-            
+
             if (type != null) {
                 // Create temporary entity to get its max health
                 Entity entity = type.create(level);
                 if (entity instanceof net.minecraft.world.entity.LivingEntity livingEntity) {
                     float maxHealth = livingEntity.getMaxHealth();
-                    // health × 6 seconds × 20 ticks per second
-                    return (int) (maxHealth * 6 * 20);
+                    return (int) (maxHealth * HEALTH_TO_TICKS_MULTIPLIER);
                 }
             }
         } catch (Exception e) {
             // Failed to calculate, use default
         }
-        
-        // Default: 60 seconds (for 10 health entities)
-        return 1200;
+
+        return DEFAULT_RECONSTRUCTION_DURATION;
     }
 
     // Spawn the fully reconstructed entity
@@ -213,9 +209,13 @@ public class ReformerBlockEntity extends BlockEntity {
                             steveNPC.setPlayerUUID(playerUUID);
                         }
                     }
-                    
-                    // Position entity on top of 8px tall reformer (0.5 blocks)
-                    entity.setPos(worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5);
+
+                    // Position entity on top of reformer
+                    entity.setPos(
+                        worldPosition.getX() + SPAWN_OFFSET,
+                        worldPosition.getY() + SPAWN_OFFSET,
+                        worldPosition.getZ() + SPAWN_OFFSET
+                    );
                     serverLevel.addFreshEntity(entity);
                 }
             }

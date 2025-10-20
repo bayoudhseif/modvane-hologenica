@@ -29,18 +29,15 @@ public class NeurocellBlockEntity extends BlockEntity implements MenuProvider {
         public void setChanged() {
             super.setChanged();
             NeurocellBlockEntity.this.setChanged();
-            if (!isLoading) {
-                NeurocellBlockEntity.this.onInventoryChanged();
-            }
+            NeurocellBlockEntity.this.onInventoryChanged();
         }
     };
-    
+
     private String entityType = "";
     private String entityName = ""; // Name of the entity being cloned
     private java.util.UUID playerUUID = null; // Player UUID for skin rendering
     private int cloningTime = 0;
     private boolean hasRagdoll = false; // Whether a ragdoll is currently displayed
-    private boolean isLoading = false; // Flag to prevent inventory changes during load
     private static final int CLONING_DURATION = 300; // 15 seconds (20 ticks per second)
 
     public NeurocellBlockEntity(BlockPos pos, BlockState state) {
@@ -54,90 +51,58 @@ public class NeurocellBlockEntity extends BlockEntity implements MenuProvider {
     // Called when inventory changes
     private void onInventoryChanged() {
         if (level == null || level.isClientSide) return;
-        
+
         ItemStack bioscannerStack = inventory.getItem(0);
-        
-        // If bioscanner was removed completely, clear everything
-        if (bioscannerStack.isEmpty()) {
-            if (!entityType.isEmpty() || hasRagdoll) {
-                this.entityType = "";
-                this.entityName = "";
-                this.cloningTime = 0;
-                this.hasRagdoll = false;
-                setChanged();
-                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
-            }
+
+        // If bioscanner was removed or has no DNA, clear state
+        if (bioscannerStack.isEmpty() || !bioscannerStack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA)) {
+            clearRagdollState();
             return;
         }
-        
-            // Check if bioscanner has DNA
-            if (bioscannerStack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA)) {
-                net.minecraft.world.item.component.CustomData customData = bioscannerStack.getOrDefault(
-                    net.minecraft.core.component.DataComponents.CUSTOM_DATA,
-                    net.minecraft.world.item.component.CustomData.EMPTY);
-                CompoundTag tag = customData.copyTag();
-                
-                if (tag.contains("EntityType")) {
-                    String newEntityType = tag.getString("EntityType");
-                    String newEntityName = tag.contains("EntityName") ? tag.getString("EntityName") : "";
-                    
-                    // If entity type changed, restart cloning with new entity
-                    if (!newEntityType.equals(entityType)) {
-                        this.entityType = newEntityType;
-                        this.entityName = newEntityName;
-                        // Cache player UUID for renderer
-                        if (tag.hasUUID("PlayerUUID")) {
-                            this.playerUUID = tag.getUUID("PlayerUUID");
-                        } else {
-                            this.playerUUID = null;
-                        }
-                        this.cloningTime = 0;
-                        this.hasRagdoll = true; // Instantly show ragdoll
-                        setChanged();
 
-                        level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
-                    }
-                }
-            } else {
-                // Bioscanner present but no DNA - clear everything
-                if (!entityType.isEmpty() || hasRagdoll) {
-                    this.entityType = "";
-                    this.entityName = "";
-                    this.playerUUID = null;
-                    this.cloningTime = 0;
-                    this.hasRagdoll = false;
-                    setChanged();
-                    level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
-                }
-            }
-    }
+        // Check if bioscanner has DNA
+        net.minecraft.world.item.component.CustomData customData = bioscannerStack.getOrDefault(
+            net.minecraft.core.component.DataComponents.CUSTOM_DATA,
+            net.minecraft.world.item.component.CustomData.EMPTY);
+        CompoundTag tag = customData.copyTag();
 
-    // Called every tick
-    public void tick() {
-        // No ticking needed - ragdoll appears instantly when bioscanner is inserted
-    }
+        if (!tag.contains("EntityType")) {
+            clearRagdollState();
+            return;
+        }
 
-    // Display the ragdoll inside the chamber
-    private void displayRagdoll() {
-        this.hasRagdoll = true;
-        setChanged();
-        
-        // Sync to client for rendering
-        if (level != null && !level.isClientSide) {
+        String newEntityType = tag.getString("EntityType");
+
+        // If entity type changed, update ragdoll
+        if (!newEntityType.equals(entityType)) {
+            this.entityType = newEntityType;
+            this.entityName = tag.contains("EntityName") ? tag.getString("EntityName") : "";
+            this.playerUUID = tag.hasUUID("PlayerUUID") ? tag.getUUID("PlayerUUID") : null;
+            this.cloningTime = 0;
+            this.hasRagdoll = true;
+            setChanged();
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
         }
     }
 
-    // Clear the ragdoll (for future use if needed)
-    public void clearRagdoll() {
+    // Clear ragdoll state
+    private void clearRagdollState() {
+        if (entityType.isEmpty() && !hasRagdoll) return; // Already clear
+
         this.entityType = "";
+        this.entityName = "";
+        this.playerUUID = null;
         this.cloningTime = 0;
         this.hasRagdoll = false;
         setChanged();
-        
-        if (level != null && !level.isClientSide) {
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
-        }
+        level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+    }
+
+    // Called every tick (removed - not needed)
+
+    // Clear the ragdoll (public API for external use)
+    public void clearRagdoll() {
+        clearRagdollState();
     }
 
     @Override
@@ -160,27 +125,17 @@ public class NeurocellBlockEntity extends BlockEntity implements MenuProvider {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider provider) {
         super.loadAdditional(tag, provider);
-        
-        // Set loading flag to prevent onInventoryChanged during load
-        isLoading = true;
-        
+
         entityType = tag.getString("EntityType");
         entityName = tag.getString("EntityName");
-        if (tag.hasUUID("PlayerUUID")) {
-            playerUUID = tag.getUUID("PlayerUUID");
-        } else {
-            playerUUID = null;
-        }
+        playerUUID = tag.hasUUID("PlayerUUID") ? tag.getUUID("PlayerUUID") : null;
         cloningTime = tag.getInt("CloningTime");
         hasRagdoll = tag.getBoolean("HasRagdoll");
-        
+
         // Load inventory using container load method
         net.minecraft.core.NonNullList<ItemStack> items = net.minecraft.core.NonNullList.withSize(1, ItemStack.EMPTY);
         net.minecraft.world.ContainerHelper.loadAllItems(tag, items, provider);
         inventory.setItem(0, items.get(0));
-        
-        // Clear loading flag
-        isLoading = false;
     }
     
     @Override

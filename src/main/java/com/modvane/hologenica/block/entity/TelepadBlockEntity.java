@@ -31,15 +31,37 @@ import java.util.*;
 // Features charging time, cooldowns, sounds, and particle effects
 public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
 
-    private String telepadName = "";
-
     // Teleportation timing constants
     private static final int CHARGE_TIME = 40; // 2 seconds charging time (20 ticks per second)
     private static final int COOLDOWN_AFTER_TELEPORT = 60; // 3 seconds cooldown after arriving
-    
+
+    // Particle and sound constants
+    private static final int CHARGING_PARTICLE_INTERVAL = 2; // Spawn particles every 2 ticks
+    private static final int SOUND_INTERVAL = 10; // Play sound every 10 ticks
+    private static final int CHARGING_PARTICLE_COUNT = 3;
+    private static final double PARTICLE_RADIUS_MIN = 0.5;
+    private static final double PARTICLE_RADIUS_MAX = 1.0;
+    private static final double PARTICLE_SPEED = 0.05;
+
+    // Teleport particle constants
+    private static final int TELEPORT_PARTICLE_COUNT = 50;
+    private static final int TELEPORT_END_ROD_COUNT = 20;
+    private static final double TELEPORT_PARTICLE_SPREAD_X = 0.3;
+    private static final double TELEPORT_PARTICLE_SPREAD_Y = 0.5;
+    private static final double TELEPORT_PARTICLE_SPREAD_Z = 0.3;
+    private static final double TELEPORT_PARTICLE_VELOCITY = 0.5;
+    private static final double END_ROD_SPREAD = 0.2;
+    private static final double END_ROD_HEIGHT = 0.3;
+    private static final double END_ROD_VELOCITY = 0.1;
+
+    // Teleportation position constants
+    private static final double TELEPORT_CENTER_OFFSET = 0.5;
+
+    private String telepadName = "";
+
     // Track players currently on this telepad with their charge progress
     private final Map<UUID, Integer> chargingPlayers = new HashMap<>();
-    
+
     // Track players who just teleported to prevent immediate re-teleport
     private final Map<UUID, Long> recentArrivals = new HashMap<>();
 
@@ -109,14 +131,14 @@ public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
             chargingPlayers.put(playerId, chargeTime);
             
             // Spawn charging particles
-            if (chargeTime % 2 == 0) { // Every 2 ticks
+            if (chargeTime % CHARGING_PARTICLE_INTERVAL == 0) {
                 spawnChargingParticles(player);
             }
-            
+
             // Play charging sound periodically
             if (chargeTime == 1) {
                 level.playSound(null, worldPosition, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 0.5f, 1.5f);
-            } else if (chargeTime % 10 == 0 && chargeTime < CHARGE_TIME) {
+            } else if (chargeTime % SOUND_INTERVAL == 0 && chargeTime < CHARGE_TIME) {
                 level.playSound(null, worldPosition, SoundEvents.BEACON_AMBIENT, SoundSource.BLOCKS, 0.3f, 1.8f);
             }
             
@@ -199,9 +221,9 @@ public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
         // Teleport the player
         player.teleportTo(
             dest.level,
-            dest.pos.getX() + 0.5,
-            dest.pos.getY() + 0.5,
-            dest.pos.getZ() + 0.5,
+            dest.pos.getX() + TELEPORT_CENTER_OFFSET,
+            dest.pos.getY() + TELEPORT_CENTER_OFFSET,
+            dest.pos.getZ() + TELEPORT_CENTER_OFFSET,
             player.getYRot(),
             player.getXRot()
         );
@@ -229,22 +251,22 @@ public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
     // Spawn charging particles around player
     private void spawnChargingParticles(Player player) {
         if (!(level instanceof ServerLevel serverLevel)) return;
-        
+
         double x = player.getX();
         double y = player.getY();
         double z = player.getZ();
-        
+
         // Spawn particles in a circle around the player
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < CHARGING_PARTICLE_COUNT; i++) {
             double angle = Math.random() * Math.PI * 2;
-            double radius = 0.5 + Math.random() * 0.5;
+            double radius = PARTICLE_RADIUS_MIN + Math.random() * (PARTICLE_RADIUS_MAX - PARTICLE_RADIUS_MIN);
             double offsetX = Math.cos(angle) * radius;
             double offsetZ = Math.sin(angle) * radius;
-            
+
             serverLevel.sendParticles(
                 ParticleTypes.PORTAL,
                 x + offsetX, y + Math.random(), z + offsetZ,
-                1, 0, 0, 0, 0.05
+                1, 0, 0, 0, PARTICLE_SPEED
             );
         }
     }
@@ -252,37 +274,26 @@ public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
     // Spawn teleport particles at a position
     private void spawnTeleportParticles(net.minecraft.world.phys.Vec3 pos) {
         if (!(level instanceof ServerLevel serverLevel)) return;
-        
-        // Large burst of particles
-        serverLevel.sendParticles(
-            ParticleTypes.PORTAL,
-            pos.x, pos.y + 0.5, pos.z,
-            50, 0.3, 0.5, 0.3, 0.5
-        );
-        
-        serverLevel.sendParticles(
-            ParticleTypes.END_ROD,
-            pos.x, pos.y + 0.5, pos.z,
-            20, 0.2, 0.3, 0.2, 0.1
-        );
+        spawnTeleportParticlesAt(serverLevel, pos.x, pos.y, pos.z);
     }
-    
+
     // Spawn teleport particles at a block position
     private void spawnArrivalParticlesAt(ServerLevel serverLevel, BlockPos pos) {
-        double x = pos.getX() + 0.5;
-        double y = pos.getY() + 0.5;
-        double z = pos.getZ() + 0.5;
-        
+        spawnTeleportParticlesAt(serverLevel, pos.getX() + TELEPORT_CENTER_OFFSET, pos.getY() + TELEPORT_CENTER_OFFSET, pos.getZ() + TELEPORT_CENTER_OFFSET);
+    }
+
+    // Shared teleport particle spawning logic
+    private void spawnTeleportParticlesAt(ServerLevel serverLevel, double x, double y, double z) {
         serverLevel.sendParticles(
             ParticleTypes.PORTAL,
-            x, y, z,
-            50, 0.3, 0.5, 0.3, 0.5
+            x, y + TELEPORT_CENTER_OFFSET, z,
+            TELEPORT_PARTICLE_COUNT, TELEPORT_PARTICLE_SPREAD_X, TELEPORT_PARTICLE_SPREAD_Y, TELEPORT_PARTICLE_SPREAD_Z, TELEPORT_PARTICLE_VELOCITY
         );
-        
+
         serverLevel.sendParticles(
             ParticleTypes.END_ROD,
-            x, y, z,
-            20, 0.2, 0.3, 0.2, 0.1
+            x, y + TELEPORT_CENTER_OFFSET, z,
+            TELEPORT_END_ROD_COUNT, END_ROD_SPREAD, END_ROD_HEIGHT, END_ROD_SPREAD, END_ROD_VELOCITY
         );
     }
 

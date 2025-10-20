@@ -157,18 +157,11 @@ public class NeurocellBlock extends Block implements EntityBlock {
         return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
-    // Enable ticking for the lower block entity only
+    // No ticker needed - neurocell updates on inventory changes, not every tick
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        if (level.isClientSide || state.getValue(HALF) != DoubleBlockHalf.LOWER) {
-            return null;
-        }
-        return (lvl, pos, st, be) -> {
-            if (be instanceof NeurocellBlockEntity pod) {
-                pod.tick();
-            }
-        };
+        return null;
     }
 }
 
