@@ -122,6 +122,12 @@ public class ImprinterBlockEntity extends BlockEntity {
                 // Complete imprinting
                 if (imprintProgress >= IMPRINT_DURATION) {
                     imprintEntityDNA(neurocell, entity);
+                    
+                    // Kill non-player entities after scanning (players survive)
+                    if (!(entity instanceof Player)) {
+                        entity.kill();
+                    }
+                    
                     isImprinting = false;
                     imprintProgress = 0;
                     setChanged();
