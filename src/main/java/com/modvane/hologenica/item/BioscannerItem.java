@@ -23,11 +23,16 @@ public class BioscannerItem extends Item {
         super(properties);
     }
 
-    // Right-click on an entity to capture its DNA
+    // Right-click on an entity to capture its DNA (not for players - use Imprinter for that)
     @Override
     public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity, InteractionHand hand) {
         if (player.level().isClientSide) {
             return InteractionResult.SUCCESS;
+        }
+        
+        // Players cannot be scanned with right-click - use Imprinter instead
+        if (entity instanceof Player) {
+            return InteractionResult.PASS;
         }
         
         // If DNA is already captured, don't allow overwriting
@@ -37,24 +42,6 @@ public class BioscannerItem extends Item {
         
         captureDNA(stack, player, hand, entity);
         return InteractionResult.SUCCESS;
-    }
-
-    // Right-click in air to sample yourself
-    @Override
-    public net.minecraft.world.InteractionResultHolder<ItemStack> use(net.minecraft.world.level.Level level, Player player, InteractionHand hand) {
-        ItemStack stack = player.getItemInHand(hand);
-        
-        if (level.isClientSide) {
-            return net.minecraft.world.InteractionResultHolder.success(stack);
-        }
-        
-        // If DNA is already captured, don't allow overwriting
-        if (hasDNA(stack)) {
-            return net.minecraft.world.InteractionResultHolder.pass(stack);
-        }
-        
-        captureDNA(stack, player, hand, player);
-        return net.minecraft.world.InteractionResultHolder.success(stack);
     }
 
     // Check if the bioscanner already has DNA captured

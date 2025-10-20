@@ -84,55 +84,33 @@ public class ReformerBlockEntity extends BlockEntity {
         }
     }
     
-    // Find a neurocell connected through neurolink blocks (max 32 blocks away)
+    // Find a neurocell connected through exactly 1 neurolink block (no direct connection)
     private NeurocellBlockEntity findConnectedNeurocell() {
         if (level == null) return null;
         
-        Queue<BlockPos> toVisit = new LinkedList<>();
-        Set<BlockPos> visited = new HashSet<>();
-        
-        // Start from reconstruction pod position
-        toVisit.add(worldPosition);
-        visited.add(worldPosition);
-        
-        int maxDistance = 32; // Maximum search distance
-        int currentDistance = 0;
-        
-        while (!toVisit.isEmpty() && currentDistance < maxDistance) {
-            int levelSize = toVisit.size();
+        // Check all 4 horizontal directions for neurolinks
+        for (Direction firstDir : Direction.Plane.HORIZONTAL) {
+            BlockPos neurolinkPos = worldPosition.relative(firstDir);
+            BlockState neurolinkState = level.getBlockState(neurolinkPos);
             
-            for (int i = 0; i < levelSize; i++) {
-                BlockPos current = toVisit.poll();
-                
-                // Check all horizontal directions (neurolinks connect horizontally)
-                for (Direction direction : Direction.Plane.HORIZONTAL) {
-                    BlockPos neighbor = current.relative(direction);
+            // Must be a neurolink (no direct connection to neurocell)
+            if (neurolinkState.getBlock() instanceof NeurolinkBlock) {
+                // Now check all 4 directions from the neurolink for a neurocell
+                for (Direction secondDir : Direction.Plane.HORIZONTAL) {
+                    BlockPos neurocellPos = neurolinkPos.relative(secondDir);
+                    BlockState neurocellState = level.getBlockState(neurocellPos);
                     
-                    // Skip if already visited
-                    if (visited.contains(neighbor)) continue;
-                    visited.add(neighbor);
-                    
-                    BlockState neighborState = level.getBlockState(neighbor);
-                    
-                    // Check if this is a neurocell with a ragdoll
-                    if (neighborState.getBlock() instanceof NeurocellBlock) {
-                        BlockEntity be = level.getBlockEntity(neighbor);
+                    if (neurocellState.getBlock() instanceof NeurocellBlock) {
+                        BlockEntity be = level.getBlockEntity(neurocellPos);
                         if (be instanceof NeurocellBlockEntity pod) {
-                            // Check if neurocell accepts connections from this direction and has a ragdoll
-                            if (pod.acceptsConnectionFrom(direction.getOpposite()) && pod.hasRagdoll() && !pod.getEntityType().isEmpty()) {
+                            // Check if connection is NOT from the back (Reformer uses left/right sides only)
+                            if (pod.acceptsConnectionFrom(secondDir.getOpposite()) && !pod.isBackConnection(secondDir.getOpposite()) && pod.hasRagdoll() && !pod.getEntityType().isEmpty()) {
                                 return pod;
                             }
                         }
                     }
-                    
-                    // If this is a neurolink block, continue searching through it
-                    if (neighborState.getBlock() instanceof NeurolinkBlock) {
-                        toVisit.add(neighbor);
-                    }
                 }
             }
-            
-            currentDistance++;
         }
         
         return null; // No connected neurocell found

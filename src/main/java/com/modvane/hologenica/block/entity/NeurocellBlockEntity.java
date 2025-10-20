@@ -225,7 +225,7 @@ public class NeurocellBlockEntity extends BlockEntity implements MenuProvider {
         return (float) cloningTime / (float) CLONING_DURATION;
     }
     
-    // Neurocell only accepts connections from left and right sides (perpendicular to facing)
+    // Neurocell accepts connections from left, right, and back sides
     public boolean acceptsConnectionFrom(Direction direction) {
         if (level == null) return false;
         BlockState state = getBlockState();
@@ -234,8 +234,21 @@ public class NeurocellBlockEntity extends BlockEntity implements MenuProvider {
         Direction facing = state.getValue(NeurocellBlock.FACING);
         Direction left = facing.getCounterClockWise();
         Direction right = facing.getClockWise();
+        Direction back = facing.getOpposite();
         
-        return direction == left || direction == right;
+        return direction == left || direction == right || direction == back;
+    }
+    
+    // Check if connection from direction is from the back (for Imprinter)
+    public boolean isBackConnection(Direction direction) {
+        if (level == null) return false;
+        BlockState state = getBlockState();
+        if (!(state.getBlock() instanceof NeurocellBlock)) return false;
+        
+        Direction facing = state.getValue(NeurocellBlock.FACING);
+        Direction back = facing.getOpposite();
+        
+        return direction == back;
     }
 }
 
