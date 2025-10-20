@@ -123,8 +123,20 @@ public class ImprinterBlockEntity extends BlockEntity {
                 if (imprintProgress >= IMPRINT_DURATION) {
                     imprintEntityDNA(neurocell, entity);
                     
-                    // Kill non-player entities after scanning (players survive)
-                    if (!(entity instanceof Player)) {
+                    if (entity instanceof Player player) {
+                        // Players: Drop to 1 heart and get debuffs for 2 minutes
+                        float damageAmount = player.getHealth() - 2.0f; // Leave 1 heart (2 health)
+                        if (damageAmount > 0) {
+                            player.hurt(player.damageSources().magic(), damageAmount);
+                        }
+                        player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                            net.minecraft.world.effect.MobEffects.WEAKNESS, 2400, 1)); // 2 minutes Weakness II
+                        player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                            net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN, 2400, 1)); // 2 minutes Slowness II
+                        player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                            net.minecraft.world.effect.MobEffects.HUNGER, 2400, 2)); // 2 minutes Hunger III
+                    } else {
+                        // Non-player entities: Get killed
                         entity.kill();
                     }
                     
