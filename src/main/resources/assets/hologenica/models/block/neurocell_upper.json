@@ -1,7 +1,5 @@
 {
-  "parent": "minecraft:block/air",
   "textures": {
     "particle": "hologenica:block/neurocell"
   }
 }
-

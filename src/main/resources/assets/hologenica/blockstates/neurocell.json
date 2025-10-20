@@ -19,16 +19,13 @@
       "model": "hologenica:block/neurocell_upper"
     },
     "facing=south,half=upper": {
-      "model": "hologenica:block/neurocell_upper",
-      "y": 180
+      "model": "hologenica:block/neurocell_upper"
     },
     "facing=west,half=upper": {
-      "model": "hologenica:block/neurocell_upper",
-      "y": 270
+      "model": "hologenica:block/neurocell_upper"
     },
     "facing=east,half=upper": {
-      "model": "hologenica:block/neurocell_upper",
-      "y": 90
+      "model": "hologenica:block/neurocell_upper"
     }
   }
 }
