@@ -1,6 +1,6 @@
 package com.modvane.hologenica.client.renderer;
 
-import com.modvane.hologenica.block.entity.ReconstructionPodBlockEntity;
+import com.modvane.hologenica.block.entity.ReformerBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
@@ -13,16 +13,16 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 
 // Renders a growing entity inside the reconstruction pod (1% to 100% scale)
-public class ReconstructionPodRenderer implements BlockEntityRenderer<ReconstructionPodBlockEntity> {
+public class ReformerRenderer implements BlockEntityRenderer<ReformerBlockEntity> {
 
     private final EntityRenderDispatcher entityRenderer;
 
-    public ReconstructionPodRenderer(BlockEntityRendererProvider.Context context) {
+    public ReformerRenderer(BlockEntityRendererProvider.Context context) {
         this.entityRenderer = Minecraft.getInstance().getEntityRenderDispatcher();
     }
 
     @Override
-    public void render(ReconstructionPodBlockEntity blockEntity, float partialTick, PoseStack poseStack,
+    public void render(ReformerBlockEntity blockEntity, float partialTick, PoseStack poseStack,
                        MultiBufferSource buffer, int light, int overlay) {
         
         // Only render if reconstructing

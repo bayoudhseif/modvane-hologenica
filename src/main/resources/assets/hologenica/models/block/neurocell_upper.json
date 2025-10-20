@@ -1,7 +1,7 @@
 {
   "parent": "minecraft:block/air",
   "textures": {
-    "particle": "hologenica:block/cloning-pod"
+    "particle": "hologenica:block/neurocell"
   }
 }
 

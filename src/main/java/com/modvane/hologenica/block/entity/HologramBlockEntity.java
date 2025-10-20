@@ -1,6 +1,6 @@
 package com.modvane.hologenica.block.entity;
 
-import com.modvane.hologenica.menu.HologramProjectorMenu;
+import com.modvane.hologenica.menu.HologramMenu;
 import com.modvane.hologenica.registry.HologenicaBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 // Stores the map region and cached terrain scan for holographic display
-public class HologramProjectorBlockEntity extends BlockEntity {
+public class HologramBlockEntity extends BlockEntity {
 
     // Rendering style options
     public enum RenderStyle {
@@ -46,8 +46,8 @@ public class HologramProjectorBlockEntity extends BlockEntity {
     private int[][][] cachedTerrain = null;
     private boolean needsRescan = true;
 
-    public HologramProjectorBlockEntity(BlockPos pos, BlockState state) {
-        super(HologenicaBlockEntities.HOLOGRAM_PROJECTOR.get(), pos, state);
+    public HologramBlockEntity(BlockPos pos, BlockState state) {
+        super(HologenicaBlockEntities.HOLOGRAM.get(), pos, state);
     }
 
     // Setup scan region based on current scan size
@@ -277,8 +277,8 @@ public class HologramProjectorBlockEntity extends BlockEntity {
     // Provide menu for the GUI
     public MenuProvider getMenuProvider() {
         return new SimpleMenuProvider(
-            (containerId, playerInventory, player) -> new HologramProjectorMenu(containerId, playerInventory, this),
-            Component.translatable("block.hologenica.hologram_projector")
+            (containerId, playerInventory, player) -> new HologramMenu(containerId, playerInventory, this),
+            Component.translatable("block.hologenica.hologram")
         );
     }
 }

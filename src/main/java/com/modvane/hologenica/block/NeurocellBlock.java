@@ -1,6 +1,6 @@
 package com.modvane.hologenica.block;
 
-import com.modvane.hologenica.block.entity.CloningPodBlockEntity;
+import com.modvane.hologenica.block.entity.NeurocellBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
@@ -31,13 +31,13 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-// Cloning Pod block for entity duplication - two blocks tall with directional placement
-public class CloningPodBlock extends Block implements EntityBlock {
+// Neurocell block for entity duplication - two blocks tall with directional placement
+public class NeurocellBlock extends Block implements EntityBlock {
 
     public static final EnumProperty<DoubleBlockHalf> HALF = BlockStateProperties.DOUBLE_BLOCK_HALF;
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-    public CloningPodBlock(Properties properties) {
+    public NeurocellBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any()
             .setValue(HALF, DoubleBlockHalf.LOWER)
@@ -53,7 +53,7 @@ public class CloningPodBlock extends Block implements EntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return state.getValue(HALF) == DoubleBlockHalf.LOWER ? new CloningPodBlockEntity(pos, state) : null;
+        return state.getValue(HALF) == DoubleBlockHalf.LOWER ? new NeurocellBlockEntity(pos, state) : null;
     }
 
     @Override
@@ -150,7 +150,7 @@ public class CloningPodBlock extends Block implements EntityBlock {
         // Only interact with lower block
         BlockPos lowerPos = state.getValue(HALF) == DoubleBlockHalf.LOWER ? pos : pos.below();
         
-        if (!level.isClientSide && level.getBlockEntity(lowerPos) instanceof CloningPodBlockEntity pod) {
+        if (!level.isClientSide && level.getBlockEntity(lowerPos) instanceof NeurocellBlockEntity pod) {
             player.openMenu(pod);
             return InteractionResult.SUCCESS;
         }
@@ -165,7 +165,7 @@ public class CloningPodBlock extends Block implements EntityBlock {
             return null;
         }
         return (lvl, pos, st, be) -> {
-            if (be instanceof CloningPodBlockEntity pod) {
+            if (be instanceof NeurocellBlockEntity pod) {
                 pod.tick();
             }
         };

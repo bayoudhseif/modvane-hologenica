@@ -1,9 +1,9 @@
 package com.modvane.hologenica.registry;
 
 import com.modvane.hologenica.HologenicaMod;
-import com.modvane.hologenica.block.entity.CloningPodBlockEntity;
-import com.modvane.hologenica.block.entity.HologramProjectorBlockEntity;
-import com.modvane.hologenica.block.entity.ReconstructionPodBlockEntity;
+import com.modvane.hologenica.block.entity.NeurocellBlockEntity;
+import com.modvane.hologenica.block.entity.HologramBlockEntity;
+import com.modvane.hologenica.block.entity.ReformerBlockEntity;
 import com.modvane.hologenica.block.entity.TelepadBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -16,23 +16,23 @@ public class HologenicaBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
         DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, HologenicaMod.MODID);
 
-    // Hologram projector block entity
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<HologramProjectorBlockEntity>> HOLOGRAM_PROJECTOR =
-        BLOCK_ENTITIES.register("hologram_projector", () ->
-            BlockEntityType.Builder.of(HologramProjectorBlockEntity::new,
-                HologenicaBlocks.HOLOGRAM_PROJECTOR.get()).build(null));
+    // Hologram block entity
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<HologramBlockEntity>> HOLOGRAM =
+        BLOCK_ENTITIES.register("hologram", () ->
+            BlockEntityType.Builder.of(HologramBlockEntity::new,
+                HologenicaBlocks.HOLOGRAM.get()).build(null));
 
-    // Cloning pod block entity
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CloningPodBlockEntity>> CLONING_POD =
-        BLOCK_ENTITIES.register("cloning_pod", () ->
-            BlockEntityType.Builder.of(CloningPodBlockEntity::new,
-                HologenicaBlocks.CLONING_POD.get()).build(null));
+    // Neurocell block entity
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<NeurocellBlockEntity>> NEUROCELL =
+        BLOCK_ENTITIES.register("neurocell", () ->
+            BlockEntityType.Builder.of(NeurocellBlockEntity::new,
+                HologenicaBlocks.NEUROCELL.get()).build(null));
 
-    // Reconstruction pod block entity
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ReconstructionPodBlockEntity>> RECONSTRUCTION_POD =
-        BLOCK_ENTITIES.register("reconstruction_pod", () ->
-            BlockEntityType.Builder.of(ReconstructionPodBlockEntity::new,
-                HologenicaBlocks.RECONSTRUCTION_POD.get()).build(null));
+    // Reformer block entity
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ReformerBlockEntity>> REFORMER =
+        BLOCK_ENTITIES.register("reformer", () ->
+            BlockEntityType.Builder.of(ReformerBlockEntity::new,
+                HologenicaBlocks.REFORMER.get()).build(null));
 
     // Telepad block entity
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TelepadBlockEntity>> TELEPAD =

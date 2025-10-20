@@ -1,11 +1,11 @@
 package com.modvane.hologenica.client;
 
-import com.modvane.hologenica.client.renderer.CloningPodRenderer;
-import com.modvane.hologenica.client.renderer.HologramProjectorRenderer;
-import com.modvane.hologenica.client.renderer.ReconstructionPodRenderer;
+import com.modvane.hologenica.client.renderer.NeurocellRenderer;
+import com.modvane.hologenica.client.renderer.HologramRenderer;
+import com.modvane.hologenica.client.renderer.ReformerRenderer;
 import com.modvane.hologenica.client.renderer.SteveNPCRenderer;
-import com.modvane.hologenica.client.screen.CloningPodScreen;
-import com.modvane.hologenica.client.screen.HologramProjectorScreen;
+import com.modvane.hologenica.client.screen.NeurocellScreen;
+import com.modvane.hologenica.client.screen.HologramScreen;
 import com.modvane.hologenica.client.screen.SteveNPCScreen;
 import com.modvane.hologenica.client.screen.TelepadScreen;
 import com.modvane.hologenica.registry.HologenicaBlockEntities;
@@ -29,16 +29,16 @@ public class HologenicaClient {
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(
-            HologenicaBlockEntities.HOLOGRAM_PROJECTOR.get(),
-            HologramProjectorRenderer::new
+            HologenicaBlockEntities.HOLOGRAM.get(),
+            HologramRenderer::new
         );
         event.registerBlockEntityRenderer(
-            HologenicaBlockEntities.CLONING_POD.get(),
-            CloningPodRenderer::new
+            HologenicaBlockEntities.NEUROCELL.get(),
+            NeurocellRenderer::new
         );
         event.registerBlockEntityRenderer(
-            HologenicaBlockEntities.RECONSTRUCTION_POD.get(),
-            ReconstructionPodRenderer::new
+            HologenicaBlockEntities.REFORMER.get(),
+            ReformerRenderer::new
         );
         
         // Register entity renderers
@@ -48,8 +48,8 @@ public class HologenicaClient {
     // Register GUI screens
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
-        event.register(HologenicaMenus.HOLOGRAM_PROJECTOR.get(), HologramProjectorScreen::new);
-        event.register(HologenicaMenus.CLONING_POD.get(), CloningPodScreen::new);
+        event.register(HologenicaMenus.HOLOGRAM.get(), HologramScreen::new);
+        event.register(HologenicaMenus.NEUROCELL.get(), NeurocellScreen::new);
         event.register(HologenicaMenus.STEVE_NPC.get(), SteveNPCScreen::new);
         event.register(HologenicaMenus.TELEPAD.get(), TelepadScreen::new);
     }
@@ -58,10 +58,10 @@ public class HologenicaClient {
     @SubscribeEvent
     public static void clientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
-            ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.HOLOGRAM_PROJECTOR.get(), RenderType.translucent());
-            ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.CLONING_POD.get(), RenderType.translucent());
+            ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.HOLOGRAM.get(), RenderType.translucent());
+            ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.NEUROCELL.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.CENTRIFUGE.get(), RenderType.translucent());
-            ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.RECONSTRUCTION_POD.get(), RenderType.translucent());
+            ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.REFORMER.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.TELEPAD.get(), RenderType.translucent());
         });
     }

@@ -12,15 +12,15 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class HologenicaItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(Registries.ITEM, HologenicaMod.MODID);
 
-    // Hologram projector item
-    public static final DeferredHolder<Item, BlockItem> HOLOGRAM_PROJECTOR =
-        ITEMS.register("hologram_projector", () ->
-            new BlockItem(HologenicaBlocks.HOLOGRAM_PROJECTOR.get(), new Item.Properties()));
+    // Hologram item
+    public static final DeferredHolder<Item, BlockItem> HOLOGRAM =
+        ITEMS.register("hologram", () ->
+            new BlockItem(HologenicaBlocks.HOLOGRAM.get(), new Item.Properties()));
 
-    // Cloning pod item
-    public static final DeferredHolder<Item, BlockItem> CLONING_POD =
-        ITEMS.register("cloning_pod", () ->
-            new BlockItem(HologenicaBlocks.CLONING_POD.get(), new Item.Properties()));
+    // Neurocell item
+    public static final DeferredHolder<Item, BlockItem> NEUROCELL =
+        ITEMS.register("neurocell", () ->
+            new BlockItem(HologenicaBlocks.NEUROCELL.get(), new Item.Properties()));
 
     // Bioscanner item
     public static final DeferredHolder<Item, BioscannerItem> BIOSCANNER =
@@ -32,20 +32,20 @@ public class HologenicaItems {
         ITEMS.register("centrifuge", () ->
             new BlockItem(HologenicaBlocks.CENTRIFUGE.get(), new Item.Properties()));
 
-    // Reconstruction pod item
-    public static final DeferredHolder<Item, BlockItem> RECONSTRUCTION_POD =
-        ITEMS.register("reconstruction_pod", () ->
-            new BlockItem(HologenicaBlocks.RECONSTRUCTION_POD.get(), new Item.Properties()));
+    // Reformer item
+    public static final DeferredHolder<Item, BlockItem> REFORMER =
+        ITEMS.register("reformer", () ->
+            new BlockItem(HologenicaBlocks.REFORMER.get(), new Item.Properties()));
 
     // Telepad item
     public static final DeferredHolder<Item, BlockItem> TELEPAD =
         ITEMS.register("telepad", () ->
             new BlockItem(HologenicaBlocks.TELEPAD.get(), new Item.Properties()));
 
-    // Bridge item
-    public static final DeferredHolder<Item, BlockItem> BRIDGE =
-        ITEMS.register("bridge", () ->
-            new BlockItem(HologenicaBlocks.BRIDGE.get(), new Item.Properties()));
+    // Neurolink item
+    public static final DeferredHolder<Item, BlockItem> NEUROLINK =
+        ITEMS.register("neurolink", () ->
+            new BlockItem(HologenicaBlocks.NEUROLINK.get(), new Item.Properties()));
 
     public static void init(IEventBus modEventBus) {
         ITEMS.register(modEventBus);

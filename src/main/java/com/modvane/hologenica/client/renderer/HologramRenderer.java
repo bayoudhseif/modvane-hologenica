@@ -1,6 +1,6 @@
 package com.modvane.hologenica.client.renderer;
 
-import com.modvane.hologenica.block.entity.HologramProjectorBlockEntity;
+import com.modvane.hologenica.block.entity.HologramBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -9,13 +9,13 @@ import net.minecraft.world.level.Level;
 
 // Renders a 3D holographic projection of terrain above the hologram projector block
 // Delegates to either holographic or realistic renderer based on user setting
-public class HologramProjectorRenderer implements BlockEntityRenderer<HologramProjectorBlockEntity> {
+public class HologramRenderer implements BlockEntityRenderer<HologramBlockEntity> {
 
-    public HologramProjectorRenderer(BlockEntityRendererProvider.Context context) {
+    public HologramRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
-    public void render(HologramProjectorBlockEntity blockEntity, float partialTick, PoseStack poseStack,
+    public void render(HologramBlockEntity blockEntity, float partialTick, PoseStack poseStack,
                        MultiBufferSource buffer, int light, int overlay) {
 
         if (!blockEntity.hasValidRegion() || blockEntity.getLevel() == null) return;

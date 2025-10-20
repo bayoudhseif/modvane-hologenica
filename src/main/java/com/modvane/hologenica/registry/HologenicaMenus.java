@@ -1,8 +1,8 @@
 package com.modvane.hologenica.registry;
 
 import com.modvane.hologenica.HologenicaMod;
-import com.modvane.hologenica.menu.CloningPodMenu;
-import com.modvane.hologenica.menu.HologramProjectorMenu;
+import com.modvane.hologenica.menu.NeurocellMenu;
+import com.modvane.hologenica.menu.HologramMenu;
 import com.modvane.hologenica.menu.SteveNPCMenu;
 import com.modvane.hologenica.menu.TelepadMenu;
 import net.minecraft.core.registries.Registries;
@@ -17,15 +17,15 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class HologenicaMenus {
     public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, HologenicaMod.MODID);
 
-    // Hologram projector menu type
-    public static final DeferredHolder<MenuType<?>, MenuType<HologramProjectorMenu>> HOLOGRAM_PROJECTOR =
-        MENUS.register("hologram_projector", () -> IMenuTypeExtension.create((containerId, inventory, buffer) -> 
-            new HologramProjectorMenu(containerId, inventory, null)));
+    // Hologram menu type
+    public static final DeferredHolder<MenuType<?>, MenuType<HologramMenu>> HOLOGRAM =
+        MENUS.register("hologram", () -> IMenuTypeExtension.create((containerId, inventory, buffer) -> 
+            new HologramMenu(containerId, inventory, null)));
 
-    // Cloning Pod menu type
-    public static final DeferredHolder<MenuType<?>, MenuType<CloningPodMenu>> CLONING_POD =
-        MENUS.register("cloning_pod", () -> IMenuTypeExtension.create((containerId, inventory, buffer) -> 
-            new CloningPodMenu(containerId, inventory, new SimpleContainer(1))));
+    // Neurocell menu type
+    public static final DeferredHolder<MenuType<?>, MenuType<NeurocellMenu>> NEUROCELL =
+        MENUS.register("neurocell", () -> IMenuTypeExtension.create((containerId, inventory, buffer) -> 
+            new NeurocellMenu(containerId, inventory, new SimpleContainer(1))));
 
     // Steve NPC menu type
     public static final DeferredHolder<MenuType<?>, MenuType<SteveNPCMenu>> STEVE_NPC =

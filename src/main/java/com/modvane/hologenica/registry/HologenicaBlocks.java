@@ -1,11 +1,11 @@
 package com.modvane.hologenica.registry;
 
 import com.modvane.hologenica.HologenicaMod;
-import com.modvane.hologenica.block.BridgeBlock;
+import com.modvane.hologenica.block.NeurolinkBlock;
 import com.modvane.hologenica.block.CentrifugeBlock;
-import com.modvane.hologenica.block.CloningPodBlock;
-import com.modvane.hologenica.block.HologramProjectorBlock;
-import com.modvane.hologenica.block.ReconstructionPodBlock;
+import com.modvane.hologenica.block.NeurocellBlock;
+import com.modvane.hologenica.block.HologramBlock;
+import com.modvane.hologenica.block.ReformerBlock;
 import com.modvane.hologenica.block.TelepadBlock;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.Block;
@@ -18,9 +18,9 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class HologenicaBlocks {
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(Registries.BLOCK, HologenicaMod.MODID);
 
-    // Hologram projector block
-    public static final DeferredHolder<Block, HologramProjectorBlock> HOLOGRAM_PROJECTOR =
-        BLOCKS.register("hologram_projector", () -> new HologramProjectorBlock(
+    // Hologram block
+    public static final DeferredHolder<Block, HologramBlock> HOLOGRAM =
+        BLOCKS.register("hologram", () -> new HologramBlock(
             BlockBehaviour.Properties.of()
                 .strength(3.0f)
                 .sound(SoundType.METAL)
@@ -32,9 +32,9 @@ public class HologenicaBlocks {
                 .isViewBlocking((state, level, pos) -> false)
         ));
 
-    // Cloning pod block
-    public static final DeferredHolder<Block, CloningPodBlock> CLONING_POD =
-        BLOCKS.register("cloning_pod", () -> new CloningPodBlock(
+    // Neurocell block
+    public static final DeferredHolder<Block, NeurocellBlock> NEUROCELL =
+        BLOCKS.register("neurocell", () -> new NeurocellBlock(
             BlockBehaviour.Properties.of()
                 .strength(5.0f)
                 .sound(SoundType.METAL)
@@ -60,9 +60,9 @@ public class HologenicaBlocks {
                 .isViewBlocking((state, level, pos) -> false)
         ));
 
-    // Reconstruction pod block
-    public static final DeferredHolder<Block, ReconstructionPodBlock> RECONSTRUCTION_POD =
-        BLOCKS.register("reconstruction_pod", () -> new ReconstructionPodBlock(
+    // Reformer block
+    public static final DeferredHolder<Block, ReformerBlock> REFORMER =
+        BLOCKS.register("reformer", () -> new ReformerBlock(
             BlockBehaviour.Properties.of()
                 .strength(4.0f)
                 .sound(SoundType.METAL)
@@ -88,9 +88,9 @@ public class HologenicaBlocks {
                 .isViewBlocking((state, level, pos) -> false)
         ));
 
-    // Bridge block - decorative walkway
-    public static final DeferredHolder<Block, BridgeBlock> BRIDGE =
-        BLOCKS.register("bridge", () -> new BridgeBlock(
+    // Neurolink block - decorative walkway
+    public static final DeferredHolder<Block, NeurolinkBlock> NEUROLINK =
+        BLOCKS.register("neurolink", () -> new NeurolinkBlock(
             BlockBehaviour.Properties.of()
                 .strength(2.0f)
                 .sound(SoundType.METAL)

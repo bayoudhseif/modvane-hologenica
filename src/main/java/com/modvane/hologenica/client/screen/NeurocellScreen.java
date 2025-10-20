@@ -1,20 +1,20 @@
 package com.modvane.hologenica.client.screen;
 
 import com.modvane.hologenica.HologenicaMod;
-import com.modvane.hologenica.menu.CloningPodMenu;
+import com.modvane.hologenica.menu.NeurocellMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-// Client-side GUI screen for Cloning Pod
-public class CloningPodScreen extends AbstractContainerScreen<CloningPodMenu> {
+// Client-side GUI screen for Neurocell
+public class NeurocellScreen extends AbstractContainerScreen<NeurocellMenu> {
     
     private static final ResourceLocation TEXTURE = 
         ResourceLocation.fromNamespaceAndPath(HologenicaMod.MODID, "textures/gui/centrifuge.png");
 
-    public CloningPodScreen(CloningPodMenu menu, Inventory playerInventory, Component title) {
+    public NeurocellScreen(NeurocellMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         this.imageHeight = 166;
         this.inventoryLabelY = this.imageHeight - 94;

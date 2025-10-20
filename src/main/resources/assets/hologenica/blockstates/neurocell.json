@@ -1,33 +1,33 @@
 {
   "variants": {
     "facing=north,half=lower": {
-      "model": "hologenica:block/cloning_pod"
+      "model": "hologenica:block/neurocell"
     },
     "facing=south,half=lower": {
-      "model": "hologenica:block/cloning_pod",
+      "model": "hologenica:block/neurocell",
       "y": 180
     },
     "facing=west,half=lower": {
-      "model": "hologenica:block/cloning_pod",
+      "model": "hologenica:block/neurocell",
       "y": 270
     },
     "facing=east,half=lower": {
-      "model": "hologenica:block/cloning_pod",
+      "model": "hologenica:block/neurocell",
       "y": 90
     },
     "facing=north,half=upper": {
-      "model": "hologenica:block/cloning_pod_upper"
+      "model": "hologenica:block/neurocell_upper"
     },
     "facing=south,half=upper": {
-      "model": "hologenica:block/cloning_pod_upper",
+      "model": "hologenica:block/neurocell_upper",
       "y": 180
     },
     "facing=west,half=upper": {
-      "model": "hologenica:block/cloning_pod_upper",
+      "model": "hologenica:block/neurocell_upper",
       "y": 270
     },
     "facing=east,half=upper": {
-      "model": "hologenica:block/cloning_pod_upper",
+      "model": "hologenica:block/neurocell_upper",
       "y": 90
     }
   }

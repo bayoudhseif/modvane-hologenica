@@ -1,6 +1,6 @@
 package com.modvane.hologenica.menu;
 
-import com.modvane.hologenica.block.entity.CloningPodBlockEntity;
+import com.modvane.hologenica.block.entity.NeurocellBlockEntity;
 import com.modvane.hologenica.registry.HologenicaMenus;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -10,15 +10,15 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-// Menu for Cloning Pod GUI
-public class CloningPodMenu extends AbstractContainerMenu {
+// Menu for Neurocell GUI
+public class NeurocellMenu extends AbstractContainerMenu {
     
     private final Container container;
-    private CloningPodBlockEntity blockEntity;
+    private NeurocellBlockEntity blockEntity;
 
     // Constructor for server-side (with block entity)
-    public CloningPodMenu(int containerId, Inventory playerInventory, CloningPodBlockEntity blockEntity) {
-        super(HologenicaMenus.CLONING_POD.get(), containerId);
+    public NeurocellMenu(int containerId, Inventory playerInventory, NeurocellBlockEntity blockEntity) {
+        super(HologenicaMenus.NEUROCELL.get(), containerId);
         this.container = blockEntity.getInventory();
         this.blockEntity = blockEntity;
 
@@ -39,8 +39,8 @@ public class CloningPodMenu extends AbstractContainerMenu {
     }
 
     // Constructor for client-side (without block entity)
-    public CloningPodMenu(int containerId, Inventory playerInventory, Container container) {
-        super(HologenicaMenus.CLONING_POD.get(), containerId);
+    public NeurocellMenu(int containerId, Inventory playerInventory, Container container) {
+        super(HologenicaMenus.NEUROCELL.get(), containerId);
         this.container = container;
         this.blockEntity = null;
 
@@ -70,12 +70,12 @@ public class CloningPodMenu extends AbstractContainerMenu {
             itemstack = slotItem.copy();
             
             if (index == 0) {
-                // Moving from cloning pod to player inventory
+                // Moving from neurocell to player inventory
                 if (!this.moveItemStackTo(slotItem, 1, 37, true)) {
                     return ItemStack.EMPTY;
                 }
             } else {
-                // Moving from player inventory to cloning pod
+                // Moving from player inventory to neurocell
                 if (!this.moveItemStackTo(slotItem, 0, 1, false)) {
                     return ItemStack.EMPTY;
                 }
@@ -96,7 +96,7 @@ public class CloningPodMenu extends AbstractContainerMenu {
         return this.container.stillValid(player);
     }
 
-    public CloningPodBlockEntity getBlockEntity() {
+    public NeurocellBlockEntity getBlockEntity() {
         return blockEntity;
     }
 }

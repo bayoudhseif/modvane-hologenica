@@ -18,17 +18,17 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-// Block entity for Cloning Pod - displays a static ragdoll model when complete
-public class CloningPodBlockEntity extends BlockEntity implements MenuProvider {
+// Block entity for Neurocell - displays a static ragdoll model when complete
+public class NeurocellBlockEntity extends BlockEntity implements MenuProvider {
     
     // Container to hold the bioscanner
     private final SimpleContainer inventory = new SimpleContainer(1) {
         @Override
         public void setChanged() {
             super.setChanged();
-            CloningPodBlockEntity.this.setChanged();
+            NeurocellBlockEntity.this.setChanged();
             if (!isLoading) {
-                CloningPodBlockEntity.this.onInventoryChanged();
+                NeurocellBlockEntity.this.onInventoryChanged();
             }
         }
     };
@@ -40,8 +40,8 @@ public class CloningPodBlockEntity extends BlockEntity implements MenuProvider {
     private boolean isLoading = false; // Flag to prevent inventory changes during load
     private static final int CLONING_DURATION = 300; // 15 seconds (20 ticks per second)
 
-    public CloningPodBlockEntity(BlockPos pos, BlockState state) {
-        super(HologenicaBlockEntities.CLONING_POD.get(), pos, state);
+    public NeurocellBlockEntity(BlockPos pos, BlockState state) {
+        super(HologenicaBlockEntities.NEUROCELL.get(), pos, state);
     }
     
     public SimpleContainer getInventory() {
@@ -184,13 +184,13 @@ public class CloningPodBlockEntity extends BlockEntity implements MenuProvider {
     
     @Override
     public Component getDisplayName() {
-        return Component.translatable("block.hologenica.cloning_pod");
+        return Component.translatable("block.hologenica.neurocell");
     }
     
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
-        return new com.modvane.hologenica.menu.CloningPodMenu(containerId, playerInventory, this);
+        return new com.modvane.hologenica.menu.NeurocellMenu(containerId, playerInventory, this);
     }
 
     // Sync data to client for rendering

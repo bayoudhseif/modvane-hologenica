@@ -1,6 +1,6 @@
 package com.modvane.hologenica.client.renderer;
 
-import com.modvane.hologenica.block.entity.CloningPodBlockEntity;
+import com.modvane.hologenica.block.entity.NeurocellBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
@@ -12,17 +12,17 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 
-// Renders a static ragdoll model inside the cloning pod when complete
-public class CloningPodRenderer implements BlockEntityRenderer<CloningPodBlockEntity> {
+// Renders a static ragdoll model inside the neurocell when complete
+public class NeurocellRenderer implements BlockEntityRenderer<NeurocellBlockEntity> {
 
     private final EntityRenderDispatcher entityRenderer;
 
-    public CloningPodRenderer(BlockEntityRendererProvider.Context context) {
+    public NeurocellRenderer(BlockEntityRendererProvider.Context context) {
         this.entityRenderer = Minecraft.getInstance().getEntityRenderDispatcher();
     }
 
     @Override
-    public void render(CloningPodBlockEntity blockEntity, float partialTick, PoseStack poseStack,
+    public void render(NeurocellBlockEntity blockEntity, float partialTick, PoseStack poseStack,
                        MultiBufferSource buffer, int light, int overlay) {
         
         // Get the entity type from the block entity

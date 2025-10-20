@@ -1,7 +1,7 @@
 package com.modvane.hologenica.block.entity;
 
-import com.modvane.hologenica.block.BridgeBlock;
-import com.modvane.hologenica.block.CloningPodBlock;
+import com.modvane.hologenica.block.NeurolinkBlock;
+import com.modvane.hologenica.block.NeurocellBlock;
 import com.modvane.hologenica.registry.HologenicaBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -24,8 +24,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-// Reconstruction Pod - grows clones from 1% to 100% then spawns them as real entities
-public class ReconstructionPodBlockEntity extends BlockEntity {
+// Reformer - grows clones from 1% to 100% then spawns them as real entities
+public class ReformerBlockEntity extends BlockEntity {
     
     private String entityType = "";
     private String entityName = ""; // Name of the entity being reconstructed
@@ -33,8 +33,8 @@ public class ReconstructionPodBlockEntity extends BlockEntity {
     private int reconstructionDuration = 0; // Dynamic duration based on entity health
     private boolean isReconstructing = false;
 
-    public ReconstructionPodBlockEntity(BlockPos pos, BlockState state) {
-        super(HologenicaBlockEntities.RECONSTRUCTION_POD.get(), pos, state);
+    public ReformerBlockEntity(BlockPos pos, BlockState state) {
+        super(HologenicaBlockEntities.REFORMER.get(), pos, state);
     }
 
     // Called every tick
@@ -48,11 +48,11 @@ public class ReconstructionPodBlockEntity extends BlockEntity {
 
         // If reconstructing, validate connection and increase progress
         if (isReconstructing && !entityType.isEmpty() && reconstructionDuration > 0) {
-            // Check if connection to cloning pod is still valid
-            CloningPodBlockEntity connectedPod = findConnectedCloningPod();
+            // Check if connection to neurocell is still valid
+            NeurocellBlockEntity connectedPod = findConnectedNeurocell();
             
             if (connectedPod == null || !connectedPod.hasRagdoll() || connectedPod.getEntityType().isEmpty()) {
-                // Connection lost or cloning pod no longer has ragdoll - stop reconstruction
+                // Connection lost or neurocell no longer has ragdoll - stop reconstruction
                 resetReconstruction();
                 return;
             }
@@ -72,20 +72,20 @@ public class ReconstructionPodBlockEntity extends BlockEntity {
         }
     }
 
-    // Search for a cloning pod connected via bridge blocks
+    // Search for a neurocell connected via neurolink blocks
     private void checkForAdjacentCloningChamber() {
         if (level == null) return;
 
-        // Use breadth-first search to find connected cloning pods through bridges
-        CloningPodBlockEntity connectedPod = findConnectedCloningPod();
+        // Use breadth-first search to find connected neurocells through neurolinks
+        NeurocellBlockEntity connectedPod = findConnectedNeurocell();
         
         if (connectedPod != null && connectedPod.hasRagdoll() && !connectedPod.getEntityType().isEmpty()) {
             startReconstruction(connectedPod.getEntityType(), connectedPod.getEntityName());
         }
     }
     
-    // Find a cloning pod connected through bridge blocks (max 32 blocks away)
-    private CloningPodBlockEntity findConnectedCloningPod() {
+    // Find a neurocell connected through neurolink blocks (max 32 blocks away)
+    private NeurocellBlockEntity findConnectedNeurocell() {
         if (level == null) return null;
         
         Queue<BlockPos> toVisit = new LinkedList<>();
@@ -104,7 +104,7 @@ public class ReconstructionPodBlockEntity extends BlockEntity {
             for (int i = 0; i < levelSize; i++) {
                 BlockPos current = toVisit.poll();
                 
-                // Check all horizontal directions (bridges connect horizontally)
+                // Check all horizontal directions (neurolinks connect horizontally)
                 for (Direction direction : Direction.Plane.HORIZONTAL) {
                     BlockPos neighbor = current.relative(direction);
                     
@@ -114,19 +114,19 @@ public class ReconstructionPodBlockEntity extends BlockEntity {
                     
                     BlockState neighborState = level.getBlockState(neighbor);
                     
-                    // Check if this is a cloning pod with a ragdoll
-                    if (neighborState.getBlock() instanceof CloningPodBlock) {
+                    // Check if this is a neurocell with a ragdoll
+                    if (neighborState.getBlock() instanceof NeurocellBlock) {
                         BlockEntity be = level.getBlockEntity(neighbor);
-                        if (be instanceof CloningPodBlockEntity pod) {
-                            // Found a cloning pod - check if it has a ragdoll
+                        if (be instanceof NeurocellBlockEntity pod) {
+                            // Found a neurocell - check if it has a ragdoll
                             if (pod.hasRagdoll() && !pod.getEntityType().isEmpty()) {
                                 return pod;
                             }
                         }
                     }
                     
-                    // If this is a bridge block, continue searching through it
-                    if (neighborState.getBlock() instanceof BridgeBlock) {
+                    // If this is a neurolink block, continue searching through it
+                    if (neighborState.getBlock() instanceof NeurolinkBlock) {
                         toVisit.add(neighbor);
                     }
                 }
@@ -135,7 +135,7 @@ public class ReconstructionPodBlockEntity extends BlockEntity {
             currentDistance++;
         }
         
-        return null; // No connected cloning pod found
+        return null; // No connected neurocell found
     }
 
     // Start the reconstruction process

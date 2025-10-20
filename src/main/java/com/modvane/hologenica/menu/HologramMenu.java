@@ -1,21 +1,21 @@
 package com.modvane.hologenica.menu;
 
-import com.modvane.hologenica.block.entity.HologramProjectorBlockEntity;
+import com.modvane.hologenica.block.entity.HologramBlockEntity;
 import com.modvane.hologenica.registry.HologenicaMenus;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 
-// Simple menu for the hologram projector block GUI
+// Simple menu for the hologram block GUI
 // Handles button clicks from the client screen
-public class HologramProjectorMenu extends AbstractContainerMenu {
+public class HologramMenu extends AbstractContainerMenu {
 
     private final ContainerLevelAccess access;
-    private final HologramProjectorBlockEntity blockEntity;
+    private final HologramBlockEntity blockEntity;
 
-    public HologramProjectorMenu(int containerId, Inventory playerInventory, HologramProjectorBlockEntity blockEntity) {
-        super(HologenicaMenus.HOLOGRAM_PROJECTOR.get(), containerId);
+    public HologramMenu(int containerId, Inventory playerInventory, HologramBlockEntity blockEntity) {
+        super(HologenicaMenus.HOLOGRAM.get(), containerId);
         if (blockEntity != null) {
             this.access = ContainerLevelAccess.create(blockEntity.getLevel(), blockEntity.getBlockPos());
             this.blockEntity = blockEntity;
@@ -68,7 +68,7 @@ public class HologramProjectorMenu extends AbstractContainerMenu {
     }
 
     // Get the block entity for the screen to access
-    public HologramProjectorBlockEntity getBlockEntity() {
+    public HologramBlockEntity getBlockEntity() {
         return blockEntity;
     }
 

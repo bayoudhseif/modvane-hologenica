@@ -27,16 +27,15 @@ public class HologenicaMod {
         CREATIVE_TABS.register("mod_tab",
             () -> CreativeModeTab.builder()
                 .title(Component.translatable("itemGroup." + MODID))
-                .icon(() -> new ItemStack(HologenicaItems.HOLOGRAM_PROJECTOR.get()))
+                .icon(() -> new ItemStack(HologenicaItems.NEUROCELL.get()))
                 .displayItems((parameters, output) -> {
-                    // Add all our items to the creative tab
-                    output.accept(HologenicaItems.HOLOGRAM_PROJECTOR.get());
-                    output.accept(HologenicaItems.CLONING_POD.get());
-                    output.accept(HologenicaItems.CENTRIFUGE.get());
-                    output.accept(HologenicaItems.RECONSTRUCTION_POD.get());
-                    output.accept(HologenicaItems.TELEPAD.get());
-                    output.accept(HologenicaItems.BRIDGE.get());
+                    // Add all our items to the creative tab in logical order
+                    output.accept(HologenicaItems.NEUROCELL.get());
                     output.accept(HologenicaItems.BIOSCANNER.get());
+                    output.accept(HologenicaItems.REFORMER.get());
+                    output.accept(HologenicaItems.NEUROLINK.get());
+                    output.accept(HologenicaItems.TELEPAD.get());
+                    output.accept(HologenicaItems.HOLOGRAM.get());
                 })
                 .build()
         );

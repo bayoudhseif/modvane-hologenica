@@ -2,8 +2,8 @@
 	"format_version": "1.21.6",
 	"texture_size": [64, 64],
 	"textures": {
-		"0": "hologenica:block/bridge",
-		"particle": "hologenica:block/bridge"
+		"0": "hologenica:block/neurolink",
+		"particle": "hologenica:block/neurolink"
 	},
 	"elements": [
 		{

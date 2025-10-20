@@ -1,15 +1,15 @@
 package com.modvane.hologenica.client.screen;
 
-import com.modvane.hologenica.menu.HologramProjectorMenu;
+import com.modvane.hologenica.menu.HologramMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
 // Hologram projector GUI with simple buttons
-public class HologramProjectorScreen extends BaseModScreen<HologramProjectorMenu> {
+public class HologramScreen extends BaseModScreen<HologramMenu> {
 
-    public HologramProjectorScreen(HologramProjectorMenu menu, Inventory playerInventory, Component title) {
+    public HologramScreen(HologramMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
     }
 

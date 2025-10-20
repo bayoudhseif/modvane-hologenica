@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "hologenica:block/hologram"
+    },
+    "facing=south": {
+      "model": "hologenica:block/hologram",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "hologenica:block/hologram",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "hologenica:block/hologram",
+      "y": 90
+    }
+  }
+}

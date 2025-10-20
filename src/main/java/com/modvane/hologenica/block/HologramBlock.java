@@ -1,7 +1,7 @@
 package com.modvane.hologenica.block;
 
 import com.mojang.serialization.MapCodec;
-import com.modvane.hologenica.block.entity.HologramProjectorBlockEntity;
+import com.modvane.hologenica.block.entity.HologramBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
@@ -20,11 +20,11 @@ import org.jetbrains.annotations.Nullable;
 
 // Block that displays a 3D holographic projection of nearby terrain with directional placement
 // Automatically scans a 32x32 area when placed
-public class HologramProjectorBlock extends HorizontalDirectionalBlock implements EntityBlock {
+public class HologramBlock extends HorizontalDirectionalBlock implements EntityBlock {
 
-    public static final MapCodec<HologramProjectorBlock> CODEC = simpleCodec(HologramProjectorBlock::new);
+    public static final MapCodec<HologramBlock> CODEC = simpleCodec(HologramBlock::new);
 
-    public HologramProjectorBlock(Properties properties) {
+    public HologramBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
@@ -50,7 +50,7 @@ public class HologramProjectorBlock extends HorizontalDirectionalBlock implement
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new HologramProjectorBlockEntity(pos, state);
+        return new HologramBlockEntity(pos, state);
     }
 
     // Use the block's model for rendering (hologram renders separately via BlockEntityRenderer)
@@ -69,7 +69,7 @@ public class HologramProjectorBlock extends HorizontalDirectionalBlock implement
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         super.onPlace(state, level, pos, oldState, movedByPiston);
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof HologramProjectorBlockEntity projector) {
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof HologramBlockEntity projector) {
             projector.setupScanRegion();
         }
     }
@@ -77,7 +77,7 @@ public class HologramProjectorBlock extends HorizontalDirectionalBlock implement
     // Right-click to open the hologram projector GUI
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof HologramProjectorBlockEntity projector) {
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof HologramBlockEntity projector) {
             player.openMenu(projector.getMenuProvider());
             return InteractionResult.SUCCESS;
         }
