@@ -3,10 +3,10 @@ package com.modvane.hologenica.client;
 import com.modvane.hologenica.client.renderer.NeurocellRenderer;
 import com.modvane.hologenica.client.renderer.HologramRenderer;
 import com.modvane.hologenica.client.renderer.ReformerRenderer;
-import com.modvane.hologenica.client.renderer.SteveNPCRenderer;
+import com.modvane.hologenica.client.renderer.PlayerCloneRenderer;
 import com.modvane.hologenica.client.screen.NeurocellScreen;
 import com.modvane.hologenica.client.screen.HologramScreen;
-import com.modvane.hologenica.client.screen.SteveNPCScreen;
+import com.modvane.hologenica.client.screen.PlayerCloneScreen;
 import com.modvane.hologenica.client.screen.TelepadScreen;
 import com.modvane.hologenica.registry.HologenicaBlockEntities;
 import com.modvane.hologenica.registry.HologenicaBlocks;
@@ -42,7 +42,7 @@ public class HologenicaClient {
         );
         
         // Register entity renderers
-        event.registerEntityRenderer(HologenicaEntities.STEVE_NPC.get(), SteveNPCRenderer::new);
+        event.registerEntityRenderer(HologenicaEntities.PLAYER_CLONE.get(), PlayerCloneRenderer::new);
     }
 
     // Register GUI screens
@@ -50,7 +50,7 @@ public class HologenicaClient {
     public static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(HologenicaMenus.HOLOGRAM.get(), HologramScreen::new);
         event.register(HologenicaMenus.NEUROCELL.get(), NeurocellScreen::new);
-        event.register(HologenicaMenus.STEVE_NPC.get(), SteveNPCScreen::new);
+        event.register(HologenicaMenus.PLAYER_CLONE.get(), PlayerCloneScreen::new);
         event.register(HologenicaMenus.TELEPAD.get(), TelepadScreen::new);
     }
 

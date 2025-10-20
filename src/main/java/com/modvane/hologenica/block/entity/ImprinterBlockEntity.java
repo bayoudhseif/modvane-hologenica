@@ -267,8 +267,8 @@ public class ImprinterBlockEntity extends BlockEntity {
     // Get entity type string for DNA storage
     private String getEntityTypeString(LivingEntity entity) {
         if (entity instanceof Player) {
-            // Players clone as Steve NPCs with their actual skin
-            return "hologenica:steve_npc";
+            // Players clone as player clones with their actual skin
+            return "hologenica:player_clone";
         } else {
             // Other entities clone as themselves
             return EntityType.getKey(entity.getType()).toString();

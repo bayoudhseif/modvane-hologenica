@@ -69,11 +69,11 @@ public class NeurocellRenderer implements BlockEntityRenderer<NeurocellBlockEnti
                 }
                 
                 if (entity != null) {
-                    // If this is a SteveNPCEntity, set the player UUID for correct skin rendering
-                    if (entity instanceof com.modvane.hologenica.entity.SteveNPCEntity steveNPC) {
+                    // If this is a PlayerCloneEntity, set the player UUID for correct skin rendering
+                    if (entity instanceof com.modvane.hologenica.entity.PlayerCloneEntity clone) {
                         java.util.UUID playerUUID = blockEntity.getPlayerUUID();
                         if (playerUUID != null) {
-                            steveNPC.setPlayerUUID(playerUUID);
+                            clone.setPlayerUUID(playerUUID);
                         }
                     }
                     

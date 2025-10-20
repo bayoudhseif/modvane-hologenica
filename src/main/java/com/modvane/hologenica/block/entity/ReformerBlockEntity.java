@@ -191,13 +191,13 @@ public class ReformerBlockEntity extends BlockEntity {
                 Entity entity = type.create(serverLevel, null, spawnPos, MobSpawnType.SPAWNER, false, false);
                 
                 if (entity != null) {
-                    // If it's a Steve NPC, set the owner name and UUID
-                    if (entity instanceof com.modvane.hologenica.entity.SteveNPCEntity steveNPC) {
+                    // If it's a player clone, set the owner name and UUID
+                    if (entity instanceof com.modvane.hologenica.entity.PlayerCloneEntity clone) {
                         if (!entityName.isEmpty()) {
-                            steveNPC.setOwnerName(entityName);
+                            clone.setOwnerName(entityName);
                         }
                         if (playerUUID != null) {
-                            steveNPC.setPlayerUUID(playerUUID);
+                            clone.setPlayerUUID(playerUUID);
                         }
                     }
 

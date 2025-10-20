@@ -1,6 +1,6 @@
 package com.modvane.hologenica.entity;
 
-import com.modvane.hologenica.menu.SteveNPCMenu;
+import com.modvane.hologenica.menu.PlayerCloneMenu;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -22,19 +22,19 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
-// Steve NPC entity - a cloned humanoid that can follow and assist the player
+// Player clone entity - a cloned humanoid that can follow and assist the player
 // Extends TamableAnimal to use Minecraft's built-in owner/pet AI system
-public class SteveNPCEntity extends TamableAnimal {
+public class PlayerCloneEntity extends TamableAnimal {
 
     private static final EntityDataAccessor<Optional<UUID>> PLAYER_UUID =
-        SynchedEntityData.defineId(SteveNPCEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+        SynchedEntityData.defineId(PlayerCloneEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
     private static final EntityDataAccessor<Boolean> IS_FOLLOWING =
-        SynchedEntityData.defineId(SteveNPCEntity.class, EntityDataSerializers.BOOLEAN);
+        SynchedEntityData.defineId(PlayerCloneEntity.class, EntityDataSerializers.BOOLEAN);
 
     private String ownerName = ""; // Store the name of who was cloned
 
-    public SteveNPCEntity(EntityType<? extends TamableAnimal> entityType, Level level) {
+    public PlayerCloneEntity(EntityType<? extends TamableAnimal> entityType, Level level) {
         super(entityType, level);
         this.setTame(false, false); // Start untamed
     }
@@ -49,8 +49,8 @@ public class SteveNPCEntity extends TamableAnimal {
     // Set the name of the original player that was cloned
     public void setOwnerName(String name) {
         this.ownerName = name;
-        // Update custom name to show "Clone" after the name
-        this.setCustomName(Component.literal(name + " Clone"));
+        // Update custom name to show just the name (not "Name Clone")
+        this.setCustomName(Component.literal(name));
         this.setCustomNameVisible(true);
     }
     
@@ -112,7 +112,7 @@ public class SteveNPCEntity extends TamableAnimal {
     // Provide menu for GUI
     private MenuProvider getMenuProvider() {
         return new SimpleMenuProvider(
-            (containerId, playerInventory, player) -> new SteveNPCMenu(containerId, playerInventory, this),
+            (containerId, playerInventory, player) -> new PlayerCloneMenu(containerId, playerInventory, this),
             Component.empty()
         );
     }
@@ -160,9 +160,9 @@ public class SteveNPCEntity extends TamableAnimal {
         super.readAdditionalSaveData(tag); // TamableAnimal handles owner and sitting state
         if (tag.contains("OwnerName")) {
             this.ownerName = tag.getString("OwnerName");
-            // Restore custom name
+            // Restore custom name (just the name, not "Name Clone")
             if (!this.ownerName.isEmpty()) {
-                this.setCustomName(Component.literal(this.ownerName + " Clone"));
+                this.setCustomName(Component.literal(this.ownerName));
                 this.setCustomNameVisible(true);
             }
         }

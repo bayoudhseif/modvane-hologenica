@@ -8,7 +8,7 @@
     "block.hologenica.telepad": "Telepad",
     "block.hologenica.neurolink": "Neurolink",
     "item.hologenica.bioscanner": "Bioscanner",
-    "entity.hologenica.steve_npc": "Steve NPC",
+    "entity.hologenica.player_clone": "Player Clone",
     "gui.hologenica.display_options": "Display Options",
     "gui.hologenica.label_transparency": "Opacity",
     "gui.hologenica.label_rotation": "Rotating",

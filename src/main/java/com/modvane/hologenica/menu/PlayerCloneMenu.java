@@ -1,6 +1,6 @@
 package com.modvane.hologenica.menu;
 
-import com.modvane.hologenica.entity.SteveNPCEntity;
+import com.modvane.hologenica.entity.PlayerCloneEntity;
 import com.modvane.hologenica.registry.HologenicaMenus;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -9,15 +9,15 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.item.ItemStack;
 
-// Menu for Steve NPC GUI
-public class SteveNPCMenu extends AbstractContainerMenu {
+// Menu for Player Clone GUI
+public class PlayerCloneMenu extends AbstractContainerMenu {
 
-    private final SteveNPCEntity npcEntity;
+    private final PlayerCloneEntity cloneEntity;
     private final ContainerData data;
 
-    public SteveNPCMenu(int containerId, Inventory playerInventory, SteveNPCEntity npcEntity) {
-        super(HologenicaMenus.STEVE_NPC.get(), containerId);
-        this.npcEntity = npcEntity;
+    public PlayerCloneMenu(int containerId, Inventory playerInventory, PlayerCloneEntity cloneEntity) {
+        super(HologenicaMenus.PLAYER_CLONE.get(), containerId);
+        this.cloneEntity = cloneEntity;
 
         // Create data container to sync following state to client
         this.data = new SimpleContainerData(1);
@@ -27,9 +27,9 @@ public class SteveNPCMenu extends AbstractContainerMenu {
     // Handle button clicks from the client screen
     @Override
     public boolean clickMenuButton(Player player, int buttonId) {
-        if (npcEntity != null && buttonId == 0) {
+        if (cloneEntity != null && buttonId == 0) {
             // Toggle follow mode
-            npcEntity.toggleFollowMode(player);
+            cloneEntity.toggleFollowMode(player);
             return true;
         }
         return false;
@@ -39,8 +39,8 @@ public class SteveNPCMenu extends AbstractContainerMenu {
     public void broadcastChanges() {
         super.broadcastChanges();
         // Update the synced data with current following state
-        if (npcEntity != null) {
-            this.data.set(0, npcEntity.isFollowing() ? 1 : 0);
+        if (cloneEntity != null) {
+            this.data.set(0, cloneEntity.isFollowing() ? 1 : 0);
         }
     }
 
@@ -56,11 +56,11 @@ public class SteveNPCMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return npcEntity != null && npcEntity.isAlive() && player.distanceToSqr(npcEntity) <= 64.0;
+        return cloneEntity != null && cloneEntity.isAlive() && player.distanceToSqr(cloneEntity) <= 64.0;
     }
 
-    public SteveNPCEntity getNpcEntity() {
-        return npcEntity;
+    public PlayerCloneEntity getCloneEntity() {
+        return cloneEntity;
     }
 }
 

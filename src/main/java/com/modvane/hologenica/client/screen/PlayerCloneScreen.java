@@ -1,17 +1,17 @@
 package com.modvane.hologenica.client.screen;
 
 import com.modvane.hologenica.client.gui.ToggleButton;
-import com.modvane.hologenica.menu.SteveNPCMenu;
+import com.modvane.hologenica.menu.PlayerCloneMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
-// GUI screen for Steve NPC with follow toggle
-public class SteveNPCScreen extends BaseModScreen<SteveNPCMenu> {
+// GUI screen for Player Clone with follow toggle
+public class PlayerCloneScreen extends BaseModScreen<PlayerCloneMenu> {
 
     private static final int BUTTON_WIDTH = 100;
 
-    public SteveNPCScreen(SteveNPCMenu menu, Inventory playerInventory, Component title) {
+    public PlayerCloneScreen(PlayerCloneMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
     }
 
