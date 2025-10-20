@@ -13,6 +13,8 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
@@ -30,7 +32,7 @@ import java.util.Set;
 // Imprinter - imprints player genetic data into bioscanners in connected neurocells
 public class ImprinterBlockEntity extends BlockEntity {
     
-    private static final int IMPRINT_DURATION = 60; // 3 seconds (60 ticks)
+    private static final int IMPRINT_DURATION = 100; // 5 seconds (100 ticks)
     private int imprintProgress = 0;
     private boolean isImprinting = false;
     private String playerName = "";
@@ -43,44 +45,83 @@ public class ImprinterBlockEntity extends BlockEntity {
     public void tick() {
         if (level == null || level.isClientSide) return;
         
-        // Check if a player is standing on top of the imprinter
+        // Check for any living entity on top of the imprinter
         AABB checkBox = new AABB(worldPosition.getX(), worldPosition.getY() + 0.5, worldPosition.getZ(),
                                    worldPosition.getX() + 1, worldPosition.getY() + 3, worldPosition.getZ() + 1);
-        List<Player> players = level.getEntitiesOfClass(Player.class, checkBox);
+        List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, checkBox);
         
-        if (!players.isEmpty()) {
-            Player player = players.get(0);
+        if (!entities.isEmpty()) {
+            LivingEntity entity = entities.get(0);
+            boolean isPlayer = entity instanceof Player;
             
             // Find a connected neurocell with an empty bioscanner
             NeurocellBlockEntity neurocell = findConnectedNeurocellWithEmptyBioscanner();
             
             if (neurocell != null) {
+                // Pull entity towards center and hold in place (for all entities including players)
+                double centerX = worldPosition.getX() + 0.5;
+                double centerZ = worldPosition.getZ() + 0.5;
+                double targetY = worldPosition.getY() + 0.5;
+                
+                // Gradually pull entity to center
+                double pullStrength = 0.1;
+                double dx = centerX - entity.getX();
+                double dz = centerZ - entity.getZ();
+                double dy = targetY - entity.getY();
+                
+                entity.setDeltaMovement(dx * pullStrength, dy * pullStrength, dz * pullStrength);
+                entity.hurtMarked = true; // Force position update
+                
                 if (!isImprinting) {
                     // Start imprinting
                     isImprinting = true;
                     imprintProgress = 0;
-                    playerName = player.getDisplayName().getString();
+                    playerName = entity.getDisplayName().getString();
                     setChanged();
                 }
                 
                 // Continue imprinting
                 imprintProgress++;
                 
-                // Spawn particles around player every few ticks
-                if (imprintProgress % 5 == 0 && level instanceof ServerLevel serverLevel) {
-                    for (int i = 0; i < 3; i++) {
-                        double offsetX = (level.random.nextDouble() - 0.5) * 1.5;
-                        double offsetY = level.random.nextDouble() * 2;
-                        double offsetZ = (level.random.nextDouble() - 0.5) * 1.5;
-                        serverLevel.sendParticles(ParticleTypes.END_ROD,
-                            player.getX() + offsetX, player.getY() + offsetY, player.getZ() + offsetZ,
-                            1, 0, 0, 0, 0);
+                // Spawn particles and play sounds during imprinting
+                if (level instanceof ServerLevel serverLevel) {
+                    // Circular scanning effect with enchantment table particles
+                    if (imprintProgress % 2 == 0) {
+                        double angle = (imprintProgress * 0.2) % (2 * Math.PI);
+                        double radius = 1.2;
+                        double x = entity.getX() + Math.cos(angle) * radius;
+                        double z = entity.getZ() + Math.sin(angle) * radius;
+                        double y = entity.getY() + level.random.nextDouble() * entity.getBbHeight();
+                        
+                        serverLevel.sendParticles(ParticleTypes.ENCHANT,
+                            x, y, z, 1, 0, 0, 0, 0.1);
+                    }
+                    
+                    // DNA helix effect with portal particles
+                    if (imprintProgress % 3 == 0) {
+                        double helixAngle = (imprintProgress * 0.3) % (2 * Math.PI);
+                        double helixRadius = 0.4;
+                        double helixHeight = (imprintProgress % 40) * 0.05;
+                        double x = entity.getX() + Math.cos(helixAngle) * helixRadius;
+                        double z = entity.getZ() + Math.sin(helixAngle) * helixRadius;
+                        double y = worldPosition.getY() + 0.5 + helixHeight;
+                        
+                        serverLevel.sendParticles(ParticleTypes.PORTAL,
+                            x, y, z, 1, 0, 0, 0, 0);
+                    }
+                    
+                    // Play ambient scanning sounds
+                    if (imprintProgress % 10 == 0) {
+                        level.playSound(null, worldPosition, 
+                            net.minecraft.sounds.SoundEvents.BEACON_AMBIENT, 
+                            net.minecraft.sounds.SoundSource.BLOCKS, 
+                            0.3f, 1.5f + (imprintProgress / 60.0f) * 0.5f);
                     }
                 }
                 
                 // Complete imprinting
                 if (imprintProgress >= IMPRINT_DURATION) {
-                    imprintPlayerDNA(neurocell, player);
+                    imprintEntityDNA(neurocell, entity);
                     isImprinting = false;
                     imprintProgress = 0;
                     setChanged();
@@ -103,22 +144,30 @@ public class ImprinterBlockEntity extends BlockEntity {
         }
     }
     
-    // Find a directly connected neurocell with an empty bioscanner (no neurolinks allowed)
+    // Find a neurocell connected through exactly 1 neurolink (same as Reformer)
     private NeurocellBlockEntity findConnectedNeurocellWithEmptyBioscanner() {
         if (level == null) return null;
         
-        // Check all 4 horizontal directions for a DIRECT neurocell connection
-        for (Direction direction : Direction.Plane.HORIZONTAL) {
-            BlockPos neighbor = worldPosition.relative(direction);
-            BlockState neighborState = level.getBlockState(neighbor);
+        // Check all 4 horizontal directions for neurolinks
+        for (Direction firstDir : Direction.Plane.HORIZONTAL) {
+            BlockPos neurolinkPos = worldPosition.relative(firstDir);
+            BlockState neurolinkState = level.getBlockState(neurolinkPos);
             
-            // Must be a neurocell directly adjacent (no neurolinks)
-            if (neighborState.getBlock() instanceof NeurocellBlock) {
-                BlockEntity be = level.getBlockEntity(neighbor);
-                if (be instanceof NeurocellBlockEntity neurocell) {
-                    // Check if connection is from the back (Imprinter can only connect via back)
-                    if (neurocell.isBackConnection(direction.getOpposite()) && hasEmptyBioscanner(neurocell)) {
-                        return neurocell;
+            // Must be a neurolink (no direct connection to neurocell)
+            if (neurolinkState.getBlock() instanceof NeurolinkBlock) {
+                // Now check all 4 directions from the neurolink for a neurocell
+                for (Direction secondDir : Direction.Plane.HORIZONTAL) {
+                    BlockPos neurocellPos = neurolinkPos.relative(secondDir);
+                    BlockState neurocellState = level.getBlockState(neurocellPos);
+                    
+                    if (neurocellState.getBlock() instanceof NeurocellBlock) {
+                        BlockEntity be = level.getBlockEntity(neurocellPos);
+                        if (be instanceof NeurocellBlockEntity neurocell) {
+                            // Check if connection is from the back (Imprinter connects via back)
+                            if (neurocell.isBackConnection(secondDir.getOpposite()) && hasEmptyBioscanner(neurocell)) {
+                                return neurocell;
+                            }
+                        }
                     }
                 }
             }
@@ -138,32 +187,70 @@ public class ImprinterBlockEntity extends BlockEntity {
         return !tag.contains("EntityType");
     }
     
-    // Imprint player DNA into the bioscanner
-    private void imprintPlayerDNA(NeurocellBlockEntity neurocell, Player player) {
+    // Imprint entity DNA into the bioscanner
+    private void imprintEntityDNA(NeurocellBlockEntity neurocell, LivingEntity entity) {
         ItemStack bioscanner = neurocell.getInventory().getItem(0);
         if (bioscanner.isEmpty()) return;
         
-        // Add player DNA to bioscanner
+        // Determine entity type and name
+        String entityTypeString;
+        String entityName;
+        
+        if (entity instanceof Player) {
+            // Players clone as Steve NPCs
+            entityTypeString = "hologenica:steve_npc";
+            entityName = entity.getDisplayName().getString();
+        } else {
+            // Other entities clone as themselves
+            entityTypeString = EntityType.getKey(entity.getType()).toString();
+            entityName = entity.hasCustomName() ? 
+                entity.getCustomName().getString() : 
+                entity.getDisplayName().getString();
+        }
+        
+        // Add entity DNA to bioscanner
         bioscanner.update(DataComponents.CUSTOM_DATA, CustomData.EMPTY, customData -> {
             CompoundTag tag = customData.copyTag();
-            tag.putString("EntityType", "hologenica:steve_npc");
-            tag.putString("EntityName", player.getDisplayName().getString());
+            tag.putString("EntityType", entityTypeString);
+            tag.putString("EntityName", entityName);
             return CustomData.of(tag);
         });
         
         // Update the neurocell's inventory
         neurocell.getInventory().setItem(0, bioscanner);
         
-        // Spawn success particles
+        // Spawn gradual completion effects and play success sound
         if (level instanceof ServerLevel serverLevel) {
-            for (int i = 0; i < 20; i++) {
-                double offsetX = (level.random.nextDouble() - 0.5) * 2;
-                double offsetY = level.random.nextDouble() * 2;
-                double offsetZ = (level.random.nextDouble() - 0.5) * 2;
-                serverLevel.sendParticles(ParticleTypes.HAPPY_VILLAGER,
-                    player.getX() + offsetX, player.getY() + offsetY, player.getZ() + offsetZ,
-                    1, 0, 0, 0, 0);
+            // Gradual upward stream of particles
+            for (int i = 0; i < 25; i++) {
+                double offsetX = (level.random.nextDouble() - 0.5) * 0.8;
+                double offsetZ = (level.random.nextDouble() - 0.5) * 0.8;
+                double offsetY = level.random.nextDouble() * 0.5;
+                serverLevel.sendParticles(ParticleTypes.ENCHANTED_HIT,
+                    entity.getX() + offsetX, entity.getY() + offsetY, entity.getZ() + offsetZ,
+                    1, 0, 0.5, 0, 0.05);
             }
+            
+            // Glow particles rising from imprinter to entity
+            for (int i = 0; i < 15; i++) {
+                double offsetX = (level.random.nextDouble() - 0.5) * 0.5;
+                double offsetZ = (level.random.nextDouble() - 0.5) * 0.5;
+                serverLevel.sendParticles(ParticleTypes.GLOW,
+                    worldPosition.getX() + 0.5 + offsetX, 
+                    worldPosition.getY() + 0.5, 
+                    worldPosition.getZ() + 0.5 + offsetZ,
+                    1, 0, 0.3, 0, 0.02);
+            }
+            
+            // Success sound with echo effect
+            level.playSound(null, entity.blockPosition(), 
+                net.minecraft.sounds.SoundEvents.EXPERIENCE_ORB_PICKUP, 
+                net.minecraft.sounds.SoundSource.BLOCKS, 
+                0.8f, 1.5f);
+            level.playSound(null, entity.blockPosition(), 
+                net.minecraft.sounds.SoundEvents.AMETHYST_BLOCK_CHIME, 
+                net.minecraft.sounds.SoundSource.BLOCKS, 
+                0.6f, 1.8f);
         }
     }
 
@@ -208,4 +295,5 @@ public class ImprinterBlockEntity extends BlockEntity {
         return (float) imprintProgress / (float) IMPRINT_DURATION;
     }
 }
+
 
