@@ -1,34 +1,31 @@
 package com.modvane.hologenica.block;
 
 import com.mojang.serialization.MapCodec;
-import com.modvane.hologenica.block.entity.ReformerBlockEntity;
+import com.modvane.hologenica.block.entity.ImprinterBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-// Reformer - grows clones from 1% to 100% then spawns them
-public class ReformerBlock extends HorizontalDirectionalBlock implements EntityBlock {
+// Imprinter - prints/imprints genetic data
+public class ImprinterBlock extends HorizontalDirectionalBlock implements EntityBlock {
 
-    public static final MapCodec<ReformerBlock> CODEC = simpleCodec(ReformerBlock::new);
+    public static final MapCodec<ImprinterBlock> CODEC = simpleCodec(ImprinterBlock::new);
 
-    // Custom shape matching the 8 pixel tall model
+    // Custom shape matching the 8 pixel tall model (same as Reformer)
     private static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 8.0, 16.0);
 
-    public ReformerBlock(Properties properties) {
+    public ImprinterBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
@@ -45,15 +42,13 @@ public class ReformerBlock extends HorizontalDirectionalBlock implements EntityB
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        // Face toward the player - north side of block faces player
-        // getHorizontalDirection() returns player facing direction, so use opposite to face toward player
         return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
     }
 
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new ReformerBlockEntity(pos, state);
+        return new ImprinterBlockEntity(pos, state);
     }
 
     @Override
@@ -71,17 +66,6 @@ public class ReformerBlock extends HorizontalDirectionalBlock implements EntityB
     @Override
     protected float getShadeBrightness(BlockState state, BlockGetter level, BlockPos pos) {
         return 1.0f;
-    }
-
-    // Enable ticking for the block entity
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return level.isClientSide ? null : (lvl, pos, st, be) -> {
-            if (be instanceof ReformerBlockEntity pod) {
-                pod.tick();
-            }
-        };
     }
 }
 

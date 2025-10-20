@@ -118,8 +118,8 @@ public class ReformerBlockEntity extends BlockEntity {
                     if (neighborState.getBlock() instanceof NeurocellBlock) {
                         BlockEntity be = level.getBlockEntity(neighbor);
                         if (be instanceof NeurocellBlockEntity pod) {
-                            // Found a neurocell - check if it has a ragdoll
-                            if (pod.hasRagdoll() && !pod.getEntityType().isEmpty()) {
+                            // Check if neurocell accepts connections from this direction and has a ragdoll
+                            if (pod.acceptsConnectionFrom(direction.getOpposite()) && pod.hasRagdoll() && !pod.getEntityType().isEmpty()) {
                                 return pod;
                             }
                         }
@@ -206,13 +206,8 @@ public class ReformerBlockEntity extends BlockEntity {
             EntityType<?> type = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.get(entityId);
             
             if (type != null) {
-                // Spawn position above the pod
-                BlockPos spawnPos = worldPosition.above();
-                
-                // Make sure the spawn position is safe
-                if (!serverLevel.getBlockState(spawnPos).isAir()) {
-                    spawnPos = worldPosition.above(2);
-                }
+                // Spawn position on top of the reformer (8 pixels = 0.5 blocks tall)
+                BlockPos spawnPos = worldPosition;
                 
                 // Spawn the entity
                 Entity entity = type.create(serverLevel, null, spawnPos, MobSpawnType.SPAWNER, false, false);
@@ -223,8 +218,8 @@ public class ReformerBlockEntity extends BlockEntity {
                         steveNPC.setOwnerName(entityName);
                     }
                     
-                    // Position it in the center of the block
-                    entity.setPos(spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5);
+                    // Position entity on top of 8px tall reformer (0.5 blocks)
+                    entity.setPos(worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5);
                     serverLevel.addFreshEntity(entity);
                 }
             }

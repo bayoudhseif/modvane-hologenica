@@ -1,7 +1,9 @@
 package com.modvane.hologenica.block.entity;
 
+import com.modvane.hologenica.block.NeurocellBlock;
 import com.modvane.hologenica.registry.HologenicaBlockEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -83,7 +85,7 @@ public class NeurocellBlockEntity extends BlockEntity implements MenuProvider {
                         this.entityType = newEntityType;
                         this.entityName = newEntityName;
                         this.cloningTime = 0;
-                        this.hasRagdoll = false;
+                        this.hasRagdoll = true; // Instantly show ragdoll
                         setChanged();
 
                         level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
@@ -104,24 +106,7 @@ public class NeurocellBlockEntity extends BlockEntity implements MenuProvider {
 
     // Called every tick
     public void tick() {
-        if (level == null || level.isClientSide) return;
-
-        // If we have DNA to clone, start the cloning process
-        if (!entityType.isEmpty() && cloningTime < CLONING_DURATION && !hasRagdoll) {
-            cloningTime++;
-            setChanged();
-
-            // Sync to client every 5 ticks for smooth visual updates
-            if (cloningTime % 5 == 0) {
-                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
-            }
-
-            // When cloning is complete, display the ragdoll
-            if (cloningTime >= CLONING_DURATION) {
-                displayRagdoll();
-                // Bioscanner keeps its DNA - it's an infinite template!
-            }
-        }
+        // No ticking needed - ragdoll appears instantly when bioscanner is inserted
     }
 
     // Display the ragdoll inside the chamber
@@ -238,6 +223,19 @@ public class NeurocellBlockEntity extends BlockEntity implements MenuProvider {
     public float getCloningProgress() {
         if (hasRagdoll || entityType.isEmpty()) return 1.0f;
         return (float) cloningTime / (float) CLONING_DURATION;
+    }
+    
+    // Neurocell only accepts connections from left and right sides (perpendicular to facing)
+    public boolean acceptsConnectionFrom(Direction direction) {
+        if (level == null) return false;
+        BlockState state = getBlockState();
+        if (!(state.getBlock() instanceof NeurocellBlock)) return false;
+        
+        Direction facing = state.getValue(NeurocellBlock.FACING);
+        Direction left = facing.getCounterClockWise();
+        Direction right = facing.getClockWise();
+        
+        return direction == left || direction == right;
     }
 }
 

@@ -62,6 +62,7 @@ public class HologenicaClient {
             ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.NEUROCELL.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.CENTRIFUGE.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.REFORMER.get(), RenderType.translucent());
+            ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.IMPRINTER.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(HologenicaBlocks.TELEPAD.get(), RenderType.translucent());
         });
     }

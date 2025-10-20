@@ -3,6 +3,7 @@ package com.modvane.hologenica.registry;
 import com.modvane.hologenica.HologenicaMod;
 import com.modvane.hologenica.block.entity.NeurocellBlockEntity;
 import com.modvane.hologenica.block.entity.HologramBlockEntity;
+import com.modvane.hologenica.block.entity.ImprinterBlockEntity;
 import com.modvane.hologenica.block.entity.ReformerBlockEntity;
 import com.modvane.hologenica.block.entity.TelepadBlockEntity;
 import net.minecraft.core.registries.Registries;
@@ -33,6 +34,12 @@ public class HologenicaBlockEntities {
         BLOCK_ENTITIES.register("reformer", () ->
             BlockEntityType.Builder.of(ReformerBlockEntity::new,
                 HologenicaBlocks.REFORMER.get()).build(null));
+
+    // Imprinter block entity
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ImprinterBlockEntity>> IMPRINTER =
+        BLOCK_ENTITIES.register("imprinter", () ->
+            BlockEntityType.Builder.of(ImprinterBlockEntity::new,
+                HologenicaBlocks.IMPRINTER.get()).build(null));
 
     // Telepad block entity
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TelepadBlockEntity>> TELEPAD =

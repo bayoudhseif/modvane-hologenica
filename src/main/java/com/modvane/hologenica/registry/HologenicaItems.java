@@ -37,6 +37,11 @@ public class HologenicaItems {
         ITEMS.register("reformer", () ->
             new BlockItem(HologenicaBlocks.REFORMER.get(), new Item.Properties()));
 
+    // Imprinter item
+    public static final DeferredHolder<Item, BlockItem> IMPRINTER =
+        ITEMS.register("imprinter", () ->
+            new BlockItem(HologenicaBlocks.IMPRINTER.get(), new Item.Properties()));
+
     // Telepad item
     public static final DeferredHolder<Item, BlockItem> TELEPAD =
         ITEMS.register("telepad", () ->

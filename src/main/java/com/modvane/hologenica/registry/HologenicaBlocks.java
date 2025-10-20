@@ -5,6 +5,7 @@ import com.modvane.hologenica.block.NeurolinkBlock;
 import com.modvane.hologenica.block.CentrifugeBlock;
 import com.modvane.hologenica.block.NeurocellBlock;
 import com.modvane.hologenica.block.HologramBlock;
+import com.modvane.hologenica.block.ImprinterBlock;
 import com.modvane.hologenica.block.ReformerBlock;
 import com.modvane.hologenica.block.TelepadBlock;
 import net.minecraft.core.registries.Registries;
@@ -67,6 +68,20 @@ public class HologenicaBlocks {
                 .strength(4.0f)
                 .sound(SoundType.METAL)
                 .lightLevel(state -> 12)
+                .noOcclusion()
+                .isValidSpawn((state, level, pos, type) -> false)
+                .isRedstoneConductor((state, level, pos) -> false)
+                .isSuffocating((state, level, pos) -> false)
+                .isViewBlocking((state, level, pos) -> false)
+        ));
+
+    // Imprinter block
+    public static final DeferredHolder<Block, ImprinterBlock> IMPRINTER =
+        BLOCKS.register("imprinter", () -> new ImprinterBlock(
+            BlockBehaviour.Properties.of()
+                .strength(4.0f)
+                .sound(SoundType.METAL)
+                .lightLevel(state -> 8)
                 .noOcclusion()
                 .isValidSpawn((state, level, pos, type) -> false)
                 .isRedstoneConductor((state, level, pos) -> false)

@@ -33,6 +33,7 @@ public class HologenicaMod {
                     output.accept(HologenicaItems.NEUROCELL.get());
                     output.accept(HologenicaItems.BIOSCANNER.get());
                     output.accept(HologenicaItems.REFORMER.get());
+                    output.accept(HologenicaItems.IMPRINTER.get());
                     output.accept(HologenicaItems.NEUROLINK.get());
                     output.accept(HologenicaItems.TELEPAD.get());
                     output.accept(HologenicaItems.HOLOGRAM.get());

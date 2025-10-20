@@ -48,8 +48,8 @@ public class ReformerRenderer implements BlockEntityRenderer<ReformerBlockEntity
                 if (entity != null) {
                     poseStack.pushPose();
 
-                    // Position the entity at 9 pixels (0.5625 blocks) from the bottom
-                    poseStack.translate(0.5, 0.5625, 0.5);
+                    // Position the entity at 8 pixels (0.5 blocks) from the bottom - standing on reformer
+                    poseStack.translate(0.5, 0.5, 0.5);
                     
                     // Rotate to face forward
                     poseStack.mulPose(Axis.YP.rotationDegrees(180));
