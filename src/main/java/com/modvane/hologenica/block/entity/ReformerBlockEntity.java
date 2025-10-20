@@ -19,16 +19,12 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Set;
-
 // Reformer - grows clones from 1% to 100% then spawns them as real entities
 public class ReformerBlockEntity extends BlockEntity {
     
     private String entityType = "";
     private String entityName = ""; // Name of the entity being reconstructed
+    private java.util.UUID playerUUID = null; // UUID of the player (for skin rendering)
     private int reconstructionProgress = 0;
     private int reconstructionDuration = 0; // Dynamic duration based on entity health
     private boolean isReconstructing = false;
@@ -80,7 +76,7 @@ public class ReformerBlockEntity extends BlockEntity {
         NeurocellBlockEntity connectedPod = findConnectedNeurocell();
         
         if (connectedPod != null && connectedPod.hasRagdoll() && !connectedPod.getEntityType().isEmpty()) {
-            startReconstruction(connectedPod.getEntityType(), connectedPod.getEntityName());
+            startReconstruction(connectedPod);
         }
     }
     
@@ -117,13 +113,29 @@ public class ReformerBlockEntity extends BlockEntity {
     }
 
     // Start the reconstruction process
-    private void startReconstruction(String entityTypeString, String entityNameString) {
-        this.entityType = entityTypeString;
-        this.entityName = entityNameString;
+    private void startReconstruction(NeurocellBlockEntity neurocell) {
+        this.entityType = neurocell.getEntityType();
+        this.entityName = neurocell.getEntityName();
         this.reconstructionProgress = 0;
         
+        // Get player UUID from neurocell's bioscanner
+        net.minecraft.world.item.ItemStack bioscanner = neurocell.getInventory().getItem(0);
+        
+        if (!bioscanner.isEmpty()) {
+            net.minecraft.world.item.component.CustomData customData = bioscanner.getOrDefault(
+                net.minecraft.core.component.DataComponents.CUSTOM_DATA, 
+                net.minecraft.world.item.component.CustomData.EMPTY);
+            CompoundTag tag = customData.copyTag();
+            
+            if (tag.hasUUID("PlayerUUID")) {
+                this.playerUUID = tag.getUUID("PlayerUUID");
+            } else {
+                this.playerUUID = null;
+            }
+        }
+        
         // Calculate duration based on entity's max health (health × 6 seconds × 20 ticks)
-        this.reconstructionDuration = calculateReconstructionDuration(entityTypeString);
+        this.reconstructionDuration = calculateReconstructionDuration(this.entityType);
         
         this.isReconstructing = true;
         setChanged();
@@ -137,6 +149,7 @@ public class ReformerBlockEntity extends BlockEntity {
     private void resetReconstruction() {
         this.entityType = "";
         this.entityName = "";
+        this.playerUUID = null;
         this.reconstructionProgress = 0;
         this.reconstructionDuration = 0;
         this.isReconstructing = false;
@@ -191,9 +204,14 @@ public class ReformerBlockEntity extends BlockEntity {
                 Entity entity = type.create(serverLevel, null, spawnPos, MobSpawnType.SPAWNER, false, false);
                 
                 if (entity != null) {
-                    // If it's a Steve NPC, set the owner name
-                    if (entity instanceof com.modvane.hologenica.entity.SteveNPCEntity steveNPC && !entityName.isEmpty()) {
-                        steveNPC.setOwnerName(entityName);
+                    // If it's a Steve NPC, set the owner name and UUID
+                    if (entity instanceof com.modvane.hologenica.entity.SteveNPCEntity steveNPC) {
+                        if (!entityName.isEmpty()) {
+                            steveNPC.setOwnerName(entityName);
+                        }
+                        if (playerUUID != null) {
+                            steveNPC.setPlayerUUID(playerUUID);
+                        }
                     }
                     
                     // Position entity on top of 8px tall reformer (0.5 blocks)
@@ -208,6 +226,7 @@ public class ReformerBlockEntity extends BlockEntity {
         // Reset the pod
         entityType = "";
         entityName = "";
+        playerUUID = null;
         reconstructionProgress = 0;
         reconstructionDuration = 0;
         isReconstructing = false;
@@ -223,6 +242,9 @@ public class ReformerBlockEntity extends BlockEntity {
         super.saveAdditional(tag, provider);
         tag.putString("EntityType", entityType);
         tag.putString("EntityName", entityName);
+        if (playerUUID != null) {
+            tag.putUUID("PlayerUUID", playerUUID);
+        }
         tag.putInt("ReconstructionProgress", reconstructionProgress);
         tag.putInt("ReconstructionDuration", reconstructionDuration);
         tag.putBoolean("IsReconstructing", isReconstructing);
@@ -233,6 +255,11 @@ public class ReformerBlockEntity extends BlockEntity {
         super.loadAdditional(tag, provider);
         entityType = tag.getString("EntityType");
         entityName = tag.getString("EntityName");
+        if (tag.hasUUID("PlayerUUID")) {
+            playerUUID = tag.getUUID("PlayerUUID");
+        } else {
+            playerUUID = null;
+        }
         reconstructionProgress = tag.getInt("ReconstructionProgress");
         reconstructionDuration = tag.getInt("ReconstructionDuration");
         isReconstructing = tag.getBoolean("IsReconstructing");
@@ -244,10 +271,18 @@ public class ReformerBlockEntity extends BlockEntity {
         CompoundTag tag = super.getUpdateTag(registries);
         tag.putString("EntityType", entityType);
         tag.putString("EntityName", entityName);
+        if (playerUUID != null) {
+            tag.putUUID("PlayerUUID", playerUUID);
+        }
         tag.putInt("ReconstructionProgress", reconstructionProgress);
         tag.putInt("ReconstructionDuration", reconstructionDuration);
         tag.putBoolean("IsReconstructing", isReconstructing);
         return tag;
+    }
+    
+    // Getter for player UUID (used by renderer)
+    public java.util.UUID getPlayerUUID() {
+        return playerUUID;
     }
 
     @Nullable

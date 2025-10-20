@@ -23,11 +23,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
-import java.util.Set;
 
 // Imprinter - imprints player genetic data into bioscanners in connected neurocells
 public class ImprinterBlockEntity extends BlockEntity {
@@ -52,7 +48,6 @@ public class ImprinterBlockEntity extends BlockEntity {
         
         if (!entities.isEmpty()) {
             LivingEntity entity = entities.get(0);
-            boolean isPlayer = entity instanceof Player;
             
             // Find a connected neurocell with an empty bioscanner
             NeurocellBlockEntity neurocell = findConnectedNeurocellWithEmptyBioscanner();
@@ -214,10 +209,10 @@ public class ImprinterBlockEntity extends BlockEntity {
         String entityTypeString;
         String entityName;
         
-        if (entity instanceof Player) {
-            // Players clone as Steve NPCs
+        if (entity instanceof Player player) {
+            // Players clone as Steve NPCs with their actual skin
             entityTypeString = "hologenica:steve_npc";
-            entityName = entity.getDisplayName().getString();
+            entityName = player.getDisplayName().getString();
         } else {
             // Other entities clone as themselves
             entityTypeString = EntityType.getKey(entity.getType()).toString();
@@ -231,6 +226,11 @@ public class ImprinterBlockEntity extends BlockEntity {
             CompoundTag tag = customData.copyTag();
             tag.putString("EntityType", entityTypeString);
             tag.putString("EntityName", entityName);
+            // Store player UUID for skin rendering
+            if (entity instanceof Player player) {
+                java.util.UUID uuid = player.getUUID();
+                tag.putUUID("PlayerUUID", uuid);
+            }
             return CustomData.of(tag);
         });
         

@@ -46,6 +46,14 @@ public class ReformerRenderer implements BlockEntityRenderer<ReformerBlockEntity
                 Entity entity = type.create(blockEntity.getLevel());
                 
                 if (entity != null) {
+                    // If this is a SteveNPCEntity, set the player UUID for correct skin rendering
+                    if (entity instanceof com.modvane.hologenica.entity.SteveNPCEntity steveNPC) {
+                        java.util.UUID playerUUID = blockEntity.getPlayerUUID();
+                        if (playerUUID != null) {
+                            steveNPC.setPlayerUUID(playerUUID);
+                        }
+                    }
+                    
                     poseStack.pushPose();
 
                     // Position the entity at 8 pixels (0.5 blocks) from the bottom - standing on reformer

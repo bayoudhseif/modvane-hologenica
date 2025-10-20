@@ -37,6 +37,7 @@ public class NeurocellBlockEntity extends BlockEntity implements MenuProvider {
     
     private String entityType = "";
     private String entityName = ""; // Name of the entity being cloned
+    private java.util.UUID playerUUID = null; // Player UUID for skin rendering
     private int cloningTime = 0;
     private boolean hasRagdoll = false; // Whether a ragdoll is currently displayed
     private boolean isLoading = false; // Flag to prevent inventory changes during load
@@ -84,6 +85,12 @@ public class NeurocellBlockEntity extends BlockEntity implements MenuProvider {
                     if (!newEntityType.equals(entityType)) {
                         this.entityType = newEntityType;
                         this.entityName = newEntityName;
+                        // Cache player UUID for renderer
+                        if (tag.hasUUID("PlayerUUID")) {
+                            this.playerUUID = tag.getUUID("PlayerUUID");
+                        } else {
+                            this.playerUUID = null;
+                        }
                         this.cloningTime = 0;
                         this.hasRagdoll = true; // Instantly show ragdoll
                         setChanged();
@@ -96,6 +103,7 @@ public class NeurocellBlockEntity extends BlockEntity implements MenuProvider {
                 if (!entityType.isEmpty() || hasRagdoll) {
                     this.entityType = "";
                     this.entityName = "";
+                    this.playerUUID = null;
                     this.cloningTime = 0;
                     this.hasRagdoll = false;
                     setChanged();
@@ -137,6 +145,9 @@ public class NeurocellBlockEntity extends BlockEntity implements MenuProvider {
         super.saveAdditional(tag, provider);
         tag.putString("EntityType", entityType);
         tag.putString("EntityName", entityName);
+        if (playerUUID != null) {
+            tag.putUUID("PlayerUUID", playerUUID);
+        }
         tag.putInt("CloningTime", cloningTime);
         tag.putBoolean("HasRagdoll", hasRagdoll);
         
@@ -155,6 +166,11 @@ public class NeurocellBlockEntity extends BlockEntity implements MenuProvider {
         
         entityType = tag.getString("EntityType");
         entityName = tag.getString("EntityName");
+        if (tag.hasUUID("PlayerUUID")) {
+            playerUUID = tag.getUUID("PlayerUUID");
+        } else {
+            playerUUID = null;
+        }
         cloningTime = tag.getInt("CloningTime");
         hasRagdoll = tag.getBoolean("HasRagdoll");
         
@@ -184,6 +200,9 @@ public class NeurocellBlockEntity extends BlockEntity implements MenuProvider {
         CompoundTag tag = super.getUpdateTag(registries);
         tag.putString("EntityType", entityType);
         tag.putString("EntityName", entityName);
+        if (playerUUID != null) {
+            tag.putUUID("PlayerUUID", playerUUID);
+        }
         tag.putInt("CloningTime", cloningTime);
         tag.putBoolean("HasRagdoll", hasRagdoll);
         return tag;
@@ -249,6 +268,11 @@ public class NeurocellBlockEntity extends BlockEntity implements MenuProvider {
         Direction back = facing.getOpposite();
         
         return direction == back;
+    }
+    
+    // Get player UUID (cached from bioscanner for renderer)
+    public java.util.UUID getPlayerUUID() {
+        return playerUUID;
     }
 }
 

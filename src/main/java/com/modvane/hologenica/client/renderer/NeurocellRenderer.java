@@ -60,6 +60,14 @@ public class NeurocellRenderer implements BlockEntityRenderer<NeurocellBlockEnti
                 Entity entity = type.create(blockEntity.getLevel());
                 
                 if (entity != null) {
+                    // If this is a SteveNPCEntity, set the player UUID for correct skin rendering
+                    if (entity instanceof com.modvane.hologenica.entity.SteveNPCEntity steveNPC) {
+                        java.util.UUID playerUUID = blockEntity.getPlayerUUID();
+                        if (playerUUID != null) {
+                            steveNPC.setPlayerUUID(playerUUID);
+                        }
+                    }
+                    
                     poseStack.pushPose();
 
                     // Calculate time-based animations (using world time for smooth animation)

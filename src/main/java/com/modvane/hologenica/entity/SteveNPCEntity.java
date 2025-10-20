@@ -18,6 +18,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.network.chat.Component;
 
+import java.util.Optional;
 import java.util.UUID;
 
 // Steve NPC entity - a simple humanoid entity that looks like Steve
@@ -26,8 +27,10 @@ public class SteveNPCEntity extends PathfinderMob {
 
     private static final EntityDataAccessor<Boolean> FOLLOWING = 
         SynchedEntityData.defineId(SteveNPCEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Optional<UUID>> PLAYER_UUID = 
+        SynchedEntityData.defineId(SteveNPCEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 
-    private UUID ownerUUID;
+    private UUID ownerUUID; // UUID of the player who controls this NPC
     private Player cachedOwner;
     private String ownerName = ""; // Store the name of who was cloned
 
@@ -39,6 +42,7 @@ public class SteveNPCEntity extends PathfinderMob {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(FOLLOWING, false);
+        builder.define(PLAYER_UUID, Optional.empty());
     }
     
     // Set the name of the original player that was cloned
@@ -47,6 +51,14 @@ public class SteveNPCEntity extends PathfinderMob {
         // Update custom name to show "Clone" after the name
         this.setCustomName(Component.literal(name + " Clone"));
         this.setCustomNameVisible(true);
+    }
+    
+    public void setPlayerUUID(UUID uuid) {
+        this.entityData.set(PLAYER_UUID, Optional.ofNullable(uuid));
+    }
+    
+    public UUID getPlayerUUID() {
+        return this.entityData.get(PLAYER_UUID).orElse(null);
     }
     
     // Get the stored owner name
@@ -205,6 +217,10 @@ public class SteveNPCEntity extends PathfinderMob {
         if (!this.ownerName.isEmpty()) {
             tag.putString("OwnerName", this.ownerName);
         }
+        UUID playerUUID = getPlayerUUID();
+        if (playerUUID != null) {
+            tag.putUUID("PlayerUUID", playerUUID);
+        }
     }
 
     // Load data
@@ -222,6 +238,9 @@ public class SteveNPCEntity extends PathfinderMob {
                 this.setCustomName(Component.literal(this.ownerName + " Clone"));
                 this.setCustomNameVisible(true);
             }
+        }
+        if (tag.hasUUID("PlayerUUID")) {
+            setPlayerUUID(tag.getUUID("PlayerUUID"));
         }
     }
 }
