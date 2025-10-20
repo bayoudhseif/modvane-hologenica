@@ -1,6 +1,5 @@
 package com.modvane.hologenica.block.entity;
 
-import com.modvane.hologenica.block.entity.NeurocellBlockEntity;
 import com.modvane.hologenica.item.BioscannerItem;
 import com.modvane.hologenica.registry.HologenicaBlockEntities;
 import com.modvane.hologenica.util.NeurocellConnector;
@@ -29,46 +28,6 @@ import java.util.List;
 // Imprinter - imprints player genetic data into bioscanners in connected neurocells
 public class ImprinterBlockEntity extends BlockEntity {
 
-    // Timing constants
-    private static final int IMPRINT_DURATION = 100; // 5 seconds (100 ticks)
-
-    // Position and physics constants
-    private static final double ENTITY_CHECK_HEIGHT = 3.0;
-    private static final double ENTITY_CHECK_MIN_Y = 0.5;
-    private static final double PULL_STRENGTH = 0.1;
-    private static final double CENTER_OFFSET = 0.5;
-
-    // Particle effect intervals
-    private static final int SCANNING_PARTICLE_INTERVAL = 2; // Every 2 ticks
-    private static final int HELIX_PARTICLE_INTERVAL = 3; // Every 3 ticks
-    private static final int SOUND_INTERVAL = 10; // Every 10 ticks
-
-    // Sound pitch constants
-    private static final float BASE_SOUND_PITCH = 1.5f;
-    private static final float SOUND_PITCH_INCREMENT = 0.5f;
-    private static final float SOUND_PITCH_DIVISOR = 60.0f;
-
-    // DNA imprinting consequence constants
-    private static final int PLAYER_EFFECT_DURATION = 2400; // 2 minutes (2400 ticks)
-    private static final float PLAYER_MIN_HEALTH = 2.0f; // 1 heart
-
-    // Particle effect constants
-    private static final int COMPLETION_PARTICLE_COUNT = 25;
-    private static final int GLOW_PARTICLE_COUNT = 15;
-    private static final double PARTICLE_SPREAD_HORIZONTAL = 0.8;
-    private static final double PARTICLE_SPREAD_SMALL = 0.5;
-    private static final double PARTICLE_VERTICAL_OFFSET = 0.5;
-    private static final double PARTICLE_SPEED = 0.05;
-    private static final double PARTICLE_SPEED_SLOW = 0.02;
-    private static final double SCANNING_PARTICLE_RADIUS = 1.2;
-    private static final double SCANNING_PARTICLE_ANGLE_MULTIPLIER = 0.2;
-    private static final double HELIX_ANGLE_MULTIPLIER = 0.3;
-    private static final double HELIX_RADIUS = 0.4;
-    private static final int HELIX_HEIGHT_CYCLE = 40;
-    private static final double HELIX_HEIGHT_MULTIPLIER = 0.05;
-    private static final double PARTICLE_SPEED_HELIX = 0.1;
-
-    // State variables
     private int imprintProgress = 0;
     private boolean isImprinting = false;
     private String playerName = "";
@@ -103,8 +62,8 @@ public class ImprinterBlockEntity extends BlockEntity {
         if (level == null) return null;
 
         AABB checkBox = new AABB(
-            worldPosition.getX(), worldPosition.getY() + ENTITY_CHECK_MIN_Y, worldPosition.getZ(),
-            worldPosition.getX() + 1, worldPosition.getY() + ENTITY_CHECK_HEIGHT, worldPosition.getZ() + 1
+            worldPosition.getX(), worldPosition.getY() + 0.5, worldPosition.getZ(),
+            worldPosition.getX() + 1, worldPosition.getY() + 3.0, worldPosition.getZ() + 1
         );
         List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, checkBox);
 
@@ -113,15 +72,15 @@ public class ImprinterBlockEntity extends BlockEntity {
 
     // Pull entity towards the center of the imprinter
     private void pullEntityToCenter(LivingEntity entity) {
-        double centerX = worldPosition.getX() + CENTER_OFFSET;
-        double centerZ = worldPosition.getZ() + CENTER_OFFSET;
-        double targetY = worldPosition.getY() + CENTER_OFFSET;
+        double centerX = worldPosition.getX() + 0.5;
+        double centerZ = worldPosition.getZ() + 0.5;
+        double targetY = worldPosition.getY() + 0.5;
 
         double dx = centerX - entity.getX();
         double dz = centerZ - entity.getZ();
         double dy = targetY - entity.getY();
 
-        entity.setDeltaMovement(dx * PULL_STRENGTH, dy * PULL_STRENGTH, dz * PULL_STRENGTH);
+        entity.setDeltaMovement(dx * 0.1, dy * 0.1, dz * 0.1);
         entity.hurtMarked = true; // Force position update
     }
 
@@ -134,7 +93,7 @@ public class ImprinterBlockEntity extends BlockEntity {
         imprintProgress++;
         spawnImprintingEffects(entity);
 
-        if (imprintProgress >= IMPRINT_DURATION) {
+        if (imprintProgress >= 100) { // 5 seconds
             completeImprinting(entity, neurocell);
         }
     }
@@ -161,26 +120,26 @@ public class ImprinterBlockEntity extends BlockEntity {
         if (!(level instanceof ServerLevel serverLevel)) return;
 
         // Circular scanning effect with enchantment table particles
-        if (imprintProgress % SCANNING_PARTICLE_INTERVAL == 0) {
-            double angle = (imprintProgress * SCANNING_PARTICLE_ANGLE_MULTIPLIER) % (2 * Math.PI);
-            double x = entity.getX() + Math.cos(angle) * SCANNING_PARTICLE_RADIUS;
-            double z = entity.getZ() + Math.sin(angle) * SCANNING_PARTICLE_RADIUS;
+        if (imprintProgress % 2 == 0) {
+            double angle = (imprintProgress * 0.2) % (2 * Math.PI);
+            double x = entity.getX() + Math.cos(angle) * 1.2;
+            double z = entity.getZ() + Math.sin(angle) * 1.2;
             double y = entity.getY() + serverLevel.random.nextDouble() * entity.getBbHeight();
-            serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.ENCHANT, x, y, z, 1, 0, 0, 0, PARTICLE_SPEED_HELIX);
+            serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.ENCHANT, x, y, z, 1, 0, 0, 0, 0.1);
         }
 
         // DNA helix effect with portal particles
-        if (imprintProgress % HELIX_PARTICLE_INTERVAL == 0) {
-            double helixAngle = (imprintProgress * HELIX_ANGLE_MULTIPLIER) % (2 * Math.PI);
-            double x = entity.getX() + Math.cos(helixAngle) * HELIX_RADIUS;
-            double z = entity.getZ() + Math.sin(helixAngle) * HELIX_RADIUS;
-            double y = worldPosition.getY() + CENTER_OFFSET + (imprintProgress % HELIX_HEIGHT_CYCLE) * HELIX_HEIGHT_MULTIPLIER;
+        if (imprintProgress % 3 == 0) {
+            double helixAngle = (imprintProgress * 0.3) % (2 * Math.PI);
+            double x = entity.getX() + Math.cos(helixAngle) * 0.4;
+            double z = entity.getZ() + Math.sin(helixAngle) * 0.4;
+            double y = worldPosition.getY() + 0.5 + (imprintProgress % 40) * 0.05;
             serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.PORTAL, x, y, z, 1, 0, 0, 0, 0);
         }
 
         // Play ambient scanning sounds
-        if (imprintProgress % SOUND_INTERVAL == 0) {
-            float pitch = BASE_SOUND_PITCH + (imprintProgress / SOUND_PITCH_DIVISOR) * SOUND_PITCH_INCREMENT;
+        if (imprintProgress % 10 == 0) {
+            float pitch = 1.5f + (imprintProgress / 60.0f) * 0.5f;
             level.playSound(null, worldPosition, SoundEvents.BEACON_AMBIENT, SoundSource.BLOCKS, 0.3f, pitch);
         }
     }
@@ -206,19 +165,19 @@ public class ImprinterBlockEntity extends BlockEntity {
     // Apply debuffs to player after DNA imprinting
     private void applyPlayerConsequences(Player player) {
         // Drop player to 1 heart (2 health)
-        float damageAmount = player.getHealth() - PLAYER_MIN_HEALTH;
+        float damageAmount = player.getHealth() - 2.0f;
         if (damageAmount > 0) {
             // Use level damage sources instead of player damage sources to avoid clone immunity bug
             player.hurt(player.level().damageSources().magic(), damageAmount);
         }
 
-        // Apply debuffs for 2 minutes
+        // Apply debuffs for 2 minutes (2400 ticks)
         player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
-            net.minecraft.world.effect.MobEffects.WEAKNESS, PLAYER_EFFECT_DURATION, 1)); // Weakness II
+            net.minecraft.world.effect.MobEffects.WEAKNESS, 2400, 1)); // Weakness II
         player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
-            net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN, PLAYER_EFFECT_DURATION, 1)); // Slowness II
+            net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN, 2400, 1)); // Slowness II
         player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
-            net.minecraft.world.effect.MobEffects.HUNGER, PLAYER_EFFECT_DURATION, 2)); // Hunger III
+            net.minecraft.world.effect.MobEffects.HUNGER, 2400, 2)); // Hunger III
     }
 
     // Spawn particle effects when imprinting completes
@@ -226,29 +185,29 @@ public class ImprinterBlockEntity extends BlockEntity {
         if (!(level instanceof ServerLevel serverLevel)) return;
 
         // Gradual upward stream of enchanted hit particles around entity
-        for (int i = 0; i < COMPLETION_PARTICLE_COUNT; i++) {
-            double offsetX = (level.random.nextDouble() - 0.5) * PARTICLE_SPREAD_HORIZONTAL;
-            double offsetZ = (level.random.nextDouble() - 0.5) * PARTICLE_SPREAD_HORIZONTAL;
-            double offsetY = level.random.nextDouble() * PARTICLE_VERTICAL_OFFSET;
+        for (int i = 0; i < 25; i++) {
+            double offsetX = (level.random.nextDouble() - 0.5) * 0.8;
+            double offsetZ = (level.random.nextDouble() - 0.5) * 0.8;
+            double offsetY = level.random.nextDouble() * 0.5;
             serverLevel.sendParticles(
                 net.minecraft.core.particles.ParticleTypes.ENCHANTED_HIT,
                 entity.getX() + offsetX,
                 entity.getY() + offsetY,
                 entity.getZ() + offsetZ,
-                1, 0, 0.5, 0, PARTICLE_SPEED
+                1, 0, 0.5, 0, 0.05
             );
         }
 
         // Glow particles rising from imprinter position
-        for (int i = 0; i < GLOW_PARTICLE_COUNT; i++) {
-            double offsetX = (level.random.nextDouble() - 0.5) * PARTICLE_SPREAD_SMALL;
-            double offsetZ = (level.random.nextDouble() - 0.5) * PARTICLE_SPREAD_SMALL;
+        for (int i = 0; i < 15; i++) {
+            double offsetX = (level.random.nextDouble() - 0.5) * 0.5;
+            double offsetZ = (level.random.nextDouble() - 0.5) * 0.5;
             serverLevel.sendParticles(
                 net.minecraft.core.particles.ParticleTypes.GLOW,
-                worldPosition.getX() + CENTER_OFFSET + offsetX,
-                worldPosition.getY() + CENTER_OFFSET,
-                worldPosition.getZ() + CENTER_OFFSET + offsetZ,
-                1, 0, 0.3, 0, PARTICLE_SPEED_SLOW
+                worldPosition.getX() + 0.5 + offsetX,
+                worldPosition.getY() + 0.5,
+                worldPosition.getZ() + 0.5 + offsetZ,
+                1, 0, 0.3, 0, 0.02
             );
         }
 
@@ -365,6 +324,6 @@ public class ImprinterBlockEntity extends BlockEntity {
 
     public float getImprintProgress() {
         if (!isImprinting) return 0.0f;
-        return (float) imprintProgress / (float) IMPRINT_DURATION;
+        return (float) imprintProgress / 100.0f;
     }
 }

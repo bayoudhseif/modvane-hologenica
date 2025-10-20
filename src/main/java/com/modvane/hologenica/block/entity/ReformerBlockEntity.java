@@ -3,7 +3,6 @@ package com.modvane.hologenica.block.entity;
 import com.modvane.hologenica.registry.HologenicaBlockEntities;
 import com.modvane.hologenica.util.NeurocellConnector;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -20,14 +19,6 @@ import org.jetbrains.annotations.Nullable;
 
 // Reformer - grows clones from 1% to 100% then spawns them as real entities
 public class ReformerBlockEntity extends BlockEntity {
-
-    // Reconstruction timing constants
-    private static final int DEFAULT_RECONSTRUCTION_DURATION = 1200; // 60 seconds default
-    private static final int SYNC_INTERVAL = 5; // Sync to client every 5 ticks
-    private static final int HEALTH_TO_TICKS_MULTIPLIER = 120; // health × 6 seconds × 20 ticks
-
-    // Spawn position constants
-    private static final double SPAWN_OFFSET = 0.5; // Center of block (8 pixels = 0.5 blocks tall)
 
     private String entityType = "";
     private String entityName = ""; // Name of the entity being reconstructed
@@ -63,8 +54,8 @@ public class ReformerBlockEntity extends BlockEntity {
             reconstructionProgress++;
             setChanged();
 
-            // Sync to client periodically for smooth visual updates
-            if (reconstructionProgress % SYNC_INTERVAL == 0) {
+            // Sync to client every 5 ticks for smooth visual updates
+            if (reconstructionProgress % 5 == 0) {
                 level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
             }
 
@@ -159,9 +150,9 @@ public class ReformerBlockEntity extends BlockEntity {
     }
     
     // Calculate reconstruction duration based on entity's max health
-    // Formula: health × 6 seconds × 20 ticks per second
+    // Formula: health × 6 seconds × 20 ticks per second = health × 120 ticks
     private int calculateReconstructionDuration(String entityTypeString) {
-        if (level == null) return DEFAULT_RECONSTRUCTION_DURATION;
+        if (level == null) return 1200; // 60 seconds default
 
         try {
             ResourceLocation entityId = ResourceLocation.parse(entityTypeString);
@@ -172,14 +163,14 @@ public class ReformerBlockEntity extends BlockEntity {
                 Entity entity = type.create(level);
                 if (entity instanceof net.minecraft.world.entity.LivingEntity livingEntity) {
                     float maxHealth = livingEntity.getMaxHealth();
-                    return (int) (maxHealth * HEALTH_TO_TICKS_MULTIPLIER);
+                    return (int) (maxHealth * 120);
                 }
             }
         } catch (Exception e) {
             // Failed to calculate, use default
         }
 
-        return DEFAULT_RECONSTRUCTION_DURATION;
+        return 1200; // 60 seconds default
     }
 
     // Spawn the fully reconstructed entity
@@ -210,11 +201,11 @@ public class ReformerBlockEntity extends BlockEntity {
                         }
                     }
 
-                    // Position entity on top of reformer
+                    // Position entity on top of reformer (center of 0.5 block tall reformer)
                     entity.setPos(
-                        worldPosition.getX() + SPAWN_OFFSET,
-                        worldPosition.getY() + SPAWN_OFFSET,
-                        worldPosition.getZ() + SPAWN_OFFSET
+                        worldPosition.getX() + 0.5,
+                        worldPosition.getY() + 0.5,
+                        worldPosition.getZ() + 0.5
                     );
                     serverLevel.addFreshEntity(entity);
                 }

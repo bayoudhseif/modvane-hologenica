@@ -16,6 +16,9 @@ import net.minecraft.world.entity.EntityType;
 public class NeurocellRenderer implements BlockEntityRenderer<NeurocellBlockEntity> {
 
     private final EntityRenderDispatcher entityRenderer;
+    
+    // Cache entities to avoid creating them every frame
+    private final java.util.Map<String, Entity> entityCache = new java.util.HashMap<>();
 
     public NeurocellRenderer(BlockEntityRendererProvider.Context context) {
         this.entityRenderer = Minecraft.getInstance().getEntityRenderDispatcher();
@@ -56,8 +59,14 @@ public class NeurocellRenderer implements BlockEntityRenderer<NeurocellBlockEnti
             }
             
             if (type != null && blockEntity.getLevel() != null) {
-                // Create a temporary entity just for rendering (not added to world)
-                Entity entity = type.create(blockEntity.getLevel());
+                // Get or create cached entity
+                Entity entity = entityCache.get(entityTypeString);
+                if (entity == null) {
+                    entity = type.create(blockEntity.getLevel());
+                    if (entity != null) {
+                        entityCache.put(entityTypeString, entity);
+                    }
+                }
                 
                 if (entity != null) {
                     // If this is a SteveNPCEntity, set the player UUID for correct skin rendering

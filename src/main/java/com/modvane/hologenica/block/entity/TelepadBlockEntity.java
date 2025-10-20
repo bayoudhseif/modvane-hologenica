@@ -31,32 +31,6 @@ import java.util.*;
 // Features charging time, cooldowns, sounds, and particle effects
 public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
 
-    // Teleportation timing constants
-    private static final int CHARGE_TIME = 40; // 2 seconds charging time (20 ticks per second)
-    private static final int COOLDOWN_AFTER_TELEPORT = 60; // 3 seconds cooldown after arriving
-
-    // Particle and sound constants
-    private static final int CHARGING_PARTICLE_INTERVAL = 2; // Spawn particles every 2 ticks
-    private static final int SOUND_INTERVAL = 10; // Play sound every 10 ticks
-    private static final int CHARGING_PARTICLE_COUNT = 3;
-    private static final double PARTICLE_RADIUS_MIN = 0.5;
-    private static final double PARTICLE_RADIUS_MAX = 1.0;
-    private static final double PARTICLE_SPEED = 0.05;
-
-    // Teleport particle constants
-    private static final int TELEPORT_PARTICLE_COUNT = 50;
-    private static final int TELEPORT_END_ROD_COUNT = 20;
-    private static final double TELEPORT_PARTICLE_SPREAD_X = 0.3;
-    private static final double TELEPORT_PARTICLE_SPREAD_Y = 0.5;
-    private static final double TELEPORT_PARTICLE_SPREAD_Z = 0.3;
-    private static final double TELEPORT_PARTICLE_VELOCITY = 0.5;
-    private static final double END_ROD_SPREAD = 0.2;
-    private static final double END_ROD_HEIGHT = 0.3;
-    private static final double END_ROD_VELOCITY = 0.1;
-
-    // Teleportation position constants
-    private static final double TELEPORT_CENTER_OFFSET = 0.5;
-
     private String telepadName = "";
 
     // Track players currently on this telepad with their charge progress
@@ -110,8 +84,8 @@ public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
         
         long currentTime = level.getGameTime();
         
-        // Clean up old recent arrivals
-        recentArrivals.entrySet().removeIf(entry -> currentTime - entry.getValue() > COOLDOWN_AFTER_TELEPORT);
+        // Clean up old recent arrivals (60 ticks = 3 seconds)
+        recentArrivals.entrySet().removeIf(entry -> currentTime - entry.getValue() > 60);
         
         // Process charging players
         List<UUID> toRemove = new ArrayList<>();
@@ -130,20 +104,20 @@ public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
             chargeTime++;
             chargingPlayers.put(playerId, chargeTime);
             
-            // Spawn charging particles
-            if (chargeTime % CHARGING_PARTICLE_INTERVAL == 0) {
+            // Spawn charging particles every 2 ticks
+            if (chargeTime % 2 == 0) {
                 spawnChargingParticles(player);
             }
 
             // Play charging sound periodically
             if (chargeTime == 1) {
                 level.playSound(null, worldPosition, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 0.5f, 1.5f);
-            } else if (chargeTime % SOUND_INTERVAL == 0 && chargeTime < CHARGE_TIME) {
+            } else if (chargeTime % 10 == 0 && chargeTime < 40) {
                 level.playSound(null, worldPosition, SoundEvents.BEACON_AMBIENT, SoundSource.BLOCKS, 0.3f, 1.8f);
             }
             
-            // Check if fully charged
-            if (chargeTime >= CHARGE_TIME) {
+            // Check if fully charged (40 ticks = 2 seconds)
+            if (chargeTime >= 40) {
                 executeTeleport((ServerPlayer) player);
                 toRemove.add(playerId);
             }
@@ -171,11 +145,11 @@ public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
         
         UUID playerId = player.getUUID();
         
-        // Check if player just arrived (cooldown period)
+        // Check if player just arrived (cooldown period of 60 ticks = 3 seconds)
         if (recentArrivals.containsKey(playerId)) {
             long arrivedAt = recentArrivals.get(playerId);
             long currentTime = level.getGameTime();
-            if (currentTime - arrivedAt < COOLDOWN_AFTER_TELEPORT) {
+            if (currentTime - arrivedAt < 60) {
                 // Still on cooldown, don't start charging
                 return;
             }
@@ -221,9 +195,9 @@ public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
         // Teleport the player
         player.teleportTo(
             dest.level,
-            dest.pos.getX() + TELEPORT_CENTER_OFFSET,
-            dest.pos.getY() + TELEPORT_CENTER_OFFSET,
-            dest.pos.getZ() + TELEPORT_CENTER_OFFSET,
+            dest.pos.getX() + 0.5,
+            dest.pos.getY() + 0.5,
+            dest.pos.getZ() + 0.5,
             player.getYRot(),
             player.getXRot()
         );
@@ -257,16 +231,16 @@ public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
         double z = player.getZ();
 
         // Spawn particles in a circle around the player
-        for (int i = 0; i < CHARGING_PARTICLE_COUNT; i++) {
+        for (int i = 0; i < 3; i++) {
             double angle = Math.random() * Math.PI * 2;
-            double radius = PARTICLE_RADIUS_MIN + Math.random() * (PARTICLE_RADIUS_MAX - PARTICLE_RADIUS_MIN);
+            double radius = 0.5 + Math.random() * 0.5;
             double offsetX = Math.cos(angle) * radius;
             double offsetZ = Math.sin(angle) * radius;
 
             serverLevel.sendParticles(
                 ParticleTypes.PORTAL,
                 x + offsetX, y + Math.random(), z + offsetZ,
-                1, 0, 0, 0, PARTICLE_SPEED
+                1, 0, 0, 0, 0.05
             );
         }
     }
@@ -279,21 +253,21 @@ public class TelepadBlockEntity extends BlockEntity implements MenuProvider {
 
     // Spawn teleport particles at a block position
     private void spawnArrivalParticlesAt(ServerLevel serverLevel, BlockPos pos) {
-        spawnTeleportParticlesAt(serverLevel, pos.getX() + TELEPORT_CENTER_OFFSET, pos.getY() + TELEPORT_CENTER_OFFSET, pos.getZ() + TELEPORT_CENTER_OFFSET);
+        spawnTeleportParticlesAt(serverLevel, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
     }
 
     // Shared teleport particle spawning logic
     private void spawnTeleportParticlesAt(ServerLevel serverLevel, double x, double y, double z) {
         serverLevel.sendParticles(
             ParticleTypes.PORTAL,
-            x, y + TELEPORT_CENTER_OFFSET, z,
-            TELEPORT_PARTICLE_COUNT, TELEPORT_PARTICLE_SPREAD_X, TELEPORT_PARTICLE_SPREAD_Y, TELEPORT_PARTICLE_SPREAD_Z, TELEPORT_PARTICLE_VELOCITY
+            x, y + 0.5, z,
+            50, 0.3, 0.5, 0.3, 0.5
         );
 
         serverLevel.sendParticles(
             ParticleTypes.END_ROD,
-            x, y + TELEPORT_CENTER_OFFSET, z,
-            TELEPORT_END_ROD_COUNT, END_ROD_SPREAD, END_ROD_HEIGHT, END_ROD_SPREAD, END_ROD_VELOCITY
+            x, y + 0.5, z,
+            20, 0.2, 0.3, 0.2, 0.1
         );
     }
 

@@ -101,13 +101,15 @@ public class TelepadBlock extends HorizontalDirectionalBlock implements EntityBl
         }
     }
 
-    // Start charging when an entity steps on the telepad
+    // Start charging when a player steps on the telepad
     @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
-        if (!level.isClientSide && entity instanceof Player player) {
-            if (level.getBlockEntity(pos) instanceof TelepadBlockEntity telepad) {
-                telepad.startCharging(player);
-            }
+        // Early exit for non-players to avoid unnecessary overhead
+        if (!(entity instanceof Player player)) return;
+        if (level.isClientSide) return;
+        
+        if (level.getBlockEntity(pos) instanceof TelepadBlockEntity telepad) {
+            telepad.startCharging(player);
         }
     }
     
