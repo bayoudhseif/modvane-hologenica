@@ -23,65 +23,8 @@ public class BioscannerItem extends Item {
         super(properties);
     }
 
-    // Right-click on an entity to capture its DNA (not for players - use Imprinter for that)
-    @Override
-    public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity, InteractionHand hand) {
-        if (player.level().isClientSide) {
-            return InteractionResult.SUCCESS;
-        }
-        
-        // Players cannot be scanned with right-click - use Imprinter instead
-        if (entity instanceof Player) {
-            return InteractionResult.PASS;
-        }
-        
-        // If DNA is already captured, don't allow overwriting
-        if (hasDNA(stack)) {
-            return InteractionResult.PASS;
-        }
-        
-        captureDNA(stack, player, hand, entity);
-        return InteractionResult.SUCCESS;
-    }
+    // Right-click disabled - use Imprinter to capture DNA
 
-    // Check if the bioscanner already has DNA captured
-    private boolean hasDNA(ItemStack stack) {
-        CustomData customData = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
-        CompoundTag tag = customData.copyTag();
-        return tag.contains("EntityType");
-    }
-
-    // Helper method to capture DNA from any living entity
-    private void captureDNA(ItemStack stack, Player player, InteractionHand hand, LivingEntity entity) {
-        // Check if the entity is a player - if so, we'll clone a Steve NPC instead
-        boolean isPlayer = entity instanceof Player;
-        
-        String entityTypeString;
-        String entityName;
-        
-        if (isPlayer) {
-            // Store our custom Steve NPC entity type
-            entityTypeString = "hologenica:steve_npc";
-            entityName = entity.getDisplayName().getString();
-        } else {
-            // Store regular entity type and name
-            entityTypeString = EntityType.getKey(entity.getType()).toString();
-            entityName = entity.hasCustomName() ? 
-                entity.getCustomName().getString() : 
-                entity.getDisplayName().getString();
-        }
-        
-        // Use CUSTOM_DATA to store information
-        stack.update(DataComponents.CUSTOM_DATA, CustomData.EMPTY, customData -> {
-            CompoundTag tag = customData.copyTag();
-            tag.putString("EntityType", entityTypeString);
-            tag.putString("EntityName", entityName);
-            return CustomData.of(tag);
-        });
-        
-        // Update player's held item to sync to client
-        player.setItemInHand(hand, stack);
-    }
 
     // Show what entity is stored in the tooltip
     @Override
@@ -91,12 +34,9 @@ public class BioscannerItem extends Item {
         
         if (tag.contains("EntityType")) {
             String entityName = tag.contains("EntityName") ? tag.getString("EntityName") : tag.getString("EntityType");
-            
-            tooltip.add(Component.literal("Contains: ")
-                .withStyle(ChatFormatting.GRAY)
-                .append(Component.literal(entityName).withStyle(ChatFormatting.AQUA)));
+            tooltip.add(Component.literal(entityName).withStyle(ChatFormatting.AQUA));
         } else {
-            tooltip.add(Component.literal("Empty - Right-click an entity").withStyle(ChatFormatting.DARK_GRAY));
+            tooltip.add(Component.literal("Empty").withStyle(ChatFormatting.GRAY));
         }
     }
 
