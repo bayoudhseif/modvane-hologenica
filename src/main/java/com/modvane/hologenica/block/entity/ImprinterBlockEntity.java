@@ -162,7 +162,7 @@ public class ImprinterBlockEntity extends BlockEntity {
         }
     }
 
-    // Apply debuffs to player after DNA imprinting
+    // Apply consequences to player after DNA imprinting
     private void applyPlayerConsequences(Player player) {
         // Drop player to 1 heart (2 health)
         float damageAmount = player.getHealth() - 2.0f;
@@ -170,14 +170,6 @@ public class ImprinterBlockEntity extends BlockEntity {
             // Use level damage sources instead of player damage sources to avoid clone immunity bug
             player.hurt(player.level().damageSources().magic(), damageAmount);
         }
-
-        // Apply debuffs for 2 minutes (2400 ticks)
-        player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
-            net.minecraft.world.effect.MobEffects.WEAKNESS, 2400, 1)); // Weakness II
-        player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
-            net.minecraft.world.effect.MobEffects.MOVEMENT_SLOWDOWN, 2400, 1)); // Slowness II
-        player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
-            net.minecraft.world.effect.MobEffects.HUNGER, 2400, 2)); // Hunger III
     }
 
     // Spawn particle effects when imprinting completes
