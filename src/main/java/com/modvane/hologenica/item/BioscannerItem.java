@@ -30,6 +30,11 @@ public class BioscannerItem extends Item {
             return InteractionResult.SUCCESS;
         }
         
+        // If DNA is already captured, don't allow overwriting
+        if (hasDNA(stack)) {
+            return InteractionResult.PASS;
+        }
+        
         captureDNA(stack, player, hand, entity);
         return InteractionResult.SUCCESS;
     }
@@ -43,8 +48,20 @@ public class BioscannerItem extends Item {
             return net.minecraft.world.InteractionResultHolder.success(stack);
         }
         
+        // If DNA is already captured, don't allow overwriting
+        if (hasDNA(stack)) {
+            return net.minecraft.world.InteractionResultHolder.pass(stack);
+        }
+        
         captureDNA(stack, player, hand, player);
         return net.minecraft.world.InteractionResultHolder.success(stack);
+    }
+
+    // Check if the bioscanner already has DNA captured
+    private boolean hasDNA(ItemStack stack) {
+        CustomData customData = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+        CompoundTag tag = customData.copyTag();
+        return tag.contains("EntityType");
     }
 
     // Helper method to capture DNA from any living entity
