@@ -2,7 +2,6 @@ package com.modvane.hologenica.registry;
 
 import com.modvane.hologenica.HologenicaMod;
 import com.modvane.hologenica.block.NeurolinkBlock;
-import com.modvane.hologenica.block.NeurolinkBridgeBlock;
 import com.modvane.hologenica.block.CentrifugeBlock;
 import com.modvane.hologenica.block.NeurocellBlock;
 import com.modvane.hologenica.block.HologramBlock;
@@ -104,22 +103,9 @@ public class HologenicaBlocks {
                 .isViewBlocking((state, level, pos) -> false)
         ));
 
-    // Neurolink block - decorative walkway
+    // Neurolink block - connects like redstone
     public static final DeferredHolder<Block, NeurolinkBlock> NEUROLINK =
         BLOCKS.register("neurolink", () -> new NeurolinkBlock(
-            BlockBehaviour.Properties.of()
-                .strength(2.0f)
-                .sound(SoundType.METAL)
-                .noOcclusion()
-                .isValidSpawn((state, level, pos, type) -> false)
-                .isRedstoneConductor((state, level, pos) -> false)
-                .isSuffocating((state, level, pos) -> false)
-                .isViewBlocking((state, level, pos) -> false)
-        ));
-
-    // Neurolink bridge block - same size as neurolink
-    public static final DeferredHolder<Block, NeurolinkBridgeBlock> NEUROLINK_BRIDGE =
-        BLOCKS.register("neurolink_bridge", () -> new NeurolinkBridgeBlock(
             BlockBehaviour.Properties.of()
                 .strength(2.0f)
                 .sound(SoundType.METAL)

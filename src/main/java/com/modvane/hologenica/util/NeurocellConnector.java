@@ -10,13 +10,16 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Set;
 import java.util.function.Predicate;
 
-// Utility for finding neurocell blocks connected through neurolink blocks
+// Simple pathfinding through neurolink connections
 public class NeurocellConnector {
 
-    // Find a neurocell connected through exactly one neurolink that matches the filter
-    // Neurolink BACK connects to neurocell (any side except front), neurolink FRONT connects to source (reformer)
+    // Find a connected neurocell through neurolink network
     @Nullable
     public static NeurocellBlockEntity findConnectedNeurocell(
         Level level,
@@ -25,38 +28,39 @@ public class NeurocellConnector {
     ) {
         if (level == null) return null;
 
-        // Check all 4 horizontal directions for neurolinks
-        for (Direction firstDir : Direction.Plane.HORIZONTAL) {
-            BlockPos neurolinkPos = sourcePos.relative(firstDir);
-            BlockState neurolinkState = level.getBlockState(neurolinkPos);
+        Set<BlockPos> visited = new HashSet<>();
+        Queue<BlockPos> queue = new LinkedList<>();
 
-            // Must be a neurolink (no direct connection to neurocell)
-            if (neurolinkState.getBlock() instanceof NeurolinkBlock) {
-                // Get the neurolink's facing direction (this is the FRONT)
-                Direction neurolinkFacing = neurolinkState.getValue(NeurolinkBlock.FACING);
+        // Start BFS from source
+        queue.add(sourcePos);
+        visited.add(sourcePos);
 
-                // The neurolink's FRONT must be pointing toward the source block
-                // firstDir is the direction FROM source TO neurolink
-                // So neurolinkFacing should be OPPOSITE of firstDir (facing back at source)
-                if (neurolinkFacing != firstDir.getOpposite()) {
-                    continue; // Neurolink's front is not pointing at source
+        while (!queue.isEmpty()) {
+            // Prevent searching too far
+            if (visited.size() > 64) break;
+
+            BlockPos current = queue.poll();
+
+            // Check all 6 directions
+            for (Direction dir : Direction.values()) {
+                BlockPos neighborPos = current.relative(dir);
+
+                if (visited.contains(neighborPos)) continue;
+                visited.add(neighborPos);
+
+                BlockState neighborState = level.getBlockState(neighborPos);
+
+                // If it's a neurolink, add to search queue
+                if (neighborState.getBlock() instanceof NeurolinkBlock) {
+                    queue.add(neighborPos);
+                    continue;
                 }
 
-                // The neurolink's BACK is opposite to its facing
-                Direction neurolinkBack = neurolinkFacing.getOpposite();
-
-                // Look for neurocell only at the neurolink's BACK
-                BlockPos neurocellPos = neurolinkPos.relative(neurolinkBack);
-                BlockState neurocellState = level.getBlockState(neurocellPos);
-
-                if (neurocellState.getBlock() instanceof NeurocellBlock) {
-                    BlockEntity be = level.getBlockEntity(neurocellPos);
+                // If it's a neurocell, check if valid
+                if (neighborState.getBlock() instanceof NeurocellBlock) {
+                    BlockEntity be = level.getBlockEntity(neighborPos);
                     if (be instanceof NeurocellBlockEntity neurocell) {
-                        // Verify the neurocell accepts this connection (not from its front)
-                        // The direction from neurocell to neurolink
-                        Direction neurocellToNeurolink = neurolinkBack.getOpposite();
-
-                        if (neurocell.acceptsConnectionFrom(neurocellToNeurolink) && filter.test(neurocell)) {
+                        if (neurocell.acceptsConnectionFrom(dir.getOpposite()) && filter.test(neurocell)) {
                             return neurocell;
                         }
                     }
@@ -67,55 +71,13 @@ public class NeurocellConnector {
         return null;
     }
 
-    // Find a neurocell connected through exactly one neurolink from any valid side that matches the filter
-    // Used by Imprinter - neurolink BACK connects to neurocell (any side except front), neurolink FRONT connects to imprinter
+    // Alias for imprinter (uses same logic)
     @Nullable
     public static NeurocellBlockEntity findConnectedNeurocellFromBack(
         Level level,
         BlockPos sourcePos,
         Predicate<NeurocellBlockEntity> filter
     ) {
-        if (level == null) return null;
-
-        // Check all 4 horizontal directions for neurolinks
-        for (Direction firstDir : Direction.Plane.HORIZONTAL) {
-            BlockPos neurolinkPos = sourcePos.relative(firstDir);
-            BlockState neurolinkState = level.getBlockState(neurolinkPos);
-
-            // Must be a neurolink (no direct connection to neurocell)
-            if (neurolinkState.getBlock() instanceof NeurolinkBlock) {
-                // Get the neurolink's facing direction (this is the FRONT)
-                Direction neurolinkFacing = neurolinkState.getValue(NeurolinkBlock.FACING);
-
-                // The neurolink's FRONT must be pointing toward the source block (imprinter)
-                // firstDir is the direction FROM source TO neurolink
-                // So neurolinkFacing should be OPPOSITE of firstDir (facing back at source)
-                if (neurolinkFacing != firstDir.getOpposite()) {
-                    continue; // Neurolink's front is not pointing at source
-                }
-
-                // The neurolink's BACK is opposite to its facing
-                Direction neurolinkBack = neurolinkFacing.getOpposite();
-
-                // Look for neurocell only at the neurolink's BACK
-                BlockPos neurocellPos = neurolinkPos.relative(neurolinkBack);
-                BlockState neurocellState = level.getBlockState(neurocellPos);
-
-                if (neurocellState.getBlock() instanceof NeurocellBlock) {
-                    BlockEntity be = level.getBlockEntity(neurocellPos);
-                    if (be instanceof NeurocellBlockEntity neurocell) {
-                        // Verify the neurocell accepts this connection (not from its front)
-                        // The direction from neurocell to neurolink
-                        Direction neurocellToNeurolink = neurolinkBack.getOpposite();
-
-                        if (neurocell.acceptsConnectionFrom(neurocellToNeurolink) && filter.test(neurocell)) {
-                            return neurocell;
-                        }
-                    }
-                }
-            }
-        }
-
-        return null;
+        return findConnectedNeurocell(level, sourcePos, filter);
     }
 }

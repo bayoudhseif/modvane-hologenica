@@ -35,7 +35,6 @@ public class HologenicaMod {
                     output.accept(HologenicaItems.REFORMER.get());
                     output.accept(HologenicaItems.IMPRINTER.get());
                     output.accept(HologenicaItems.NEUROLINK.get());
-                    output.accept(HologenicaItems.NEUROLINK_BRIDGE.get());
                     output.accept(HologenicaItems.TELEPAD.get());
                     output.accept(HologenicaItems.HOLOGRAM.get());
                 })

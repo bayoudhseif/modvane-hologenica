@@ -1,20 +1,61 @@
 {
-  "variants": {
-    "facing=north": {
-      "model": "hologenica:block/neurolink"
+  "multipart": [
+    {
+      "apply": {
+        "model": "hologenica:block/neurolink_dot"
+      }
     },
-    "facing=south": {
-      "model": "hologenica:block/neurolink",
-      "y": 180
+    {
+      "when": {
+        "north": "true"
+      },
+      "apply": {
+        "model": "hologenica:block/neurolink_side"
+      }
     },
-    "facing=west": {
-      "model": "hologenica:block/neurolink",
-      "y": 270
+    {
+      "when": {
+        "south": "true"
+      },
+      "apply": {
+        "model": "hologenica:block/neurolink_side",
+        "y": 180
+      }
     },
-    "facing=east": {
-      "model": "hologenica:block/neurolink",
-      "y": 90
+    {
+      "when": {
+        "east": "true"
+      },
+      "apply": {
+        "model": "hologenica:block/neurolink_side",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "west": "true"
+      },
+      "apply": {
+        "model": "hologenica:block/neurolink_side",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "up": "true"
+      },
+      "apply": {
+        "model": "hologenica:block/neurolink_up"
+      }
+    },
+    {
+      "when": {
+        "down": "true"
+      },
+      "apply": {
+        "model": "hologenica:block/neurolink_up",
+        "x": 180
+      }
     }
-  }
+  ]
 }
-
