@@ -52,6 +52,11 @@ public class HologenicaItems {
         ITEMS.register("neurolink", () ->
             new BlockItem(HologenicaBlocks.NEUROLINK.get(), new Item.Properties()));
 
+    // Neurolink bridge item
+    public static final DeferredHolder<Item, BlockItem> NEUROLINK_BRIDGE =
+        ITEMS.register("neurolink_bridge", () ->
+            new BlockItem(HologenicaBlocks.NEUROLINK_BRIDGE.get(), new Item.Properties()));
+
     public static void init(IEventBus modEventBus) {
         ITEMS.register(modEventBus);
     }

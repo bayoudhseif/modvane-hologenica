@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "hologenica:block/neurolink-bridge"
+    },
+    "facing=south": {
+      "model": "hologenica:block/neurolink-bridge",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "hologenica:block/neurolink-bridge",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "hologenica:block/neurolink-bridge",
+      "y": 90
+    }
+  }
+}
