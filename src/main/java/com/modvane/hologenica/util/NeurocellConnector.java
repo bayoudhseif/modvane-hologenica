@@ -30,14 +30,15 @@ public class NeurocellConnector {
 
         Set<BlockPos> visited = new HashSet<>();
         Queue<BlockPos> queue = new LinkedList<>();
+        int neurolinkCount = 0;
 
         // Start BFS from source
         queue.add(sourcePos);
         visited.add(sourcePos);
 
         while (!queue.isEmpty()) {
-            // Prevent searching too far
-            if (visited.size() > 64) break;
+            // Prevent searching too far (max 16 neurolinks in the network)
+            if (neurolinkCount > 16) break;
 
             BlockPos current = queue.poll();
 
@@ -64,9 +65,10 @@ public class NeurocellConnector {
                 // Add to visited after checking it's not a neurocell
                 visited.add(neighborPos);
 
-                // If it's a neurolink, add to search queue
+                // If it's a neurolink, add to search queue and count it
                 if (neighborState.getBlock() instanceof NeurolinkBlock) {
                     queue.add(neighborPos);
+                    neurolinkCount++;
                     continue;
                 }
             }
