@@ -46,17 +46,10 @@ public class NeurocellConnector {
                 BlockPos neighborPos = current.relative(dir);
 
                 if (visited.contains(neighborPos)) continue;
-                visited.add(neighborPos);
 
                 BlockState neighborState = level.getBlockState(neighborPos);
 
-                // If it's a neurolink, add to search queue
-                if (neighborState.getBlock() instanceof NeurolinkBlock) {
-                    queue.add(neighborPos);
-                    continue;
-                }
-
-                // If it's a neurocell, check if valid
+                // If it's a neurocell, check if valid (don't add to visited unless it's a neurolink)
                 if (neighborState.getBlock() instanceof NeurocellBlock) {
                     BlockEntity be = level.getBlockEntity(neighborPos);
                     if (be instanceof NeurocellBlockEntity neurocell) {
@@ -64,6 +57,17 @@ public class NeurocellConnector {
                             return neurocell;
                         }
                     }
+                    // Don't add neurocell to visited - allow checking from other directions
+                    continue;
+                }
+
+                // Add to visited after checking it's not a neurocell
+                visited.add(neighborPos);
+
+                // If it's a neurolink, add to search queue
+                if (neighborState.getBlock() instanceof NeurolinkBlock) {
+                    queue.add(neighborPos);
+                    continue;
                 }
             }
         }
