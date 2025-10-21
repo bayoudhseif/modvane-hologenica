@@ -23,7 +23,7 @@ public class HologenicaBlocks {
     public static final DeferredHolder<Block, HologramBlock> HOLOGRAM =
         BLOCKS.register("hologram", () -> new HologramBlock(
             BlockBehaviour.Properties.of()
-                .strength(3.0f)
+                .strength(1.75f, 3.0f) // Hardness, blast resistance - breakable by hand
                 .sound(SoundType.METAL)
                 .lightLevel(state -> 15) // Max light level
                 .noOcclusion() // Allow transparency
@@ -37,7 +37,7 @@ public class HologenicaBlocks {
     public static final DeferredHolder<Block, NeurocellBlock> NEUROCELL =
         BLOCKS.register("neurocell", () -> new NeurocellBlock(
             BlockBehaviour.Properties.of()
-                .strength(5.0f)
+                .strength(1.75f, 3.0f) // Hardness, blast resistance - breakable by hand
                 .sound(SoundType.METAL)
                 .lightLevel(state -> 10)
                 .noOcclusion() // Allow transparency for glass parts
@@ -51,7 +51,7 @@ public class HologenicaBlocks {
     public static final DeferredHolder<Block, CentrifugeBlock> CENTRIFUGE =
         BLOCKS.register("centrifuge", () -> new CentrifugeBlock(
             BlockBehaviour.Properties.of()
-                .strength(4.0f)
+                .strength(1.75f, 3.0f) // Hardness, blast resistance - breakable by hand
                 .sound(SoundType.METAL)
                 .lightLevel(state -> 8)
                 .noOcclusion()
@@ -65,7 +65,7 @@ public class HologenicaBlocks {
     public static final DeferredHolder<Block, ReformerBlock> REFORMER =
         BLOCKS.register("reformer", () -> new ReformerBlock(
             BlockBehaviour.Properties.of()
-                .strength(4.0f)
+                .strength(1.75f, 3.0f) // Hardness, blast resistance - breakable by hand
                 .sound(SoundType.METAL)
                 .lightLevel(state -> 12)
                 .noOcclusion()
@@ -79,7 +79,7 @@ public class HologenicaBlocks {
     public static final DeferredHolder<Block, ImprinterBlock> IMPRINTER =
         BLOCKS.register("imprinter", () -> new ImprinterBlock(
             BlockBehaviour.Properties.of()
-                .strength(4.0f)
+                .strength(1.75f, 3.0f) // Hardness, blast resistance - breakable by hand
                 .sound(SoundType.METAL)
                 .lightLevel(state -> 8)
                 .noOcclusion()
@@ -93,7 +93,7 @@ public class HologenicaBlocks {
     public static final DeferredHolder<Block, TelepadBlock> TELEPAD =
         BLOCKS.register("telepad", () -> new TelepadBlock(
             BlockBehaviour.Properties.of()
-                .strength(4.0f)
+                .strength(1.75f, 3.0f) // Hardness, blast resistance - breakable by hand
                 .sound(SoundType.METAL)
                 .lightLevel(state -> 10)
                 .noOcclusion()
@@ -107,7 +107,7 @@ public class HologenicaBlocks {
     public static final DeferredHolder<Block, NeurolinkBlock> NEUROLINK =
         BLOCKS.register("neurolink", () -> new NeurolinkBlock(
             BlockBehaviour.Properties.of()
-                .strength(2.0f)
+                .strength(1.75f, 3.0f) // Hardness, blast resistance - breakable by hand
                 .sound(SoundType.METAL)
                 .noOcclusion()
                 .isValidSpawn((state, level, pos, type) -> false)
