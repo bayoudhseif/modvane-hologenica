@@ -30,6 +30,7 @@ public class HologenicaMod {
                 .icon(() -> new ItemStack(HologenicaItems.NEUROCELL.get()))
                 .displayItems((parameters, output) -> {
                     // Add all our items to the creative tab in logical order
+                    output.accept(HologenicaItems.MANUAL.get());
                     output.accept(HologenicaItems.NEUROCELL.get());
                     output.accept(HologenicaItems.BIOSCANNER.get());
                     output.accept(HologenicaItems.REFORMER.get());

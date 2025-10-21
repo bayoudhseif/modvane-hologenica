@@ -2,6 +2,7 @@ package com.modvane.hologenica.registry;
 
 import com.modvane.hologenica.HologenicaMod;
 import com.modvane.hologenica.item.BioscannerItem;
+import com.modvane.hologenica.item.ManualItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -26,6 +27,11 @@ public class HologenicaItems {
     public static final DeferredHolder<Item, BioscannerItem> BIOSCANNER =
         ITEMS.register("bioscanner", () ->
             new BioscannerItem(new Item.Properties().stacksTo(1)));
+
+    // Hologenica Manual item
+    public static final DeferredHolder<Item, ManualItem> MANUAL =
+        ITEMS.register("manual", () ->
+            new ManualItem(new Item.Properties().stacksTo(1)));
 
     // Centrifuge item
     public static final DeferredHolder<Item, BlockItem> CENTRIFUGE =

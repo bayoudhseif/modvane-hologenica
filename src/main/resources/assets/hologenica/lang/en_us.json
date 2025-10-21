@@ -8,6 +8,7 @@
     "block.hologenica.telepad": "Telepad",
     "block.hologenica.neurolink": "Neurolink",
     "item.hologenica.bioscanner": "Bioscanner",
+    "item.hologenica.manual": "Hologenica Manual",
     "entity.hologenica.player_clone": "Player Clone",
     "gui.hologenica.display_options": "Display Options",
     "gui.hologenica.label_transparency": "Opacity",
