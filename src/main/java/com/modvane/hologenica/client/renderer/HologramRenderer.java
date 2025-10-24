@@ -4,9 +4,6 @@ import com.modvane.hologenica.block.entity.HologramBlockEntity;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexBuffer;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.ShaderInstance;
@@ -27,7 +24,7 @@ public class HologramRenderer implements BlockEntityRenderer<HologramBlockEntity
 
     @Override
     public boolean shouldRenderOffScreen(HologramBlockEntity blockEntity) {
-        return true; // Allow rendering when block entity is off-screen
+        return false; // Use Minecraft's native frustum culling
     }
 
     @Override
