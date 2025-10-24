@@ -1,6 +1,7 @@
 package com.modvane.hologenica.block.entity;
 
 import com.modvane.hologenica.client.renderer.GreedyMesher;
+import com.modvane.hologenica.client.renderer.HologramMeshCache;
 import com.modvane.hologenica.menu.HologramMenu;
 import com.modvane.hologenica.registry.HologenicaBlockEntities;
 import net.minecraft.core.BlockPos;
@@ -44,6 +45,9 @@ public class HologramBlockEntity extends BlockEntity {
     // Cached greedy mesh to avoid regenerating every frame
     private List<GreedyMesher.MergedQuad> cachedMesh = null;
 
+    // VBO cache for ultra-fast rendering (client-side only)
+    private HologramMeshCache vboCache = null;
+
     public HologramBlockEntity(BlockPos pos, BlockState state) {
         super(HologenicaBlockEntities.HOLOGRAM.get(), pos, state);
     }
@@ -68,6 +72,9 @@ public class HologramBlockEntity extends BlockEntity {
         // Clear cache and mark for rescan
         cachedTerrain = null;
         cachedMesh = null;
+        if (vboCache != null) {
+            vboCache.markDirty();
+        }
         needsRescan = true;
         setChanged();
         
@@ -96,6 +103,9 @@ public class HologramBlockEntity extends BlockEntity {
     public void markForRescan() {
         this.needsRescan = true;
         this.cachedMesh = null;
+        if (vboCache != null) {
+            vboCache.markDirty();
+        }
     }
 
     // Get cached greedy mesh (null if not generated yet)
@@ -106,6 +116,27 @@ public class HologramBlockEntity extends BlockEntity {
     // Update the cached greedy mesh
     public void setCachedMesh(List<GreedyMesher.MergedQuad> mesh) {
         this.cachedMesh = mesh;
+        if (vboCache != null) {
+            vboCache.markDirty();
+        }
+    }
+
+    // Get VBO cache (creates if needed, client-side only)
+    public HologramMeshCache getVBOCache() {
+        if (vboCache == null && level != null && level.isClientSide) {
+            vboCache = new HologramMeshCache();
+        }
+        return vboCache;
+    }
+
+    // Clean up VBO when block entity is removed
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        if (vboCache != null) {
+            vboCache.dispose();
+            vboCache = null;
+        }
     }
 
     // Check if hologram is in transparent mode
@@ -118,6 +149,9 @@ public class HologramBlockEntity extends BlockEntity {
         this.transparentMode = !this.transparentMode;
         // Clear cached mesh since transparency affects mesh generation
         this.cachedMesh = null;
+        if (vboCache != null) {
+            vboCache.markDirty();
+        }
         setChanged();
         if (level != null && !level.isClientSide) {
             // Use flag 2 for immediate client update (more efficient than flag 3)
@@ -231,6 +265,9 @@ public class HologramBlockEntity extends BlockEntity {
                 // Bounds are correct but clear cached terrain to ensure rescan with new bounds
                 cachedTerrain = null;
                 cachedMesh = null;
+                if (vboCache != null) {
+                    vboCache.markDirty();
+                }
                 needsRescan = true;
             }
         } else {
