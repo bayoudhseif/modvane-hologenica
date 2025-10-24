@@ -20,6 +20,15 @@ public class HologramRendererRealistic {
     // Full brightness for hologram
     private static final int FULL_BRIGHT = 0xF000F0;
 
+    // Public accessors for render types
+    public static RenderType getHologramSolid() {
+        return HOLOGRAM_SOLID;
+    }
+
+    public static RenderType getHologramTranslucent() {
+        return HOLOGRAM_TRANSLUCENT;
+    }
+
     // Custom render type that uses only vertex colors (no textures) - SOLID
     private static final RenderType HOLOGRAM_SOLID = RenderType.create(
         "hologenica_hologram_solid",

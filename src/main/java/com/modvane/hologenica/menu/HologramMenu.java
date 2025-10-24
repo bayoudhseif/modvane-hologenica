@@ -28,8 +28,8 @@ public class HologramMenu extends AbstractContainerMenu {
         }
         
         // Create data container to sync toggle states to client
-        // Index 0: transparency, Index 1: rotation, Index 2: render style (0=CLASSIC, 1=REALISTIC)
-        this.data = new SimpleContainerData(3);
+        // Index 0: transparency, Index 1: rotation
+        this.data = new SimpleContainerData(2);
         addDataSlots(this.data);
     }
 
@@ -44,24 +44,21 @@ public class HologramMenu extends AbstractContainerMenu {
                 blockEntity.toggleRotation();
                 return true;
             } else if (buttonId == 2) {
-                blockEntity.cycleStyle();
-                return true;
-            } else if (buttonId == 3) {
                 blockEntity.setScanSize(32);
                 return true;
-            } else if (buttonId == 4) {
+            } else if (buttonId == 3) {
                 blockEntity.setScanSize(64);
                 return true;
-            } else if (buttonId == 5) {
+            } else if (buttonId == 4) {
                 blockEntity.setScanSize(128);
                 return true;
-            } else if (buttonId == 6) {
+            } else if (buttonId == 5) {
                 blockEntity.setBlockSize(1);
                 return true;
-            } else if (buttonId == 7) {
+            } else if (buttonId == 6) {
                 blockEntity.setBlockSize(3);
                 return true;
-            } else if (buttonId == 8) {
+            } else if (buttonId == 7) {
                 blockEntity.setBlockSize(9);
                 return true;
             }
@@ -76,7 +73,6 @@ public class HologramMenu extends AbstractContainerMenu {
         if (blockEntity != null) {
             this.data.set(0, blockEntity.isTransparentMode() ? 1 : 0);
             this.data.set(1, blockEntity.isRotationEnabled() ? 1 : 0);
-            this.data.set(2, blockEntity.getRenderStyle().ordinal());
         }
     }
 
@@ -88,12 +84,6 @@ public class HologramMenu extends AbstractContainerMenu {
     // Get rotation state from synced data (works on both client and server)
     public boolean isRotationEnabled() {
         return this.data.get(1) == 1;
-    }
-
-    // Get current render style name from synced data
-    public String getRenderStyleName() {
-        int styleIndex = this.data.get(2);
-        return styleIndex == 0 ? "Classic" : "Realistic";
     }
 
     // Check if the player can still access this menu

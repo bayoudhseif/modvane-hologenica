@@ -1,5 +1,6 @@
 package com.modvane.hologenica.block.entity;
 
+import com.modvane.hologenica.client.renderer.GreedyMesher;
 import com.modvane.hologenica.menu.HologramMenu;
 import com.modvane.hologenica.registry.HologenicaBlockEntities;
 import net.minecraft.core.BlockPos;
@@ -15,21 +16,16 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 // Stores the map region and cached terrain scan for holographic display
 public class HologramBlockEntity extends BlockEntity {
 
-    // Rendering style options
-    public enum RenderStyle {
-        CLASSIC,      // Volumetric layering with depth-based color gradients
-        REALISTIC     // Modern realistic clean solid rendering
-    }
-
-    // Default settings: 32x32 scan, 1x1 display, transparent, rotating, classic style
+    // Default settings: 32x32 scan, 1x1 display, transparent, rotating
     private static final int DEFAULT_SCAN_SIZE = 32;
     private static final int DEFAULT_BLOCK_SIZE = 1;
     private static final boolean DEFAULT_TRANSPARENT = true;
     private static final boolean DEFAULT_ROTATION = true;
-    private static final RenderStyle DEFAULT_STYLE = RenderStyle.CLASSIC;
     
     // Scan area bounds (inclusive)
     private int scanMinX, scanMaxX, scanMinZ, scanMaxZ;
@@ -40,11 +36,13 @@ public class HologramBlockEntity extends BlockEntity {
     private int blockSize = DEFAULT_BLOCK_SIZE;
     private boolean transparentMode = DEFAULT_TRANSPARENT;
     private boolean rotationEnabled = DEFAULT_ROTATION;
-    private RenderStyle renderStyle = DEFAULT_STYLE;
 
     // Cached terrain data to avoid rescanning every frame
     private int[][][] cachedTerrain = null;
     private boolean needsRescan = true;
+
+    // Cached greedy mesh to avoid regenerating every frame
+    private List<GreedyMesher.MergedQuad> cachedMesh = null;
 
     public HologramBlockEntity(BlockPos pos, BlockState state) {
         super(HologenicaBlockEntities.HOLOGRAM.get(), pos, state);
@@ -69,6 +67,7 @@ public class HologramBlockEntity extends BlockEntity {
         
         // Clear cache and mark for rescan
         cachedTerrain = null;
+        cachedMesh = null;
         needsRescan = true;
         setChanged();
         
@@ -96,6 +95,17 @@ public class HologramBlockEntity extends BlockEntity {
     // Force a rescan on next render
     public void markForRescan() {
         this.needsRescan = true;
+        this.cachedMesh = null;
+    }
+
+    // Get cached greedy mesh (null if not generated yet)
+    public List<GreedyMesher.MergedQuad> getCachedMesh() {
+        return cachedMesh;
+    }
+
+    // Update the cached greedy mesh
+    public void setCachedMesh(List<GreedyMesher.MergedQuad> mesh) {
+        this.cachedMesh = mesh;
     }
 
     // Check if hologram is in transparent mode
@@ -106,6 +116,8 @@ public class HologramBlockEntity extends BlockEntity {
     // Toggle between transparent and solid rendering
     public void toggleTransparency() {
         this.transparentMode = !this.transparentMode;
+        // Clear cached mesh since transparency affects mesh generation
+        this.cachedMesh = null;
         setChanged();
         if (level != null && !level.isClientSide) {
             // Use flag 2 for immediate client update (more efficient than flag 3)
@@ -124,23 +136,6 @@ public class HologramBlockEntity extends BlockEntity {
         setChanged();
         if (level != null && !level.isClientSide) {
             // Use flag 2 for immediate client update (more efficient than flag 3)
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 2);
-        }
-    }
-    
-    // Get current render style
-    public RenderStyle getRenderStyle() {
-        return renderStyle;
-    }
-    
-    // Cycle through rendering styles: CLASSIC -> REALISTIC -> CLASSIC
-    public void cycleStyle() {
-        this.renderStyle = switch (renderStyle) {
-            case CLASSIC -> RenderStyle.REALISTIC;
-            case REALISTIC -> RenderStyle.CLASSIC;
-        };
-        setChanged();
-        if (level != null && !level.isClientSide) {
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 2);
         }
     }
@@ -189,7 +184,6 @@ public class HologramBlockEntity extends BlockEntity {
         tag.putInt("BlockSize", blockSize);
         tag.putBoolean("TransparentMode", transparentMode);
         tag.putBoolean("RotationEnabled", rotationEnabled);
-        tag.putString("RenderStyle", renderStyle.name());
         tag.putInt("ScanMinX", scanMinX);
         tag.putInt("ScanMaxX", scanMaxX);
         tag.putInt("ScanMinZ", scanMinZ);
@@ -215,14 +209,7 @@ public class HologramBlockEntity extends BlockEntity {
         if (tag.contains("RotationEnabled")) {
             rotationEnabled = tag.getBoolean("RotationEnabled");
         }
-        if (tag.contains("RenderStyle")) {
-            try {
-                renderStyle = RenderStyle.valueOf(tag.getString("RenderStyle"));
-            } catch (IllegalArgumentException e) {
-                renderStyle = DEFAULT_STYLE;
-            }
-        }
-        
+
         // Load bounds if present
         boolean hasBounds = tag.contains("ScanMinX") && tag.contains("ScanMaxX") && 
                            tag.contains("ScanMinZ") && tag.contains("ScanMaxZ");
@@ -243,6 +230,7 @@ public class HologramBlockEntity extends BlockEntity {
             } else {
                 // Bounds are correct but clear cached terrain to ensure rescan with new bounds
                 cachedTerrain = null;
+                cachedMesh = null;
                 needsRescan = true;
             }
         } else {
@@ -259,7 +247,6 @@ public class HologramBlockEntity extends BlockEntity {
         tag.putInt("BlockSize", blockSize);
         tag.putBoolean("TransparentMode", transparentMode);
         tag.putBoolean("RotationEnabled", rotationEnabled);
-        tag.putString("RenderStyle", renderStyle.name());
         tag.putInt("ScanMinX", scanMinX);
         tag.putInt("ScanMaxX", scanMaxX);
         tag.putInt("ScanMinZ", scanMinZ);
